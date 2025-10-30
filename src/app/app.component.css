@@ -1,0 +1,87 @@
+/* ---------------------------------------------------------------- */
+/* Styles Globaux et Reset de Base */
+/* ---------------------------------------------------------------- */
+:root {
+    --primary-color: #007bff; /* Bleu principal, ou votre couleur E.M.E.S */
+    --accent-color: #ff5722;  /* Couleur d'accentuation pour les boutons */
+    --background-dark: #121212;
+    --background-light: #f4f4f4;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------- */
+/* Styles de la LANDING PAGE (Inspiré de Codepen) */
+/* ---------------------------------------------------------------- */
+.landing-page-container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* Fond sombre pour un effet cinématique (similaire au Codepen) */
+    background: linear-gradient(135deg, var(--background-dark) 0%, #1a1a1a 100%);
+    color: white;
+    overflow: hidden; /* Empêche le défilement */
+    position: relative;
+    transition: all 0.5s ease-in-out;
+}
+
+.landing-content {
+    z-index: 10;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.landing-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    /* Effet néon ou contrasté */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.landing-content p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #ccc;
+}
+
+.video-placeholder {
+    height: 300px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px dashed #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-radius: 10px;
+    font-style: italic;
+    color: #888;
+}
+
+.enter-button {
+    padding: 15px 40px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.enter-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.6);
+}

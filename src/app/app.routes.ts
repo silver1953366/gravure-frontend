@@ -3,6 +3,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 
+
 // NOTE : Nous supposons que l'Estimation sera une page/route accessible DEPUIS le Dashboard,
 // ou qu'elle sera intégrée à celui-ci (ex: /dashboard/estimation).
 
@@ -28,8 +29,5 @@ export const routes: Routes = [
     component: DashboardComponent,
     title: 'E.M.E.S - Tableau de Bord'
     // Ici, vous ajouteriez l'AuthGuard: canActivate: [AuthGuard]
-  },
-  
-  // 4. Gestion des routes non trouvées (erreur 404)
-  { path: '**', redirectTo: 'login' }
+  }
 ];

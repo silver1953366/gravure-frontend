@@ -1,0 +1,137 @@
+/* --- Variables de Design --- */
+:host {
+    /* Couleurs (Simulant le thème Clair/Sombre) */
+    --color-footer-bg: #f3f4f6; /* bg-gray-100 */
+    --color-footer-text: #4b5563; /* text-gray-700 */
+    --color-footer-border: #e5e7eb; /* border-gray-200 */
+    --color-logo-blue: #2563eb; /* text-blue-600 */
+    --color-link-hover: var(--color-logo-blue);
+
+    /* Espace et Typographie */
+    --max-width: 1280px; /* max-w-7xl */
+    --padding-x: 1.5rem; /* px-6 */
+    --padding-y: 2.5rem; /* py-10 */
+    --margin-top: 2.5rem; /* mt-10 */
+    
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Thème Sombre (à appliquer via une classe 'dark' sur <html> ou <body>) --- */
+/* Si votre composant est dans le shadow DOM, utilisez :host-context(.dark) */
+:host-context(.dark) {
+    --color-footer-bg: #1f2937; /* dark:bg-gray-800, ou dark:bg-gray-900 selon le choix */
+    --color-footer-text: #d1d5db; /* dark:text-gray-300 */
+    --color-footer-border: #374151; /* dark:border-gray-700 */
+}
+
+/* --- 1. Conteneur Global et Animation --- */
+.footer-full-wrapper {
+    width: 100%;
+    background-color: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    border-top: 1px solid var(--color-footer-border);
+    margin-top: var(--margin-top);
+    transition: background-color 0.3s, color 0.3s;
+    
+    /* Animation d'apparition */
+    animation: fadeInUp 0.5s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 2. Conteneur de Grille (Remplacement de max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8) --- */
+.footer-grid-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--padding-y) var(--padding-x);
+    
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* Mobile: 1 colonne */
+    gap: 2rem; /* gap-8 */
+}
+
+/* Grille sur Tablette/Desktop (md:grid-cols-4) */
+@media (min-width: 768px) {
+    .footer-grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* --- 3. Styles des Éléments --- */
+
+.footer-logo {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700; /* font-bold */
+    color: var(--color-logo-blue);
+    margin-bottom: 0.75rem; /* mb-3 */
+}
+
+.footer-description {
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.6; /* leading-relaxed */
+}
+
+.footer-heading {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600; /* font-semibold */
+    margin-bottom: 0.75rem; /* mb-3 */
+}
+
+.footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* space-y-2 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+.footer-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.footer-link:hover {
+    color: var(--color-link-hover);
+}
+
+/* --- 4. Section Sociale --- */
+
+.social-links-container {
+    display: flex;
+    gap: 1rem; /* space-x-4 */
+    margin-top: 1rem; /* mt-4 */
+    font-size: 1.125rem; /* text-lg */
+}
+
+.social-icon {
+    color: inherit;
+    transition: color 0.2s;
+}
+.social-icon:hover {
+    /* Remplacez par les couleurs spécifiques des marques */
+    opacity: 0.8;
+}
+.facebook:hover { color: #1877f2; }
+.twitter:hover { color: #1da1f2; }
+.instagram:hover { color: #e1306c; }
+.linkedin:hover { color: #0a66c2; }
+
+/* Contact Icons */
+.contact-icon {
+    color: var(--color-logo-blue);
+    margin-right: 0.5rem; /* mr-2 */
+}
+
+/* --- 5. Barre de Copyright Inférieure --- */
+.footer-copyright-bar {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem var(--padding-x);
+    text-align: center;
+    font-size: 0.75rem; /* text-xs ou sm */
+    color: var(--color-footer-text);
+}

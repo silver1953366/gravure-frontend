@@ -1,1 +1,16 @@
-<router-outlet><p></p></router-outlet>
+<div class="app-layout">
+  
+  <app-sidebar></app-sidebar> 
+
+  <main class="app-main-content">
+    
+    <app-navbar></app-navbar> 
+    
+    <div class="page-content-wrapper">
+                <router-outlet></router-outlet>
+    </div>
+
+        <app-footer></app-footer>
+
+  </main>
+</div>

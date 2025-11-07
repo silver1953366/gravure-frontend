@@ -1,0 +1,28 @@
+<aside class="sidebar-wrapper">
+  
+  <div class="sidebar-section">
+    <div class="sidebar-logo-container">
+      <img src="assets/logo.png" alt="Logo" class="sidebar-logo-img" />
+      <span class="sidebar-logo-text">E.M.E.S</span>
+    </div>
+
+    <nav class="sidebar-nav-container">
+      <a
+        *ngFor="let link of navLinks"
+        [routerLink]="link.path"
+        routerLinkActive="active-link"
+        class="nav-link"
+      >
+        <i class="fa-solid nav-icon" [ngClass]="link.icon"></i>
+        <span class="nav-label">{{ link.label }}</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer-section">
+    <button class="logout-button">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Déconnexion</span>
+    </button>
+  </div>
+</aside>

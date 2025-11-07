@@ -1,0 +1,53 @@
+<nav class="navbar-wrapper">
+  <div class="navbar-content-container">
+    
+    <div class="navbar-left-section">
+      <button
+        class="toggle-sidebar-button"
+        (click)="onToggleSidebar()"
+      >
+        <i class="fa-solid fa-bars icon-lg"></i>
+      </button>
+
+      <a routerLink="/" class="navbar-logo-link">
+        <img src="assets/logo.png" alt="Logo" class="navbar-logo-img" />
+        <span class="navbar-logo-text">E.M.E.S Gravure</span>
+      </a>
+    </div>
+
+    <ul class="navbar-main-nav">
+      <li *ngFor="let link of [
+        { path: '/client/catalog', label: 'Catalogue' },
+        { path: '/client/configurator', label: 'Personnalisation' },
+        { path: '/client/preview', label: 'Aperçu' },
+        { path: '/client/quotes', label: 'Devis' },
+        { path: '/login', label: 'Connexion' }
+      ]">
+        <a [routerLink]="link.path" class="nav-link-item">
+          {{ link.label }}
+        </a>
+      </li>
+    </ul>
+
+    <div class="navbar-actions-section">
+      
+      <button
+        (click)="toggleDarkMode()"
+        class="action-button theme-toggle-button"
+      >
+        <i
+          class="fa-solid"
+          [ngClass]="isDarkMode ? 'fa-sun icon-sun' : 'fa-moon icon-moon'"
+        ></i>
+      </button>
+
+      <button
+        routerLink="/client/orders"
+        class="action-button cart-button"
+      >
+        <i class="fa-solid fa-cart-shopping icon-lg"></i>
+        <span class="cart-count-badge">3</span>
+      </button>
+    </div>
+  </div>
+</nav>

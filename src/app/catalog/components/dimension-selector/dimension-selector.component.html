@@ -1,1 +1,25 @@
-<p>dimension-selector works!</p>
+<div class="selector-container">
+  <h3 class="selector-title">3. Dimensions (en mm)</h3>
+  <div class="dimension-grid">
+    
+    <div class="input-field">
+      <label class="label-style">Longueur</label>
+      <input type="number" [(ngModel)]="length" placeholder="Ex: 1200"
+             class="input-style">
+    </div>
+
+    <div class="input-field">
+      <label class="label-style">Largeur</label>
+      <input type="number" [(ngModel)]="width" placeholder="Ex: 800"
+             class="input-style">
+    </div>
+
+    <div class="input-field">
+      <label class="label-style">Épaisseur</label>
+      <input type="number" [(ngModel)]="thickness" placeholder="Ex: 5"
+             class="input-style">
+    </div>
+
+  </div>
+  <p class="error-message" *ngIf="isInvalid">Veuillez entrer des dimensions valides (doit être > 0).</p>
+</div>

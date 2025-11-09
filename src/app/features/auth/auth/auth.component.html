@@ -1,0 +1,128 @@
+<div class="container" [class.sign-up-mode]="isSignUpMode">
+  <div class="forms-container">
+    <div class="signin-signup">
+
+      <form (ngSubmit)="onLoginSubmit()" class="sign-in-form">
+        <h2 class="title">Connexion</h2>
+
+        <div *ngIf="isSubmitting && !isSignUpMode" class="info-message">
+          Vérification en cours...
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input 
+            type="text" 
+            placeholder="Nom d'utilisateur" 
+            [(ngModel)]="loginData.username" 
+            name="loginUsername" 
+            required 
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            placeholder="Mot de passe" 
+            [(ngModel)]="loginData.password" 
+            name="loginPassword" 
+            required 
+          />
+        </div>
+
+        <a routerLink="/forgot-password" class="forgot-password">Mot de passe oublié ?</a>
+
+        <button type="submit" [disabled]="isSubmitting" class="btn solid">
+          {{ isSubmitting ? 'Connexion en cours...' : 'Connexion' }}
+        </button>
+
+        <p class="social-text">Ou connectez-vous avec les plateformes sociales</p>
+        <div class="social-media">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-google"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </form>
+
+      <form (ngSubmit)="onRegisterSubmit()" class="sign-up-form">
+        <h2 class="title">Inscription</h2>
+
+        <div *ngIf="isSubmitting && isSignUpMode" class="info-message">
+          Traitement de l'inscription...
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input 
+            type="text" 
+            placeholder="Nom d'utilisateur" 
+            [(ngModel)]="registerData.username" 
+            name="registerUsername" 
+            required 
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-envelope"></i>
+          <input 
+            type="email" 
+            placeholder="E-mail" 
+            [(ngModel)]="registerData.email" 
+            name="registerEmail" 
+            required 
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            placeholder="Mot de passe" 
+            [(ngModel)]="registerData.password" 
+            name="registerPassword" 
+            required 
+          />
+        </div>
+
+        <button type="submit" [disabled]="isSubmitting" class="btn">
+          {{ isSubmitting ? 'Inscription en cours...' : 'Inscrivez-vous' }}
+        </button>
+
+        <p class="social-text">Ou inscrivez-vous avec les plateformes sociales</p>
+        <div class="social-media">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-google"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <div class="panels-container">
+
+    <div class="panel left-panel">
+      <div class="content">
+        <h3>Nouveau ici ?</h3>
+        <p>Créez un compte pour rejoindre la communauté !</p>
+        <button (click)="navigateToRegister()" class="btn transparent" id="sign-up-btn">
+          Inscription
+        </button>
+      </div>
+    </div>
+
+    <div class="panel right-panel">
+      <div class="content">
+        <h3>Déjà un compte ?</h3>
+        <p>Connectez-vous pour continuer votre aventure.</p>
+        <button (click)="navigateToLogin()" class="btn transparent" id="sign-in-btn">
+          Connexion
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

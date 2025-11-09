@@ -1,29 +1,12 @@
-<section
-  class="flex flex-col items-center justify-center min-h-screen text-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200"
-  data-aos="fade-up"
->
-  <h1 class="text-[6rem] md:text-[8rem] font-extrabold text-blue-600 dark:text-blue-400 animate-bounce">
-    404
-  </h1>
-
-  <h2 class="text-2xl md:text-3xl font-semibold mt-2">
-    Oups ! Page introuvable 😢
-  </h2>
-
-  <p class="mt-3 text-gray-500 dark:text-gray-400 max-w-md">
-    Il semble que la page que vous cherchez n’existe pas ou a été déplacée.
-  </p>
-
-  <a
-    routerLink="/"
-    class="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all duration-300 hover:scale-105"
-  >
-    ⬅ Retour à l’accueil
-  </a>
-
-  <img
-    src="src/app/assets/images/283328-P6EPD4-346.jpg"
-    alt="Page non trouvée"
-    class="mt-10 w-72 md:w-96 animate-float"
-  />
-</section>
+<div class="not-found-container">
+  <div class="content-box">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Page Introuvable</h2>
+    <p class="error-message">
+      Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+    </p>
+    <a routerLink="/" class="home-button">
+      Retour à l'accueil
+    </a>
+  </div>
+</div>

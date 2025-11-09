@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-price-display',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, CurrencyPipe],
   templateUrl: './price-display.component.html',
-  styleUrl: './price-display.component.css'
+  styleUrls: ['./price-display.component.css']
 })
 export class PriceDisplayComponent {
-
+  // Le prix réel proviendrait d'un service après calcul
+  @Input() price: number = 895.50; 
 }

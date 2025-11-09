@@ -10,19 +10,13 @@
       </button>
 
       <a routerLink="/" class="navbar-logo-link">
-        <img src="assets/logo.png" alt="Logo" class="navbar-logo-img" />
+        <img src="src/app/assets/images/283328-P6EPD4-346.jpg" alt="Logo" class="navbar-logo-img" />
         <span class="navbar-logo-text">E.M.E.S Gravure</span>
       </a>
     </div>
 
     <ul class="navbar-main-nav">
-      <li *ngFor="let link of [
-        { path: '/client/catalog', label: 'Catalogue' },
-        { path: '/client/configurator', label: 'Personnalisation' },
-        { path: '/client/preview', label: 'Aperçu' },
-        { path: '/client/quotes', label: 'Devis' },
-        { path: '/login', label: 'Connexion' }
-      ]">
+      <li *ngFor="let link of mainNavLinks">
         <a [routerLink]="link.path" class="nav-link-item">
           {{ link.label }}
         </a>
@@ -34,6 +28,7 @@
       <button
         (click)="toggleDarkMode()"
         class="action-button theme-toggle-button"
+        aria-label="Toggle Dark Mode"
       >
         <i
           class="fa-solid"
@@ -44,10 +39,20 @@
       <button
         routerLink="/client/orders"
         class="action-button cart-button"
+        aria-label="Voir les commandes"
       >
         <i class="fa-solid fa-cart-shopping icon-lg"></i>
         <span class="cart-count-badge">3</span>
       </button>
+
+      <button
+        routerLink="/client/profile"
+        class="action-button profile-button"
+        title="Accéder au profil"
+      >
+        <i class="fa-solid fa-user-circle icon-lg"></i>
+      </button>
+
     </div>
   </div>
 </nav>

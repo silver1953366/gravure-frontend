@@ -1,1 +1,35 @@
-<p>configuration works!</p>
+<div class="config-page">
+  <h1 class="page-header">Configuration de Produit</h1>
+  
+  <div class="config-grid">
+    
+    <div class="controls-panel">
+      
+      <app-shape-selector></app-shape-selector>
+      <hr class="separator">
+      
+      <app-material-selector></app-material-selector>
+      <hr class="separator">
+      
+      <app-dimension-selector></app-dimension-selector>
+    </div>
+    
+    <div class="visualization-panel">
+      
+      <div class="visual-block">
+        <p class="visual-placeholder">Zone de Visualisation 3D (Future)</p>
+      </div>
+      
+      <div class="price-action-block">
+        <app-price-display></app-price-display>
+        
+        <button class="action-button primary">
+          Ajouter au Devis
+        </button>
+        <a routerLink="/catalog/preview" class="action-button secondary">
+          Voir la Simulation Détaillée
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

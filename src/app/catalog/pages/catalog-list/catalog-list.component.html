@@ -1,1 +1,16 @@
-<p>catalog-list works!</p>
+<div class="page-container">
+  <h1 class="page-title">Catalogue des Produits (Liste)</h1>
+  <p class="page-description">
+    Bienvenue dans notre catalogue. Sélectionnez un matériau ou une catégorie pour commencer votre personnalisation.
+  </p>
+  
+  <div class="card-grid">
+    <div *ngFor="let item of products" class="product-card">
+      <h2 class="card-title">Produit {{ item }}</h2>
+      <p class="card-text">Description courte du produit.</p>
+      <a routerLink="/catalog/configurator" class="config-button">
+        Configurer
+      </a>
+    </div>
+  </div>
+</div>

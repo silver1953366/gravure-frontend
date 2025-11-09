@@ -1,1 +1,7 @@
-<p>material-selector works!</p>
+<div class="selector-container">
+  <h3 class="selector-title">2. Sélection du Matériau</h3>
+  <select [(ngModel)]="selectedMaterial" class="input-style">
+    <option [ngValue]="null" disabled>-- Choisir un matériau --</option>
+    <option *ngFor="let material of materials" [ngValue]="material.id">{{ material.name }}</option>
+  </select>
+</div>

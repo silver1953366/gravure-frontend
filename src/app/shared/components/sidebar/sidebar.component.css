@@ -1,6 +1,6 @@
-/* --- Variables de Design (Reproduction des couleurs et espacements Tailwind) --- */
+/* --- Variables de Design --- */
 :host {
-    /* Couleurs de la sidebar */
+    /* Couleurs mode CLAIR */
     --sidebar-width: 16rem; /* 256px */
     --color-sidebar-bg: white;
     --color-border: #e5e7eb; /* gray-200 */
@@ -10,129 +10,167 @@
     --color-link-hover-text: #2563eb;
     --color-logout-bg: #dc2626; /* red-600 */
     --color-logout-hover-bg: #b91c1c; /* red-700 */
-
+    --color-close-button: #9ca3af; /* gray-400 */
+    
     /* Espacement */
     --space-sm: 0.5rem; /* p-2 */
     --space-md: 1rem;   /* p-4 */
     --space-lg: 2rem;   /* mb-8 */
 }
 
-/* --- 1. Conteneur Principal (Remplacement de h-screen sticky top-0 left-0 ...) --- */
+/* ========================================================== */
+/* 🌙 DARK MODE STYLES */
+/* ========================================================== */
+html.dark :host {
+    --color-sidebar-bg: #1f2937; /* gray-800 */
+    --color-border: #374151; /* gray-700 */
+    --color-link-default: #d1d5db; /* gray-300 */
+    --color-link-hover-bg: #374151; /* gray-700 */
+    --color-link-hover-text: #60a5fa; /* blue-400 */
+    --color-close-button: #9ca3af; /* gray-400 */
+}
+
+
+/* --- 1. Conteneur Principal de la Sidebar --- */
 .sidebar-wrapper {
-    /* h-screen sticky top-0 left-0 */
     height: 100vh;
-    position: sticky;
+    position: fixed; /* Fixé pour l'accessibilité mobile */
     top: 0;
     left: 0;
+    z-index: 1000; /* Très haut pour être au-dessus de la navbar */
 
-    /* flex flex-col justify-between */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
-    /* p-4 bg-white border-r border-gray-200 shadow-lg */
     width: var(--sidebar-width);
     padding: var(--space-md);
     background-color: var(--color-sidebar-bg);
     border-right: 1px solid var(--color-border);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     
-    /* transition-all duration-300 */
-    transition: all 0.3s ease-in-out;
+    /* Animation de transition */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* ease-out */
+    transform: translateX(0); /* Par défaut visible sur Desktop */
+    
     font-family: 'Inter', sans-serif;
-    animation: fadeInLeft 0.4s ease-in-out;
 }
 
-@keyframes fadeInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* --- Overlay de masquage (pour mobile/tablette) --- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; 
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease-in-out;
 }
 
-/* --- 2. Logo et Header (Remplacement de flex items-center space-x-2 mb-8) --- */
+.sidebar-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* --- 2. Logo et Header --- */
 .sidebar-logo-container {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* space-x-2 */
-    margin-bottom: var(--space-lg); /* mb-8 */
+    justify-content: space-between;
+    gap: 0.5rem; 
+    margin-bottom: var(--space-lg); 
 }
 .sidebar-logo-img {
-    height: 2rem; /* h-8 */
-    width: 2rem;  /* w-8 */
+    height: 2rem; 
+    width: 2rem; 
     object-fit: contain;
 }
 .sidebar-logo-text {
     font-weight: 600;
-    font-size: 1.125rem; /* text-lg */
+    font-size: 1.125rem; 
+    color: var(--color-logo-blue);
+    margin-right: auto; /* Pousse le bouton de fermeture à droite */
+}
+
+/* Bouton de fermeture sur Mobile */
+.close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-close-button);
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+.close-button:hover {
     color: var(--color-logo-blue);
 }
 
-/* --- 3. Navigation (Remplacement de flex flex-col space-y-2) --- */
+
+/* --- 3. Navigation --- */
 .sidebar-nav-container {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; /* space-y-2 */
+    gap: 0.5rem; 
 }
 .nav-link {
-    /* flex items-center space-x-3 p-2 rounded-lg */
     display: flex;
     align-items: center;
-    gap: 0.75rem; /* space-x-3 */
+    gap: 0.75rem; 
     padding: var(--space-sm);
-    border-radius: 0.5rem; /* rounded-lg */
+    border-radius: 0.5rem; 
     
-    /* Couleurs et transition */
     color: var(--color-link-default);
     text-decoration: none;
     font-weight: 500;
     transition: all 0.2s;
 }
 .nav-link:hover {
-    /* hover:bg-blue-50 hover:text-blue-600 */
     background-color: var(--color-link-hover-bg);
     color: var(--color-link-hover-text);
 }
 
-/* Lien actif (CSS initial) */
+/* Lien actif */
 .active-link {
     background-color: var(--color-logo-blue);
     color: white !important;
-    font-weight: 600; /* Ajouté pour l'emphase */
+    font-weight: 600; 
 }
 .active-link .nav-icon {
     color: white !important;
 }
+
+/* Gestion des icônes */
 .nav-icon {
-    /* Fixe la couleur de l'icône, souvent nécessaire avec FontAwesome */
     color: var(--color-link-default); 
+    font-size: 1.1rem;
 }
 .nav-link:hover .nav-icon {
     color: var(--color-link-hover-text); 
 }
+.active-link:hover .nav-icon {
+    color: white !important;
+}
 
-
-/* --- 4. Footer et Déconnexion (Remplacement de pt-4 border-t border-gray-200) --- */
+/* --- 4. Footer et Déconnexion --- */
 .sidebar-footer-section {
-    padding-top: var(--space-md); /* pt-4 */
+    padding-top: var(--space-md); 
     border-top: 1px solid var(--color-border);
 }
 .logout-button {
-    /* w-full flex items-center justify-center space-x-2 p-2 rounded-lg */
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem; /* space-x-2 */
+    gap: 0.5rem; 
     padding: var(--space-sm);
     border-radius: 0.5rem;
     border: none;
     
-    /* bg-red-600 text-white transition font-semibold */
     background-color: var(--color-logout-bg);
     color: white;
     font-weight: 600;
@@ -145,10 +183,27 @@
 
 
 /* --- 5. Responsivité (Mobile/Tablette) --- */
-@media (max-width: 1024px) { 
+@media (min-width: 1025px) {
+    /* Sur desktop/grand écran, la sidebar est par défaut visible et fixe */
     .sidebar-wrapper {
-        /* Masquez la sidebar sur les petits écrans. 
-           Si vous souhaitez un menu hamburger, cette classe sera retirée/ajoutée via JavaScript/TypeScript */
-        display: none; 
+        position: sticky;
+        transform: translateX(0) !important;
+        /* Le close-button n'est pas nécessaire ici */
+    }
+    .close-button {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) { 
+    /* Sur mobile/tablette, la sidebar est masquée par défaut */
+    .sidebar-wrapper {
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+        transform: translateX(calc(var(--sidebar-width) * -1)); /* Déplacé hors de l'écran */
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    /* Quand elle est ouverte, elle revient en place */
+    .sidebar-wrapper.is-open {
+        transform: translateX(0);
     }
 }

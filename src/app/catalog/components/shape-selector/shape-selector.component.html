@@ -1,1 +1,11 @@
-<p>shape-selector works!</p>
+<div class="selector-container">
+  <h3 class="selector-title">1. Sélection de la Forme</h3>
+  <div class="button-list">
+    <button *ngFor="let shape of shapes" (click)="selectShape(shape)" 
+            [class.selected]="selectedShape === shape.name"
+            class="shape-btn">
+      <i [class]="shape.icon" class="icon-style"></i>
+      <span>{{ shape.name }}</span>
+    </button>
+  </div>
+</div>

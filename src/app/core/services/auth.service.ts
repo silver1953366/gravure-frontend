@@ -1,82 +1,97 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map } from 'rxjs';
-
-// Le rôle idéal pour l'interface de l'utilisateur (à mettre dans user.model.ts)
-export type UserRole = 'admin' | 'controller' | 'client';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-  // Autres champs...
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // Simule l'utilisateur connecté (pour les composants qui y souscrivent)
-  private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser: Observable<User | null>;
+  private readonly API_BASE_URL = environment.apiUrl || 'http://localhost:8000/api'; 
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_ROLE_KEY = 'user_role';
 
-  private apiUrl = '/api'; // URL de base de votre API Laravel
+  constructor(private http: HttpClient, private router: Router) { }
 
-  constructor(private http: HttpClient, private router: Router) {
-    // Tente de charger les données stockées au démarrage
-    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    this.currentUserSubject = new BehaviorSubject<User | null>(user);
-    this.currentUser = this.currentUserSubject.asObservable();
-  }
-
-  // Utilisé par le RoleGuard pour une vérification synchrone
-  public get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
-  }
-  
-  // LOGIQUE DE CONNEXION (Exemple pour POST /api/login)
-  login(credentials: any): Observable<User> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
-      map(response => {
-        const user: User = response.user;
-        const token: string = response.token; 
-        
-        // Stockage sécurisé dans le local storage (pour persistance)
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        this.currentUserSubject.next(user);
-        return user;
+  /**
+   * Envoie les identifiants à l'API pour connexion.
+   * La réponse contient le jeton d'accès et le rôle de l'utilisateur.
+   */
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.API_BASE_URL}/login`, credentials).pipe(
+      tap((response: any) => {
+        // 1. Stockage du jeton (Token)
+        this.setToken(response.access_token);
+        // 2. Stockage du rôle pour la gestion des permissions/redirection
+        this.setUserRole(response.role); 
       })
     );
   }
 
-  // LOGIQUE DE DÉCONNEXION
-  logout(): void {
-    // Appel API pour révoquer le token (bonne pratique)
-    this.http.post(`${this.apiUrl}/logout`, {}).subscribe({
-      next: () => this.performLocalLogout(),
-      error: () => this.performLocalLogout() // Déconnexion locale même en cas d'échec API
-    });
-  }
-  
-  private performLocalLogout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
-  }
-  
-  // VÉRIFICATION D'AUTHENTIFICATION (pour AuthGuard et Interceptor)
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('authToken');
+  /**
+   * Stocke le jeton dans le navigateur.
+   */
+  private setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  // RÉCUPÉRATION DU RÔLE ACTUEL (pour RoleGuard)
-  getUserRole(): UserRole | null {
-    const user = this.currentUserValue;
-    return user ? user.role : null;
+  /**
+   * Stocke le rôle dans le navigateur.
+   */
+  private setUserRole(role: string): void {
+    localStorage.setItem(this.USER_ROLE_KEY, role);
+  }
+
+  /**
+   * Récupère le jeton stocké.
+   */
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+  
+  /**
+   * Récupère le rôle stocké.
+   */
+  getUserRole(): string | null {
+    return localStorage.getItem(this.USER_ROLE_KEY);
+  }
+
+  /**
+   * Vérifie si l'utilisateur est connecté (présence du jeton).
+   */
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+  
+  /**
+   * Déconnexion: supprime le jeton et le rôle, puis redirige vers la page de connexion.
+   */
+  logout(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_ROLE_KEY);
+
+    // Optionnel: informer le Backend de la révocation
+    this.http.post(`${this.API_BASE_URL}/logout`, {}).subscribe({
+      next: () => console.log('Déconnexion Backend OK'),
+      error: (err) => console.error('Erreur Déconnexion Backend', err)
+    });
+    this.router.navigate(['/login']);
+  }
+
+  /**
+   * Vérifie le rôle pour l'autorisation (RBAC)
+   */
+  hasRole(requiredRole: string): boolean {
+    const userRole = this.getUserRole();
+    if (!userRole) {
+      return false;
+    }
+
+    // L'Admin est généralement autorisé à faire tout ce que fait le Contrôleur
+    if (requiredRole === 'controller') {
+        return userRole === 'admin' || userRole === 'controller';
+    }
+    return userRole === requiredRole;
   }
 }

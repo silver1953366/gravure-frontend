@@ -1,0 +1,21 @@
+.price-box {
+  text-align: center;
+  padding: 16px;
+}
+.label {
+  font-size: 16px;
+  color: #374151; 
+  font-weight: 500;
+}
+.price-value {
+  font-size: 40px; 
+  font-weight: 800;
+  color: #16a34a; 
+  margin-top: 4px;
+  line-height: 1.2;
+}
+.disclaimer {
+  font-size: 12px;
+  color: #6b7280; 
+  margin-top: 8px;
+}

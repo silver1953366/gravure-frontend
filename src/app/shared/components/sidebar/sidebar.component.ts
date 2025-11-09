@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -9,13 +9,38 @@ import { RouterModule } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
 
+  // 📥 Propriété d'entrée pour déterminer si la sidebar est ouverte (contrôlée par le composant parent)
+  @Input() isOpen: boolean = false; 
   
-  // Exemple : on pourrait récupérer dynamiquement le rôle depuis un service Auth plus tard
-  userRole: 'admin' | 'controller' | 'client' = 'client';
+  // 📤 Événement de sortie pour demander la fermeture (e.g., clic sur le fond ou un lien)
+  @Output() closeSidebar = new EventEmitter<void>();
 
-  // Permet de déterminer dynamiquement les liens affichés selon le rôle
+  // Rôle de l'utilisateur pour la démo
+  userRole: 'admin' | 'controller' | 'client' = 'client';
+  isDarkMode: boolean = false;
+
+  ngOnInit(): void {
+    // Vérifie l'état initial du mode sombre du document
+    this.isDarkMode = document.documentElement.classList.contains('dark');
+  }
+
+  // 📜 Gère la logique de navigation en fermant la sidebar après un clic de lien (utile pour mobile)
+  onLinkClick(): void {
+    this.closeSidebar.emit();
+  }
+
+  // 🔒 Fonction de déconnexion simulée
+  onLogout(): void {
+    // Ici, vous ajouteriez la logique d'appel au service d'authentification pour la déconnexion
+    console.log('Déconnexion simulée...');
+    // Redirection vers la page de connexion après la déconnexion
+    // Note: Vous devriez utiliser le Router ici pour une vraie navigation, mais la simulation suffit pour le moment.
+    this.closeSidebar.emit();
+  }
+  
+  // 🔗 Détermine dynamiquement les liens affichés selon le rôle
   get navLinks() {
     switch (this.userRole) {
       case 'admin':
@@ -38,11 +63,12 @@ export class SidebarComponent {
           { path: '/controller/notifications', icon: 'fa-bell', label: 'Notifications' },
         ];
 
-      default: // client
+      default: // client ou utilisateur non authentifié
         return [
-          { path: '/client/catalog', icon: 'fa-store', label: 'Catalogue' },
-          { path: '/client/configurator', icon: 'fa-pen-ruler', label: 'Personnalisation' },
-          { path: '/client/preview', icon: 'fa-eye', label: 'Aperçu' },
+          // Liens publics simplifiés, utilisez des chemins sans préfixe client/admin pour la clarté des exemples
+          { path: '/catalog', icon: 'fa-store', label: 'Catalogue' }, 
+          { path: '/configurator', icon: 'fa-pen-ruler', label: 'Personnalisation' },
+          { path: '/preview', icon: 'fa-eye', label: 'Aperçu' },
           { path: '/client/quotes', icon: 'fa-file-invoice', label: 'Mes devis' },
           { path: '/client/orders', icon: 'fa-bag-shopping', label: 'Commandes' },
           { path: '/client/favorites', icon: 'fa-heart', label: 'Favoris' },

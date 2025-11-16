@@ -1,0 +1,160 @@
+:host {
+    --sidebar-width: 16rem; /* Plus compact que l'Admin ou le Catalogue */
+    --color-primary: #10b981; /* Vert, couleur distincte pour le client */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f3f4f6;
+    --color-text-default: #1f2937;
+    display: block;
+}
+
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--sidebar-width);
+    background-color: var(--color-bg-primary);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 900;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sur les grands écrans, la barre est visible, transformée par le conteneur parent */
+@media (min-width: 1025px) {
+    .sidebar-container {
+        transform: translateX(0); /* Toujours visible sur desktop */
+        position: sticky; 
+        top: 0;
+        height: 100vh;
+    }
+}
+
+.sidebar-container.open {
+    transform: translateX(0); /* Force l'ouverture sur mobile */
+}
+
+/* --- En-tête --- */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-logo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-default);
+    display: block;
+}
+@media (min-width: 1025px) {
+    .close-button {
+        display: none; /* Caché sur desktop car la barre est toujours visible */
+    }
+}
+
+/* --- Navigation --- */
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: var(--color-text-default);
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.nav-link:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-primary);
+}
+
+.nav-link.active {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+    border-left-color: var(--color-primary); /* Pas visible car BG est la couleur */
+}
+.nav-link.active .nav-icon {
+    color: white;
+}
+
+.nav-icon {
+    width: 1.5rem;
+    text-align: center;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* --- Pied de Page --- */
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.logout-button {
+    width: 100%;
+    background-color: #fca5a5; /* Rouge clair pour la déconnexion */
+    color: #991b1b;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #ef4444; /* Rouge plus foncé */
+    color: white;
+}
+
+/* --- Overlay --- */
+.sidebar-overlay {
+    /* Style identique à celui du catalogue pour l'overlay mobile */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 899;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+
+.sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (min-width: 1025px) {
+    .sidebar-overlay {
+        display: none;
+    }
+}

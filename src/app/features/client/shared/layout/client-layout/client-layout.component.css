@@ -1,0 +1,152 @@
+/* Variables du Layout Client (basé sur le thème clair du dashboard) */
+:host {
+    --color-white: #ffffff;
+    --color-primary-dark: #11121C;
+    --color-primary-accent: #2F80ED;
+    --color-text-dim: #94a3b8;
+    --color-border: #e2e8f0;
+    --sidebar-width-lg: 16rem; /* Largeur standard pour desktop */
+    --layout-transition: all 0.3s ease-in-out;
+}
+
+/* 1. Shell global */
+.client-app-shell {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-background, #f1f5f9);
+}
+
+/* 2. Sidebar Host (Navigation) */
+.client-sidebar-host {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: var(--sidebar-width-lg);
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0;
+    transform: translateX(0);
+    transition: var(--layout-transition);
+}
+
+/* Sidebar sur Mobile/Tablette: masquée par défaut */
+@media (max-width: 1023px) {
+    .client-sidebar-host {
+        transform: translateX(calc(-1 * var(--sidebar-width-lg)));
+    }
+    .client-sidebar-host.is-open {
+        transform: translateX(0);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.logo-area {
+    padding: 0 1.5rem 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+.client-nav {
+    flex-grow: 1;
+    padding: 0 1rem;
+}
+.nav-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--color-text-dim);
+    transition: background-color 0.2s, color 0.2s;
+}
+.nav-link:hover {
+    background-color: #f7f7f7;
+    color: var(--color-primary-dark);
+}
+.nav-link.active {
+    background-color: var(--color-primary-accent);
+    color: var(--color-white);
+    font-weight: 600;
+}
+.sidebar-toggle-mobile {
+    display: none; /* Cacher sur desktop */
+}
+
+/* 3. Contenu Principal (Navbar + Router Outlet) */
+.main-content-wrapper {
+    flex-grow: 1;
+    transition: margin-left var(--layout-transition), width var(--layout-transition);
+    width: 100%;
+    margin-left: 0; 
+}
+
+/* Décalage sur Desktop */
+@media (min-width: 1024px) {
+    .main-content-wrapper.pushed {
+        margin-left: var(--sidebar-width-lg);
+        width: calc(100% - var(--sidebar-width-lg)); 
+    }
+}
+
+/* 4. Navbar (Header) */
+.client-navbar-header {
+    position: sticky;
+    top: 0;
+    z-index: 30; 
+    height: 4rem; 
+    background-color: var(--color-white); 
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 1.5rem; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-toggle-desktop {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-dim);
+    transition: color 0.2s;
+}
+.menu-toggle-desktop:hover {
+    color: var(--color-primary-accent);
+}
+@media (max-width: 1023px) {
+    /* Cache le bouton "push" sur mobile car on veut le bouton pour ouvrir */
+    .menu-toggle-desktop {
+        display: none;
+    }
+}
+
+.navbar-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin-right: auto;
+}
+
+.profile-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background-color: var(--color-primary-accent);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 5. Zone de Contenu de la Page (Là où le Dashboard sera affiché) */
+.page-content-area {
+    padding: 1.5rem;
+    max-width: 100%;
+}

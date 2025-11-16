@@ -1,0 +1,44 @@
+<footer class="app-footer">
+    <div class="footer-content">
+        
+        <div class="footer-section brand-info">
+            <div class="app-logo">E.M.E.S.</div>
+            <p class="description">
+                Fabrication et personnalisation de plaques gravées sur mesure, de la conception à la livraison.
+            </p>
+        </div>
+
+        <div class="footer-section">
+            <h3 class="title">L'entreprise</h3>
+            <ul>
+                @for (link of companyLinks; track link.label) {
+                    <li><a [routerLink]="[link.path]">{{ link.label }}</a></li>
+                }
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h3 class="title">Légal</h3>
+            <ul>
+                @for (link of legalLinks; track link.label) {
+                    <li><a [routerLink]="[link.path]">{{ link.label }}</a></li>
+                }
+            </ul>
+        </div>
+        
+        <div class="footer-section contact-info">
+            <h3 class="title">Nous Joindre</h3>
+            <p>Email: gravureplaqueInf&#64;gmail.com</p>
+            <p>Tél: 077 40 22 78</p>
+            <div class="social-icons">
+                <i class="fa-brands fa-facebook-f"></i>
+                <i class="fa-brands fa-linkedin-in"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="copyright">
+        &copy; {{ currentYear }} E.M.E.S. Tous droits réservés.
+    </div>
+</footer>

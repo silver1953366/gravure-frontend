@@ -1,0 +1,180 @@
+<div class="client-layout-container">
+      
+  <div class="content-wrapper" [class.lg-pushed]="isSidebarOpen()"> 
+    
+    <main class="page-main-content">
+      <div class="dashboard-content-wrapper">
+        
+        <h1>Tableau de Bord Client</h1>
+        
+        @if (!isLoading) {
+          <div class="dashboard-grid-layout">
+            
+            <article class="card order-tracker-card">
+              <header class="card-header">
+                <div>
+                  <p class="card-category">Suivi de commande</p>
+                  <h2 class="card-title">{{ latestOrderTracker.title }} · {{ latestOrderTracker.product }}</h2>
+                </div>
+                <span class="order-eta-chip">ETA : {{ latestOrderTracker.eta | date:'dd/MM/yyyy' }}</span>
+              </header>
+              <div class="tracker-body">
+                <div class="timeline-bar-container">
+                  <div class="timeline-progress-bar" [style.width.%]="timelineProgress()"></div>
+                </div>
+                <div class="timeline-stages-grid">
+                  @for (stage of orderStages; track $index) {
+                    <div class="stage-item"
+                         [class.active-stage]="$index <= activeStageIndex()"
+                         [class.current-stage]="$index === activeStageIndex()"
+                         [class.pending-stage]="$index > activeStageIndex()">
+                      <span class="stage-icon">{{ $index + 1 }}</span>
+                      <p class="stage-label">{{ stage.label }}</p>
+                      <p class="stage-details">
+                        <span>{{ stage.details }}</span> 
+                      </p>
+                    </div>
+                  }
+                </div>
+              </div>
+            </article>
+            
+            <article class="card quotes-summary-card">
+              <header class="card-header">
+                <div>
+                  <p class="card-category">Mes derniers devis</p>
+                  <h2 class="card-title-lg">Synthèse rapide</h2>
+                </div>
+                <a href="/client/quotes" class="action-button secondary-action-button">Voir tous les devis</a>
+              </header>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead class="table-header">
+                    <tr>
+                      <th class="text-left">Référence</th>
+                      <th class="text-left">Projet</th>
+                      <th class="text-left">Statut</th>
+                      <th class="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="table-body">
+                    @for (quote of quotes.slice(0, 3); track quote.id) {
+                      <tr>
+                        <td class="ref-cell">{{ quote.id }}</td>
+                        <td class="project-cell">
+                          <p class="project-name">{{ quote.name }}</p>
+                          <p class="project-date">{{ quote.updatedAt | date:'shortDate':'':'fr' }}</p>
+                        </td>
+                        <td class="status-cell">
+                          <span class="status-chip" [ngClass]="statusChipClasses[quote.status]">
+                            <span class="status-dot"></span>
+                            {{ quote.status }}
+                          </span>
+                        </td>
+                        <td class="action-cell">
+                          <button class="action-button primary-action-button">
+                            {{ getQuoteActionText(quote) }}
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                    @if (quotes.length === 0) {
+                      <tr>
+                        <td colspan="4" class="text-center py-4 text-gray-500">Vous n'avez pas encore de devis.</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="card favorites-card">
+              <header class="card-header">
+                <div>
+                  <p class="card-category">Mes favoris produits</p>
+                  <h2 class="card-title-lg">Projets à relancer en un clic</h2>
+                </div>
+                <a href="/client/favorites" class="action-button secondary-action-button">Tout voir</a>
+              </header>
+              <div class="product-grid">
+                
+                @if (isLoadingFavorites()) {
+                  <div class="col-span-full text-center py-4 text-blue-500">
+                    Chargement des favoris...
+                  </div>
+                } @else if (favourites().length === 0) {
+                  <div class="col-span-full text-center py-4 text-gray-500">
+                    Ajoutez des produits à vos favoris pour les reconfigurer rapidement.
+                  </div>
+                } @else {
+                  @for (favorite of favourites().slice(0, 4); track favorite.id) {
+                    <div class="product-item">
+                      <div class="product-image-container">
+                        <img [src]="favorite.image" [alt]="favorite.quote.name" class="product-image" loading="lazy" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/160x120/E0E0E0/333?text=PLQ'"/>
+                        <span class="product-reference-chip">{{ favorite.quote.reference }}</span>
+                      </div>
+                      <div class="product-details">
+                        <div>
+                          <p class="product-name">{{ favorite.quote.name }}</p>
+                          <p class="product-material">{{ favorite.quote.material }}</p>
+                        </div>
+                        <button class="action-button favorite-action-button" (click)="relaunchConfiguration(favorite.quote_id)">
+                          Relancer la configuration
+                          <svg class="icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="m4 2 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </article>
+            
+            <article class="card cart-summary-card dark-card">
+              <header class="card-header">
+                <div>
+                  <p class="card-category">Accès rapide panier</p>
+                  <h2 class="card-title">Finaliser ma commande</h2>
+                </div>
+                <span class="cart-count-chip">{{ cartSummary.items }} devis prêts à convertir</span>
+              </header>
+              <div class="cart-body">
+                <div class="cart-stats-grid">
+                  <div class="stat-box">
+                    <p class="stat-category">Articles</p>
+                    <p class="stat-value">{{ cartSummary.items }}</p>
+                    <p class="stat-details">Total dans votre panier</p>
+                  </div>
+                  <div class="stat-box">
+                    <p class="stat-category">Estimation</p>
+                    <p class="stat-value">
+                      {{ cartSummary.amount | currency:cartSummary.currency:'symbol':'1.0-0':'fr' }}
+                    </p>
+                    <p class="stat-details">Hors taxes · Gravure incluse</p>
+                  </div>
+                  <div class="stat-box">
+                    <p class="stat-category">Conversion</p>
+                    <p class="stat-value">78%</p>
+                    <p class="stat-details">Objectif mensuel atteint</p>
+                  </div>
+                </div>
+                <button class="action-button primary-cta-button">
+                  Finaliser ma commande
+                  <svg class="icon-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="m6 3 4 5-4 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            </article>
+
+          </div>
+        }
+      </div>
+    </main>
+    
+    <p class="contact-email-standalone">Email: contact&#64;gravureplaqueInf.com</p>
+  </div>
+  
+  </div>

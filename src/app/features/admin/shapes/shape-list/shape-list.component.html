@@ -1,0 +1,42 @@
+<div class="shape-management-container">
+    <h2>Gestion des Formes Géométriques</h2>
+
+    <div class="header-actions">
+        <button (click)="onCreateShape()">+ Ajouter une nouvelle forme</button>
+    </div>
+
+    <div *ngIf="isLoading">Chargement des formes...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && shapes.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Slug</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let shape of shapes">
+                <td>{{ shape.id }}</td>
+                <td>{{ shape.name }}</td>
+                <td>{{ shape.slug }}</td>
+                <td>
+                    <span [class]="shape.is_active ? 'status-active' : 'status-inactive'">
+                        {{ shape.is_active ? 'Actif' : 'Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <button (click)="onEditShape(shape.id)">Modifier</button>
+                    <button (click)="onDeleteShape(shape.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && shapes.length === 0 && !error">
+        Aucune forme trouvée.
+    </div>
+</div>

@@ -1,1 +1,109 @@
-<p>pricing works!</p>
+<div class="pricing-container">
+    <h2>Gestion du Catalogue de Prix par Dimension Matériaux</h2>
+    <p>Créez, modifiez ou supprimez les références de prix basées sur la combinaison Matériau, Forme et Catégorie.</p>
+
+    <div *ngIf="error" class="alert-error" [innerHTML]="error"></div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+    <div *ngIf="isLoading" class="loading-message">Chargement des données du catalogue...</div>
+    
+    <div class="form-card" *ngIf="!isLoading">
+        <h3>{{ isEditMode ? 'Modifier l\'Entrée' : 'Ajouter une Nouvelle Entrée' }}</h3>
+        <form [formGroup]="dimensionForm" (ngSubmit)="onSubmit()">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="material_id">Matériau *</label>
+                    <select id="material_id" formControlName="material_id">
+                        <option *ngFor="let m of materials" [value]="m.id">{{ m.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="shape_id">Forme *</label>
+                    <select id="shape_id" formControlName="shape_id">
+                        <option *ngFor="let s of shapes" [value]="s.id">{{ s.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="category_id">Catégorie *</label>
+                    <select id="category_id" formControlName="category_id">
+                        <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dimension_label">Description de la Dimension/Taille *</label>
+                    <input id="dimension_label" type="text" formControlName="dimension_label" placeholder="Ex: 50x50 cm, Grande Plaque">
+                    <small>Doit être unique pour ce Matériau/Forme.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="unit_price_fcfa">Prix Unitaire (FCFA) *</label>
+                    <input id="unit_price_fcfa" type="number" step="0.01" formControlName="unit_price_fcfa" min="0.01">
+                    <small>Prix de base utilisé pour le calcul du devis.</small>
+                </div>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input id="is_active" type="checkbox" formControlName="is_active">
+                <label for="is_active">Article Actif (Disponible pour les devis)</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" [disabled]="dimensionForm.invalid || isSaving" class="btn-save">
+                    {{ isSaving ? 'Sauvegarde en cours...' : (isEditMode ? 'Modifier l\'Entrée' : 'Ajouter au Catalogue') }}
+                </button>
+                <button type="button" (click)="resetForm()" *ngIf="isEditMode" class="btn-cancel">Annuler la Modification</button>
+            </div>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="catalog-list" *ngIf="!isLoading">
+        <h3>Catalogue Actuel ({{ dimensions.length }} Entrée{{ dimensions.length > 1 ? 's' : '' }})</h3>
+        
+        <table *ngIf="dimensions.length > 0; else emptyCatalog">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Matériau</th>
+                    <th>Forme</th>
+                    <th>Catégorie</th>
+                    <th>Label Dimension</th>
+                    <th>Prix Unitaire (FCFA)</th>
+                    <th>Statut</th>
+                    <th>Dernière MAJ</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let dim of dimensions">
+                    <td>{{ dim.id }}</td>
+                    <td>{{ dim.material?.name }}</td>
+                    <td>{{ dim.shape?.name }}</td>
+                    <td>{{ dim.category?.name }}</td>
+                    <td class="label-col">{{ dim.dimension_label }}</td>
+                    <td class="price-col">{{ dim.unit_price_fcfa | number:'1.2-2' }}</td>
+                    <td>
+                        <span [class]="dim.is_active ? 'status-active' : 'status-inactive'">
+                            {{ dim.is_active ? 'Actif' : 'Inactif' }}
+                        </span>
+                    </td>
+                    <td>{{ dim.updated_at | date:'short' }}</td>
+                    <td>
+                        <button (click)="editDimension(dim)" class="btn-edit">Modifier</button>
+                        <button (click)="deleteDimension(dim.id)" class="btn-danger">Supprimer</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <ng-template #emptyCatalog>
+            <div class="alert-info">Le catalogue de prix est actuellement vide. Veuillez ajouter une entrée ci-dessus.</div>
+        </ng-template>
+    </div>
+</div>

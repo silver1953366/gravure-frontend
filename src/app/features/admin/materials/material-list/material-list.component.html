@@ -1,0 +1,42 @@
+<div class="material-management-container">
+    <h2>Gestion des Matériaux du Catalogue</h2>
+
+    <div class="header-actions">
+        <button (click)="onCreateMaterial()">+ Ajouter un nouveau matériau</button>
+    </div>
+
+    <div *ngIf="isLoading">Chargement des matériaux...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && materials.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prix Base (€/m²)</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let material of materials">
+                <td>{{ material.id }}</td>
+                <td>{{ material.name }}</td>
+                <td>{{ material.price_per_sq_meter | currency:'EUR':'symbol':'1.2-2' }}</td>
+                <td>
+                    <span [class]="material.is_active ? 'status-active' : 'status-inactive'">
+                        {{ material.is_active ? 'Actif' : 'Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <button (click)="onEditMaterial(material.id)">Modifier</button>
+                    <button (click)="onDeleteMaterial(material.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && materials.length === 0 && !error">
+        Aucun matériau trouvé.
+    </div>
+</div>

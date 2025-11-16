@@ -1,128 +1,72 @@
-<div class="container" [class.sign-up-mode]="isSignUpMode">
-  <div class="forms-container">
-    <div class="signin-signup">
+<div class="auth-container">
+    
+    <h2 class="text-xl font-bold mb-6 text-center">
+        @if (isLoginMode) {
+            Connectez-vous à votre Espace
+        } @else {
+            Créez votre Compte Client
+        }
+    </h2>
+    
+    <form (ngSubmit)="onSubmit()">
+        
+        <!-- Formulaire d'Inscription -->
+        @if (!isLoginMode) {
+            <div>
+                <label for="name">Nom / Raison Sociale</label>
+                <input type="text" id="name" name="name" [(ngModel)]="registerData.name" required />
+            </div>
+        }
 
-      <form (ngSubmit)="onLoginSubmit()" class="sign-in-form">
-        <h2 class="title">Connexion</h2>
-
-        <div *ngIf="isSubmitting && !isSignUpMode" class="info-message">
-          Vérification en cours...
+        <!-- Champs Communs -->
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" 
+                [ngModel]="isLoginMode ? loginData.email : registerData.email" 
+                (ngModelChange)="isLoginMode ? loginData.email = $event : registerData.email = $event"
+                required />
+        </div>
+        
+        <div>
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" 
+                [ngModel]="isLoginMode ? loginData.password : registerData.password" 
+                (ngModelChange)="isLoginMode ? loginData.password = $event : registerData.password = $event"
+                required minlength="8"/>
         </div>
 
-        <div class="input-field">
-          <i class="fas fa-user"></i>
-          <input 
-            type="text" 
-            placeholder="Nom d'utilisateur" 
-            [(ngModel)]="loginData.username" 
-            name="loginUsername" 
-            required 
-          />
-        </div>
-
-        <div class="input-field">
-          <i class="fas fa-lock"></i>
-          <input 
-            type="password" 
-            placeholder="Mot de passe" 
-            [(ngModel)]="loginData.password" 
-            name="loginPassword" 
-            required 
-          />
-        </div>
-
-        <a routerLink="/forgot-password" class="forgot-password">Mot de passe oublié ?</a>
-
-        <button type="submit" [disabled]="isSubmitting" class="btn solid">
-          {{ isSubmitting ? 'Connexion en cours...' : 'Connexion' }}
+        <!-- Confirmation de Mot de passe (Inscription seulement) -->
+        @if (!isLoginMode) {
+            <div>
+                <label for="confirmPassword">Confirmer Mot de passe</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="registerData.confirmPassword" required minlength="8" />
+            </div>
+        }
+        
+        <!-- Affichage de l'erreur -->
+        @if (error) {
+            <p class="error">{{ error }}</p>
+        }
+        
+        <!-- Bouton de Soumission -->
+        <button type="submit" [disabled]="isLoading || (isLoginMode && (!loginData.email || !loginData.password)) || (!isLoginMode && (!registerData.name || !registerData.email || !registerData.password || registerData.password !== registerData.confirmPassword))">
+            @if (isLoading) {
+                Connexion en cours...
+            } @else if (isLoginMode) {
+                Se Connecter
+            } @else {
+                S'inscrire
+            }
         </button>
-
-        <p class="social-text">Ou connectez-vous avec les plateformes sociales</p>
-        <div class="social-media">
-          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-google"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </form>
-
-      <form (ngSubmit)="onRegisterSubmit()" class="sign-up-form">
-        <h2 class="title">Inscription</h2>
-
-        <div *ngIf="isSubmitting && isSignUpMode" class="info-message">
-          Traitement de l'inscription...
-        </div>
-
-        <div class="input-field">
-          <i class="fas fa-user"></i>
-          <input 
-            type="text" 
-            placeholder="Nom d'utilisateur" 
-            [(ngModel)]="registerData.username" 
-            name="registerUsername" 
-            required 
-          />
-        </div>
-
-        <div class="input-field">
-          <i class="fas fa-envelope"></i>
-          <input 
-            type="email" 
-            placeholder="E-mail" 
-            [(ngModel)]="registerData.email" 
-            name="registerEmail" 
-            required 
-          />
-        </div>
-
-        <div class="input-field">
-          <i class="fas fa-lock"></i>
-          <input 
-            type="password" 
-            placeholder="Mot de passe" 
-            [(ngModel)]="registerData.password" 
-            name="registerPassword" 
-            required 
-          />
-        </div>
-
-        <button type="submit" [disabled]="isSubmitting" class="btn">
-          {{ isSubmitting ? 'Inscription en cours...' : 'Inscrivez-vous' }}
-        </button>
-
-        <p class="social-text">Ou inscrivez-vous avec les plateformes sociales</p>
-        <div class="social-media">
-          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-google"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </form>
-
-    </div>
-  </div>
-
-  <div class="panels-container">
-
-    <div class="panel left-panel">
-      <div class="content">
-        <h3>Nouveau ici ?</h3>
-        <p>Créez un compte pour rejoindre la communauté !</p>
-        <button (click)="navigateToRegister()" class="btn transparent" id="sign-up-btn">
-          Inscription
-        </button>
-      </div>
-    </div>
-
-    <div class="panel right-panel">
-      <div class="content">
-        <h3>Déjà un compte ?</h3>
-        <p>Connectez-vous pour continuer votre aventure.</p>
-        <button (click)="navigateToLogin()" class="btn transparent" id="sign-in-btn">
-          Connexion
-        </button>
-      </div>
-    </div>
-
-  </div>
+        
+        <!-- Lien pour basculer de mode -->
+        <p class="toggle-link" (click)="toggleMode()">
+            @if (isLoginMode) {
+                Pas encore de compte ? Cliquez ici pour vous inscrire.
+            } @else {
+                Déjà un compte ? Cliquez ici pour vous connecter.
+            }
+        </p>
+    </form>
+    
 </div>

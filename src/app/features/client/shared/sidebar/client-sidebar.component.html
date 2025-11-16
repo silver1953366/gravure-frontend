@@ -1,0 +1,24 @@
+<nav class="client-sidebar-nav">
+    <div class="user-info">
+        <h3>Mon Espace Client</h3>
+        <h4>Bonjour, {{ userName }}!</h4>
+        <p class="member-since">Membre depuis le {{ memberSince | date:'shortDate' }}</p>
+    </div>
+    
+    <ul class="nav-list">
+        @for (item of navItems; track item.label) {
+            <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact: true}">
+                <a [routerLink]="item.path">
+                    <i class="fas fa-{{ item.icon }}"></i> 
+                    <span>{{ item.label }}</span>
+                </a>
+            </li>
+        }
+    </ul>
+    
+    <div class="sidebar-footer">
+        <a routerLink="/logout" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</nav>

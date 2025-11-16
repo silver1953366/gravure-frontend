@@ -1,0 +1,42 @@
+<div class="quotes-list-container">
+    <h2>Devis - Consultation</h2>
+    <p>Vue des devis clients pour le suivi des prix et la préparation des commandes.</p>
+
+    <div *ngIf="isLoading">Chargement des devis...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && quotes.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client ID</th>
+                <th>Prix Estimé</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let quote of quotes">
+                <td>{{ quote.id }}</td>
+                <td>{{ quote.user_id }}</td>
+                <td>{{ quote.total_price | currency:'EUR':'symbol' }}</td>
+                <td>{{ quote.created_at | date:'shortDate' }}</td>
+                <td>
+                    <span [class]="'status-' + quote.status">{{ quote.status | uppercase }}</span>
+                </td>
+                <td>
+                    <button (click)="goToDetail(quote.id)" class="btn-view">Détails</button>
+                    
+                    <span *ngIf="quote.status === STATUS_CALCULATED" class="tag-ready">
+                        Prêt à commander
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div *ngIf="!isLoading && quotes.length === 0 && !error">
+        Aucun devis trouvé.
+    </div>
+</div>

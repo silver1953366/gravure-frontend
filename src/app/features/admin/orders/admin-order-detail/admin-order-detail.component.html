@@ -1,0 +1,70 @@
+<div class="order-detail-container">
+    <button (click)="router.navigate(['/admin/orders'])" class="btn-back">
+        &larr; Retour à la liste des commandes
+    </button>
+
+    <h2 *ngIf="order">Détail de la Commande #{{ order.id }}</h2>
+    <h2 *ngIf="!order && !isLoading">Détail de la Commande</h2>
+
+    <div *ngIf="isLoading" class="loading-message">Chargement des détails de la commande...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+
+    <div *ngIf="order && !isLoading" class="detail-card">
+        
+        <div class="info-section">
+            <div class="info-box">
+                <h3>Informations Client</h3>
+                <p><strong>Nom du Client :</strong> {{ order.user?.name || 'Utilisateur ID ' + order.user_id }}</p>
+                <p><strong>Email :</strong> {{ order.user?.email || 'N/A' }}</p>
+                <p><strong>Devis Source :</strong> 
+                    <a [routerLink]="['/admin/quotes', order.quote_id]" class="link-primary">#{{ order.quote_id }}</a>
+                </p>
+            </div>
+
+            <div class="info-box">
+                <h3>Statut & Dates</h3>
+                <p><strong>Créé le :</strong> {{ order.created_at | date:'medium' }}</p>
+                <p><strong>Montant Total :</strong> <span class="price-total">{{ order.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span></p>
+                
+                <div class="status-control">
+                    <label for="status-select">Changer le Statut :</label>
+                    <select 
+                        id="status-select"
+                        [(ngModel)]="currentStatus" 
+                        (ngModelChange)="onStatusChange($event)"
+                        [class]="'status-select status-' + currentStatus">
+                        <option *ngFor="let status of availableStatuses" [value]="status">
+                            {{ getStatusLabel(status) }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <h3>Articles Commandés ({{ order.items.length }})</h3>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Prix Unitaire</th>
+                    <th>Quantité</th>
+                    <th>Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of order.items">
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.unit_price | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.subtotal | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-summary">
+            <strong>TOTAL FINAL :</strong> 
+            <span class="price-total">{{ order.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span>
+        </div>
+    </div>
+</div>

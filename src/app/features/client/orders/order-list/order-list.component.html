@@ -1,0 +1,61 @@
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8 border-b pb-3">
+    Historique de mes Commandes 📦
+  </h1>
+
+  @if (isLoading()) {
+    <div class="text-center p-10">
+      Chargement des commandes en cours...
+    </div>
+  } @else if (error()) {
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+      {{ error() }}
+    </div>
+  } @else if (orders().length === 0) {
+    <div class="bg-blue-50 border border-blue-200 p-8 rounded-lg text-center">
+      <p class="text-lg text-blue-700">Vous n'avez pas encore passé de commande.</p>
+      <a routerLink="/configurator" class="mt-4 inline-block px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+        Commencer une configuration
+      </a>
+    </div>
+  } @else {
+    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix Total</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Détails</span></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ order.reference }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ order.created_at | date: 'mediumDate' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ order.final_price_fcfa | number:'1.0-0' }} FCFA
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full {{ getStatusClass(order.status) }}">
+                  {{ order.status | uppercase }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <a [routerLink]="['/client/orders', order.id]" class="text-indigo-600 hover:text-indigo-900">
+                  Voir les détails
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

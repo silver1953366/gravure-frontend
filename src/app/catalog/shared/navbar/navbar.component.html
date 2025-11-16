@@ -1,0 +1,32 @@
+<header class="navbar-header">
+    
+    <button 
+      (click)="toggleSidebar.emit()" 
+      class="toggle-sidebar-button"
+      aria-label="Toggle Filtres"
+    >
+      <i class="fa-solid fa-bars"></i>
+      <span class="ml-2 hidden sm:inline">Filtres</span>
+    </button>
+    
+    <div class="logo-container">
+      <a [routerLink]="['/catalog']" class="app-logo">
+        E.M.E.S.
+      </a>
+    </div>
+    
+    <nav class="action-links">
+      <a 
+        [routerLink]="[{ outlets: { modal: ['modal', 'login'] } }]" 
+        class="btn-secondary"
+      >
+        Connexion
+      </a>
+      <a 
+        [routerLink]="['/auth/register']" 
+        class="btn-primary ml-3"
+      >
+        Inscription
+      </a>
+    </nav>
+</header>

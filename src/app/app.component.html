@@ -1,1 +1,24 @@
-<router-outlet></router-outlet>
+<div class="app-container">
+    <!-- Le contenu de la page (Header, Main, Footer) est décalé lorsque la sidebar est ouverte -->
+    <div 
+        class="content-wrapper" 
+        [class.lg-pushed]="isSidebarOpen()"
+    >
+        <!-- HEADER (Toujours visible) -->
+        <app-header (onLoginClicked)="openLoginModal()"></app-header>
+
+        <!-- MAIN CONTENT -->
+        <main class="page-content">
+            <router-outlet></router-outlet>
+        </main>
+        
+        <!-- FOOTER (Toujours visible) -->
+        <app-footer></app-footer>
+    </div>
+</div>
+
+<!-- MODAL DE CONNEXION (Flotte par-dessus le contenu) -->
+<app-login-register-modal 
+    [isOpen]="isLoginModalOpen()"
+    (close)="closeLoginModal()">
+</app-login-register-modal>

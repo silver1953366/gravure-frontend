@@ -1,0 +1,47 @@
+<div class="orders-list-container">
+    <h2>Commandes - Suivi de Production</h2>
+    <p>Vue d'ensemble et gestion des statuts des commandes en attente de traitement.</p>
+
+    <div *ngIf="isLoading">Chargement des commandes...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && orders.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client ID</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let order of orders">
+                <td>{{ order.id }}</td>
+                <td>{{ order.user_id }}</td>
+                <td>{{ order.total_amount | currency:'EUR':'symbol' }}</td>
+                <td>{{ order.created_at | date:'shortDate' }}</td>
+                <td>
+                    <span [class]="'status-' + order.status">{{ order.status | uppercase }}</span>
+                </td>
+                <td>
+                    <button (click)="goToDetail(order.id)" class="btn-view">Détails</button>
+                    
+                    <button 
+                        *ngIf="order.status === STATUS_PAID" 
+                        (click)="startProcessing(order.id)" 
+                        class="btn-primary">
+                        Démarrer Production
+                    </button>
+                    
+                    <button 
+                        *ngIf="order.status === STATUS_PROCESSING" 
+                        class="btn-secondary">
+                        Marquer Expédié
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

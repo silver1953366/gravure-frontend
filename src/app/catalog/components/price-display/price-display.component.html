@@ -1,9 +1,14 @@
-<div class="price-box">
-  <p class="label">Prix Estimé (HT)</p>
-  <h4 class="price-value">
-    {{ price | currency: 'EUR':'symbol':'1.2-2':'fr' }}
-  </h4>
-  <p class="disclaimer">
-    Estimation basée sur les données d'inventaire en temps réel.
-  </p>
+<div class="price-summary-box">
+    <div class="detail-line">
+        <p>Prix de base (Matériau + Forme)</p>
+        <span class="price-value">{{ finalConfig.basePrice | currency:'FCFA':'symbol':'1.0-0':'fr' }}</span>
+    </div>
+    <div class="detail-line">
+        <p>Coût de l'usinage / Gravure</p>
+        <span class="price-value">+ {{ finalConfig.engravingCost | currency:'FCFA':'symbol':'1.0-0':'fr' }}</span>
+    </div>
+    <div class="detail-line total-price-line">
+        <h4>Devis Estimé (Total HT)</h4>
+        <span class="total-price-value">{{ finalConfig.totalPrice | currency:'FCFA':'symbol':'1.0-0':'fr' }}</span>
+    </div>
 </div>

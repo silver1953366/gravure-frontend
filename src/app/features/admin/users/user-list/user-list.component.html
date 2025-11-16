@@ -1,0 +1,42 @@
+<div class="user-management-container">
+    <h2>Gestion des Utilisateurs</h2>
+
+    <div class="header-actions">
+        <button (click)="onCreateUser()">+ Créer un nouvel utilisateur</button>
+    </div>
+
+    <div *ngIf="isLoading">Chargement des utilisateurs...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && users.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let user of users">
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <span [class]="'role-' + user.role">{{ user.role | uppercase }}</span>
+                </td>
+                <td>{{ user.created_at | date: 'mediumDate' }}</td>
+                <td>
+                    <button (click)="onEditUser(user.id)">Modifier</button>
+                    <button (click)="onDeleteUser(user.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && users.length === 0 && !error">
+        Aucun utilisateur trouvé.
+    </div>
+</div>

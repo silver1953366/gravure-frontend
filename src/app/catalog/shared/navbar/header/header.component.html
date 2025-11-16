@@ -1,0 +1,52 @@
+<header class="main-header">
+    <div class="header-content">
+        <div class="header-logo">
+            <a routerLink="/">
+                <img src="../../../../../assets/Logo/logo.png" alt="Logo de l'entreprise E.M.E.S" class="logo-img">
+            </a>
+        </div>
+
+        <nav class="header-nav">
+            <ul class="nav-list">
+                @for (item of navItems; track item.label) {
+                    <li class="nav-item">
+                        <a [routerLink]="item.link" class="nav-link">{{ item.label }}</a>
+                    </li>
+                }
+                <li class="nav-item">
+                    <a routerLink="/configuration" class="nav-link nav-special">
+                        <i class="fas fa-hammer"></i> Créer une Plaque
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            
+            <a class="action-btn cart-btn" routerLink="/cart">
+                <i class="fas fa-shopping-cart icon"></i> Panier (0)
+            </a>
+            
+            @if (!isAuthenticated()) {
+                <button 
+                    class="action-btn account-btn" 
+                    (click)="triggerLoginModal()"
+                >
+                    <i class="fas fa-sign-in-alt icon"></i> Connexion
+                </button>
+            }
+
+            @if (isAuthenticated()) {
+                <a routerLink="/profile" class="action-btn welcome-message">
+                    <i class="fas fa-user-circle icon"></i> 
+                    Bienvenue, **{{ currentUser()?.name || 'Client' }}**
+                </a>
+
+                <button class="action-btn logout-btn" (click)="logout()">
+                    <i class="fas fa-sign-out-alt icon"></i> Déconnexion
+                </button>
+            }
+
+        </div>
+    </div>
+</header>

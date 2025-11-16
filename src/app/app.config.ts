@@ -10,6 +10,8 @@ import { provideServiceWorker } from '@angular/service-worker'; // 2. Importer l
 
 export const appConfig: ApplicationConfig = {
   providers: [
+   
+
     provideRouter(routes),
     provideClientHydration(),
     // 3. Fournir le service HTTP et enregistrer l'Interceptor
@@ -18,6 +20,14 @@ export const appConfig: ApplicationConfig = {
     ), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
+          }), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
           })
   ]
 };
+
+

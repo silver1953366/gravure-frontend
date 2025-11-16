@@ -1,0 +1,60 @@
+<div class="inventory-form-container">
+    <a routerLink="/admin/inventory" class="back-link">← Retour à l'inventaire</a>
+    
+    <h3>{{ isEditMode ? 'Modifier l\'article' : 'Ajouter un article au stock' }}</h3>
+
+    <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
+        
+        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
+        
+        <div class="form-group">
+            <label for="reference">Référence</label>
+            <input id="reference" type="text" formControlName="reference">
+            <div *ngIf="inventoryForm.controls['reference'].touched && inventoryForm.controls['reference'].invalid" class="error-message">
+                La référence est requise.
+            </div>
+            <div *ngIf="apiErrors.reference" class="error-message">{{ apiErrors.reference }}</div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description"></textarea>
+            <div *ngIf="inventoryForm.controls['description'].touched && inventoryForm.controls['description'].invalid" class="error-message">
+                La description est requise.
+            </div>
+            <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantité en stock</label>
+            <input id="quantity" type="number" formControlName="quantity">
+            <div *ngIf="inventoryForm.controls['quantity'].invalid" class="error-message">
+                La quantité doit être un nombre positif.
+            </div>
+            <div *ngIf="apiErrors.quantity" class="error-message">{{ apiErrors.quantity }}</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Localisation (Entrepôt/Étagère)</label>
+            <input id="location" type="text" formControlName="location">
+            <div *ngIf="inventoryForm.controls['location'].invalid" class="error-message">
+                La localisation est requise.
+            </div>
+            <div *ngIf="apiErrors.location" class="error-message">{{ apiErrors.location }}</div>
+        </div>
+
+        <div class="form-group">
+            <label for="price_per_unit">Prix Unitaire</label>
+            <input id="price_per_unit" type="number" formControlName="price_per_unit" step="0.01">
+            <div *ngIf="inventoryForm.controls['price_per_unit'].invalid" class="error-message">
+                Le prix unitaire est requis.
+            </div>
+            <div *ngIf="apiErrors.price_per_unit" class="error-message">{{ apiErrors.price_per_unit }}</div>
+        </div>
+
+        <button type="submit" [disabled]="inventoryForm.invalid || isLoading">
+            {{ isEditMode ? 'Sauvegarder l\'article' : 'Ajouter au stock' }}
+        </button>
+        <div *ngIf="isLoading">Sauvegarde en cours...</div>
+    </form>
+</div>

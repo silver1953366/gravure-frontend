@@ -1,45 +1,38 @@
-.selector-container {
-  padding: 0;
-}
-.selector-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #374151; 
-  margin-bottom: 16px;
-}
-.dimension-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-@media (min-width: 768px) { 
-  .dimension-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.dimension-input-group {
+    margin-bottom: var(--space-md);
 }
 
-.label-style {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #4b5563; 
-  margin-bottom: 4px;
+.dimension-input-group label {
+    display: block;
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin-bottom: .25rem;
 }
-.input-style {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #d1d5db; 
-  border-radius: 8px;
-  font-size: 16px;
-  color: #1f2937; 
+
+.dimension-input-group input {
+    width: 100%;
+    padding: .75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    color: var(--color-primary-dark);
+    /* Assure que le style est hérité si vous utilisez ngModel */
+    box-sizing: border-box; 
 }
-.input-style:focus {
-  outline: none;
-  border-color: #4f46e5; 
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+
+.note-info {
+    font-size: .75rem;
+    color: var(--color-secondary-accent);
+    background-color: rgba(240, 78, 127, 0.05);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-lg);
 }
-.error-message {
-  font-size: 14px;
-  color: #ef4444; 
-  margin-top: 8px;
+
+/* Bouton dans ce composant */
+.action-button {
+    width: 100%;
+    margin-top: var(--space-lg);
+    justify-content: center;
 }

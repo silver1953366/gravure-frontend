@@ -1,0 +1,49 @@
+<div class="admin-orders-container">
+    <h2>Gestion des Commandes (Orders)</h2>
+    <p>Visualisation et gestion du cycle de vie des commandes clients.</p>
+
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+    
+    <div *ngIf="isLoading" class="loading-message">Chargement des commandes...</div>
+
+    <table *ngIf="!isLoading && orders.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Devis Source</th>
+                <th>Prix Total (FCFA)</th>
+                <th>Statut</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let order of orders">
+                <td>{{ order.id }}</td>
+                <td>{{ order.user?.name || 'Utilisateur inconnu' }} (ID: {{ order.user_id }})</td>
+                <td>Devis #{{ order.quote_id }}</td>
+                <td class="price-col">{{ order.total_price | number:'1.2-2' }}</td>
+                <td>
+                    <select 
+                        [ngModel]="order.status" 
+                        (ngModelChange)="onStatusChange(order, $event)"
+                        [class]="'status-select status-' + order.status">
+                        <option *ngFor="let status of availableStatuses" [value]="status">
+                            {{ status | uppercase }}
+                        </option>
+                    </select>
+                </td>
+                <td>{{ order.created_at | date:'short' }}</td>
+                <td>
+                    <button class="btn-view">Détails</button>
+                    </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && orders.length === 0" class="alert-info">
+        Aucune commande en cours dans le système.
+    </div>
+</div>

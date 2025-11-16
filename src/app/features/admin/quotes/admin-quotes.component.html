@@ -1,0 +1,48 @@
+<div class="admin-quotes-container">
+    <h2>Gestion des Devis Clients (Quotes)</h2>
+    <p>Visualisation de tous les devis créés par l'ensemble des utilisateurs.</p>
+
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+    
+    <div *ngIf="isLoading" class="loading-message">Chargement des devis...</div>
+
+    <table *ngIf="!isLoading && quotes.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Prix Total (FCFA)</th>
+                <th>Statut</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let quote of quotes">
+                <td>{{ quote.id }}</td>
+                <td>{{ quote.user?.name || 'Utilisateur inconnu' }} (ID: {{ quote.user_id }})</td>
+                <td class="price-col">{{ quote.total_price | number:'1.2-2' }}</td>
+                <td>
+                    <span [class]="'status-' + quote.status">{{ quote.status | uppercase }}</span>
+                </td>
+                <td>{{ quote.created_at | date:'short' }}</td>
+                <td>
+                    <button 
+                        *ngIf="quote.status === 'submitted'" 
+                        (click)="onConvertQuote(quote)" 
+                        [disabled]="isProcessing"
+                        class="btn-convert">
+                        Convertir en Commande
+                    </button>
+                    <button class="btn-view">Détails</button> 
+                    <button (click)="onDeleteQuote(quote.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && quotes.length === 0" class="alert-info">
+        Aucun devis trouvé dans le système.
+    </div>
+</div>

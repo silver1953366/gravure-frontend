@@ -1,97 +1,124 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { User, LoginPayload, RegisterPayload, AuthResponse } from '../models/auth.model'; 
+// Assurez-vous que le chemin vers auth.models est correct.
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_BASE_URL = environment.apiUrl || 'http://localhost:8000/api'; 
-  private readonly TOKEN_KEY = 'auth_token';
-  private readonly USER_ROLE_KEY = 'user_role';
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  constructor(private http: HttpClient, private router: Router) { }
+  // URL de base de votre API Laravel
+  // ⚠️ ASSUREZ-VOUS QUE CETTE URL EST CORRECTE POUR VOTRE ENVIRONNEMENT
+  private readonly API_URL = 'http://localhost:8000/api'; 
+  
+  // États de l'authentification (avec Signals)
+  currentUser = signal<User | null>(null);
+  isAuthenticated = signal(false);
+
+  constructor() {
+    this.loadInitialState();
+  }
 
   /**
-   * Envoie les identifiants à l'API pour connexion.
-   * La réponse contient le jeton d'accès et le rôle de l'utilisateur.
+   * Charge l'état de l'utilisateur depuis le stockage local lors du démarrage.
    */
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.API_BASE_URL}/login`, credentials).pipe(
-      tap((response: any) => {
-        // 1. Stockage du jeton (Token)
-        this.setToken(response.access_token);
-        // 2. Stockage du rôle pour la gestion des permissions/redirection
-        this.setUserRole(response.role); 
-      })
+  private loadInitialState(): void {
+    const token = this.getAuthToken();
+    const userJson = localStorage.getItem('user');
+    
+    if (token && userJson) {
+      try {
+        const user: User = JSON.parse(userJson);
+        this.currentUser.set(user);
+        this.isAuthenticated.set(true);
+        // Une vérification du jeton (endpoint /user ou /me) pourrait être ajoutée ici
+      } catch (e) {
+        console.error("Erreur lors du chargement de l'utilisateur stocké.", e);
+        this.logout(false); // Nettoyer en cas de données corrompues
+      }
+    }
+  }
+  
+  // --- Méthodes API ---
+
+  /**
+   * Tente de connecter l'utilisateur via l'API Laravel.
+   */
+  login(payload: LoginPayload): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, payload).pipe(
+      tap(response => this.handleAuthResponse(response))
     );
   }
 
   /**
-   * Stocke le jeton dans le navigateur.
+   * Tente d'inscrire un nouvel utilisateur via l'API Laravel.
    */
-  private setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  register(payload: RegisterPayload): Observable<AuthResponse> {
+    // Le AuthController Laravel que vous avez montré n'a pas besoin de 'password_confirmation',
+    // mais il est inclus dans le modèle pour être complet.
+    const apiPayload = {
+        name: payload.name,
+        email: payload.email,
+        password: payload.password
+    };
+    
+    return this.http.post<AuthResponse>(`${this.API_URL}/register`, apiPayload).pipe(
+      tap(response => this.handleAuthResponse(response))
+    );
   }
 
   /**
-   * Stocke le rôle dans le navigateur.
+   * Gère la déconnexion de l'utilisateur (révoque le jeton côté serveur et nettoie côté client).
    */
-  private setUserRole(role: string): void {
-    localStorage.setItem(this.USER_ROLE_KEY, role);
+  logout(redirectToHome: boolean = true): Observable<any> {
+    // Si l'utilisateur est authentifié, on tente de révoquer le jeton côté serveur.
+    // L'intercepteur ajoutera le jeton Bearer automatiquement si l'état est "connecté".
+    return this.http.post(`${this.API_URL}/logout`, {}).pipe(
+      tap(() => {
+        // Nettoyage côté client après la révocation serveur
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        this.currentUser.set(null);
+        this.isAuthenticated.set(false);
+        
+        if (redirectToHome) {
+            this.router.navigate(['/']); 
+        }
+      })
+      // NOTE: L'erreur de déconnexion (par ex. jeton déjà expiré) peut être ignorée 
+      // car le nettoyage local doit avoir lieu dans tous les cas.
+    );
   }
 
-  /**
-   * Récupère le jeton stocké.
-   */
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
+  // --- Helpers Locaux ---
   
   /**
-   * Récupère le rôle stocké.
+   * Récupère le jeton d'accès stocké localement.
+   * Cette méthode est CRUCIALE pour l'Auth Interceptor.
    */
-  getUserRole(): string | null {
-    return localStorage.getItem(this.USER_ROLE_KEY);
+  public getAuthToken(): string | null {
+      return localStorage.getItem('access_token');
   }
 
   /**
-   * Vérifie si l'utilisateur est connecté (présence du jeton).
+   * Traite la réponse réussie des endpoints /login et /register.
    */
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
-  
-  /**
-   * Déconnexion: supprime le jeton et le rôle, puis redirige vers la page de connexion.
-   */
-  logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_ROLE_KEY);
+  private handleAuthResponse(response: AuthResponse): void {
+    const { user, access_token } = response;
 
-    // Optionnel: informer le Backend de la révocation
-    this.http.post(`${this.API_BASE_URL}/logout`, {}).subscribe({
-      next: () => console.log('Déconnexion Backend OK'),
-      error: (err) => console.error('Erreur Déconnexion Backend', err)
-    });
-    this.router.navigate(['/login']);
-  }
-
-  /**
-   * Vérifie le rôle pour l'autorisation (RBAC)
-   */
-  hasRole(requiredRole: string): boolean {
-    const userRole = this.getUserRole();
-    if (!userRole) {
-      return false;
-    }
-
-    // L'Admin est généralement autorisé à faire tout ce que fait le Contrôleur
-    if (requiredRole === 'controller') {
-        return userRole === 'admin' || userRole === 'controller';
-    }
-    return userRole === requiredRole;
+    // 1. Stockage du jeton et de l'utilisateur
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    // 2. Mise à jour des Signals
+    this.currentUser.set(user);
+    this.isAuthenticated.set(true);
+    
+    // 3. Fermer le modal et/ou naviguer (la navigation est généralement faite dans le modal/composant appelant)
   }
 }

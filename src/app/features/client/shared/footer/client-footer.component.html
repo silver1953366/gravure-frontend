@@ -1,0 +1,38 @@
+<footer class="footer-client">
+    <div class="footer-content">
+        <div class="footer-section about">
+            <h3>E.M.E.S.</h3>
+            <p>Spécialiste de la gravure et de la découpe laser sur métaux. Qualité et précision pour tous vos projets professionnels ou personnels.</p>
+        </div>
+
+        <div class="footer-section links">
+            <h4>L'entreprise</h4>
+            <ul>
+                @for (link of companyLinks; track link.label) {
+                    <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+                }
+            </ul>
+        </div>
+
+        <div class="footer-section links">
+            <h4>Information légale</h4>
+            <ul>
+                @for (link of legalLinks; track link.label) {
+                    <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+                }
+            </ul>
+        </div>
+
+        <div class="footer-section contact">
+            <h4>Contactez-nous</h4>
+            <p>Adresse : Avenue Jean Paul II</p>
+            <p>Téléphone : 077402278 </p>
+            
+           <p>Email: gravureplaqueInf&#64;gmail.com</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; {{ currentYear }} E.M.E.S. - Tous droits réservés.</p>
+    </div>
+</footer>

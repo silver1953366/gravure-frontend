@@ -1,0 +1,126 @@
+<div class="container">
+    <a routerLink="/client/quotes" class="back-link">
+        ← Retour à la liste des devis
+    </a>
+
+    @if (isLoading()) {
+        <div class="loading-state">
+            Chargement des détails du devis...
+        </div>
+    } @else if (!quote()) {
+        <div class="error-message">
+            Détails du devis introuvables.
+        </div>
+    } @else {
+        <div class="card detail-page-card">
+            <div class="p-8">
+                
+                <header class="card-header">
+                    <h1 class="card-header-title">
+                        Devis #{{ quote()!.reference }}
+                    </h1>
+                    <span class="status-pill status-{{ getStatusColor(quote()!.status) }}">
+                        {{ quote()!.status | uppercase }}
+                    </span>
+                </header>
+
+                <div class="detail-grid">
+                    
+                    <article class="detail-block">
+                        <h2>Statut & Prix</h2>
+                        <dl class="data-list">
+                            <div>
+                                <dt>Date de création:</dt>
+                                <dd>{{ quote()!.created_at | date: 'fullDate' }}</dd>
+                            </div>
+                            <div>
+                                <dt>Montant total final:</dt>
+                                <dd class="final-price">{{ quote()!.final_price_fcfa | number:'1.0-0' }} FCFA</dd>
+                            </div>
+                            <div>
+                                <dt>Prix de base:</dt>
+                                <dd>{{ quote()!.base_price_fcfa | number:'1.0-0' }} FCFA</dd>
+                            </div>
+                            @if (quote()!.discount_amount_fcfa > 0) {
+                                <div>
+                                    <dt>Réduction appliquée:</dt>
+                                    <dd class="discount-price">- {{ quote()!.discount_amount_fcfa | number:'1.0-0' }} FCFA</dd>
+                                </div>
+                            }
+                        </dl>
+                        
+                        @if (quote()!.status === 'calculated') {
+                            <button (click)="convertQuote()"
+                                    class="convert-button">
+                                Confirmer & Convertir en Commande
+                            </button>
+                        } @else if (quote()!.status === 'ordered') {
+                            <p class="ordered-message">Ce devis a été converti en commande.</p>
+                            <a [routerLink]="['/client/orders', quote()!.order_id]" class="view-order-link">
+                                Voir la commande associée
+                            </a>
+                        }
+                    </article>
+
+                    <article class="detail-block">
+                        <h2>Détails du Produit</h2>
+                        <dl class="data-list">
+                            <div>
+                                <dt>Matériau:</dt>
+                                <dd>{{ quote()!.material?.name || 'Non spécifié' }}</dd>
+                            </div>
+                            <div>
+                                <dt>Forme:</dt>
+                                <dd>{{ quote()!.shape?.name || 'Non spécifiée' }}</dd>
+                            </div>
+                            <div>
+                                <dt>Dimension:</dt>
+                                <dd>{{ quote()!.materialDimension?.dimension_label || 'Non spécifiée' }}</dd>
+                            </div>
+                            <div>
+                                <dt>Quantité demandée:</dt>
+                                <dd class="quantity">{{ quote()!.quantity }}</dd>
+                            </div>
+                            <div>
+                                <dt>Référence du client:</dt>
+                                <dd>{{ quote()!.client_ref || 'N/A' }}</dd>
+                            </div>
+                        </dl>
+                    </article>
+                    
+                    <article class="detail-block instructions-block">
+                        <h2>Instructions de Fabrication</h2>
+                        <p class="instructions-text">
+                            {{ quote()!.details_snapshot.description || 'Le client n\'a pas fourni d\'instructions spécifiques.' }}
+                        </p>
+                    </article>
+
+                </div>
+
+                <article class="card attachments-card full-width">
+                    <h2>Pièces Jointes</h2>
+                    
+                    @if (quote()!.attachments?.length) {
+                        <ul class="attachment-list">
+                            @for (att of quote()!.attachments; track att.id) {
+                                <li class="attachment-item">
+                                    <span class="file-name">{{ att.original_name }}</span>
+                                    <div class="file-info-actions">
+                                        <span class="file-size">{{ att.size | number:'1.0-0':'fr' }} octets</span>
+                                        <a [href]="getAttachmentDownloadUrl(att.id)" target="_blank" class="download-link" title="Télécharger">
+                                            Télécharger
+                                            <svg class="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-4-4l4 4 4-4"/></svg>
+                                        </a>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    } @else {
+                        <p class="no-attachments">Aucun fichier joint à ce devis.</p>
+                    }
+                </article>
+
+            </div>
+        </div>
+    }
+</div>

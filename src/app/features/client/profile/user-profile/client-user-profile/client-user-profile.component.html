@@ -1,0 +1,61 @@
+<div class="profile-container">
+    <h2>Mon Profil Client 👤</h2>
+    <p class="role-tag">Bienvenue, **{{ user?.name }}**.</p>
+
+    <div *ngIf="isLoading">Chargement de votre profil...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+
+    <ng-container *ngIf="user && !isLoading">
+        
+        <div class="profile-actions">
+            <button (click)="toggleEdit()" class="btn-primary">
+                {{ isEditing ? 'Annuler' : 'Modifier les Informations' }}
+            </button>
+        </div>
+
+        <div class="profile-details card">
+            
+            <form *ngIf="isEditing" (ngSubmit)="saveProfile()">
+                <h3>Modifier Mes Informations</h3>
+                
+                <div class="form-group">
+                    <label for="name">Nom Complet</label>
+                    <input id="name" name="name" [(ngModel)]="updatedUser.name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Téléphone</label>
+                    <input id="phone" name="phone" [(ngModel)]="updatedUser.phone" type="tel">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Adresse de Facturation</label>
+                    <textarea id="address" name="address" [(ngModel)]="updatedUser.address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email (Non modifiable ici)</label>
+                    <input id="email" [value]="user.email" disabled>
+                </div>
+                
+                <button type="submit" class="btn-save" [disabled]="!updatedUser.name">Enregistrer</button>
+            </form>
+
+            <div *ngIf="!isEditing">
+                <h3>Détails du Compte</h3>
+                <div class="info-row"><strong>Nom:</strong> <span>{{ user.name }}</span></div>
+                <div class="info-row"><strong>Email:</strong> <span>{{ user.email }}</span></div>
+                <div class="info-row"><strong>Téléphone:</strong> <span>{{ user.phone || 'N/A' }}</span></div>
+                <div class="info-row address-row"><strong>Adresse:</strong> <span>{{ user.address || 'Non spécifiée' }}</span></div>
+                <div class="info-row"><strong>Membre depuis:</strong> <span>{{ user.created_at | date:'mediumDate' }}</span></div>
+            </div>
+        </div>
+
+        <div class="related-links">
+            <h3>Mon Activité</h3>
+            <a routerLink="/client/orders">Voir mes commandes en cours →</a>
+            <a routerLink="/client/quotes">Voir mes devis soumis →</a>
+        </div>
+    </ng-container>
+</div>

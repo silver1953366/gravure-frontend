@@ -1,0 +1,114 @@
+.reports-container {
+    padding: 20px;
+    background-color: #f4f7f6;
+    border-radius: 8px;
+}
+
+h2 {
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Filtres */
+.filter-controls {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.date-filter-form {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.date-filter-form input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date-filter-form button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.date-filter-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Résumé */
+.report-summary {
+    margin-bottom: 30px;
+}
+
+.summary-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card h4 {
+    margin-top: 0;
+    color: #666;
+    font-size: 1em;
+}
+
+.card p {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #28a745; /* Couleur pour le revenu */
+    margin: 5px 0;
+}
+
+/* Tableau Mensuel */
+.monthly-breakdown table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.monthly-breakdown th, .monthly-breakdown td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.monthly-breakdown th {
+    background-color: #f0f0f0;
+    font-weight: 600;
+}
+
+/* Messages d'état */
+.alert-error {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}

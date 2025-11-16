@@ -1,0 +1,626 @@
+:host {
+    /* --- COULEURS ET THÈMES --- */
+    --color-white: #ffffff;
+    --color-primary-dark: #11121C;        /* Noir/Gris foncé de base */
+    --color-primary-accent: #2F80ED;      /* Bleu (Principal pour l'action/pending) */
+    --color-secondary-accent: #F04E7F;    /* Rose/Rouge (Secondaire/Danger/Défaut) */
+    --color-success: #22c55e;             /* Vert */
+    --color-warning: #FFC107;             /* Jaune (à définir) */
+    --color-background: #f1f5f9;
+    --color-text-dim: #94a3b8;            /* Gris faible */
+    --color-text-soft: #64748b;           /* Gris moyen */
+    --color-border: #e2e8f0;              /* Bordure légère */
+
+    /* --- ESPACEMENT ET TAILLES --- */
+    --space-xs: .125rem;
+    --space-sm: .25rem;
+    --space-md: .5rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2.5rem;
+
+    /* --- RAYONS DE BORDURE --- */
+    --radius-md: .5rem;
+    --radius-xl: .75rem;
+    --radius-3xl: 1.5rem;
+
+    /* --- OMBRES --- */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+    --shadow-card: 0 8px 20px rgba(17,18,28,.08); /* Légèrement adoucie */
+    --shadow-dark-card: 0 10px 25px rgba(17,18,28,.2);
+
+    /* Mise en page globale */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--color-background);
+    font-family: 'Inter', sans-serif;
+}
+
+.client-layout-container {
+  display: flex;
+  flex-grow: 1;
+  position: relative;
+}
+
+.content-wrapper {
+  flex-grow: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left .3s;
+  margin-left: 0; /* Par défaut, la sidebar est fermée ou cachée sur mobile */
+}
+
+@media (min-width: 1024px) {
+  .content-wrapper {
+    /* Laisser à 0 ici si la sidebar est en overlay et ne pousse pas le contenu */
+  }
+  .content-wrapper.lg-pushed {
+    /* Si la sidebar n'est pas un composant réel, cette classe est inutile pour cet exemple */
+  }
+}
+
+.page-main-content {
+  flex-grow: 1;
+}
+
+
+/* ========================================= */
+/* 1. MISE EN PAGE GÉNÉRALE */
+/* ========================================= */
+.dashboard-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-xl) var(--space-lg) 4rem;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: var(--space-lg);
+}
+
+.dashboard-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    max-width: 100%;
+}
+
+@media (min-width: 1280px) {
+    .dashboard-grid-layout {
+        grid-template-columns: repeat(12, 1fr);
+    }
+
+    .order-tracker-card {
+        grid-column: span 12 / span 12;
+    }
+
+    .quotes-summary-card,
+    .favorites-card {
+        grid-column: span 6 / span 6;
+    }
+
+    .cart-summary-card {
+        grid-column: span 12 / span 12;
+    }
+}
+
+@media (min-width: 1536px) {
+    .dashboard-grid-layout {
+        grid-template-columns: repeat(12, 1fr);
+    }
+
+    .order-tracker-card {
+        grid-column: span 7 / span 7;
+    }
+    
+    .favorites-card {
+        grid-column: span 5 / span 5;
+    }
+
+    .quotes-summary-card {
+        grid-column: span 7 / span 7;
+    }
+    
+    .cart-summary-card {
+        grid-column: span 5 / span 5;
+    }
+}
+
+
+/* ========================================= */
+/* 2. CARTES ET TYPOGRAPHIE */
+/* ========================================= */
+.card {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-3xl);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.dark-card {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+    box-shadow: var(--shadow-dark-card);
+}
+
+.card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.card-category {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--color-text-dim);
+}
+
+.dark-card .card-category {
+    color: #F7E6EC;
+}
+
+.card-title {
+    margin-top: var(--space-sm);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+.dark-card .card-title {
+    color: var(--color-white);
+}
+
+.card-title-lg {
+    margin-top: var(--space-sm);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+/* ========================================= */
+/* 3. BOUTONS ET ACTIONS */
+/* ========================================= */
+.action-button {
+    border-radius: 9999px;
+    padding: .5rem 1rem;
+    font-size: .875rem;
+    font-weight: 600;
+    transition: all .2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1;
+    border: none;
+}
+
+.primary-action-button {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+}
+
+.primary-action-button:hover {
+    background-color: var(--color-primary-accent);
+}
+
+.secondary-action-button {
+    border: 1px solid var(--color-border);
+    color: var(--color-text-soft);
+    background: none;
+}
+
+.secondary-action-button:hover {
+    border-color: var(--color-secondary-accent);
+    color: var(--color-secondary-accent);
+    background-color: rgba(240, 78, 127, .05);
+}
+
+.favorite-action-button {
+    background-color: var(--color-secondary-accent);
+    color: var(--color-white);
+    width: 100%;
+    justify-content: center;
+    padding: .75rem 1rem;
+}
+
+.favorite-action-button:hover {
+    background-color: #D53F70;
+}
+
+.order-eta-chip {
+    border-radius: 9999px;
+    padding: .35rem 1rem;
+    font-size: .75rem;
+    font-weight: 600;
+    background-color: rgba(47, 128, 237, .1);
+    color: var(--color-primary-accent);
+}
+
+.icon-arrow {
+    width: .875rem;
+    height: .875rem;
+}
+
+/* ========================================= */
+/* 4. SUIVI DE COMMANDE (ORDER TRACKER) */
+/* ========================================= */
+.tracker-body {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.timeline-bar-container {
+    position: relative;
+    height: .4rem;
+    width: 100%;
+    border-radius: 9999px;
+    background-color: var(--color-border);
+    margin: 0 auto;
+}
+
+.timeline-progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(to right, var(--color-secondary-accent), var(--color-primary-accent));
+    transition: width .5s ease-in-out;
+}
+
+.timeline-stages-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-sm);
+}
+
+.stage-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+}
+
+.stage-icon {
+    display: flex;
+    height: 3rem;
+    width: 3rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border-width: 2px;
+    border-style: solid;
+    font-size: .875rem;
+    font-weight: 600;
+    transition: all .3s;
+}
+
+.stage-item.pending-stage .stage-icon {
+    border-color: var(--color-border);
+    background-color: var(--color-white);
+    color: var(--color-text-dim);
+}
+
+.stage-item.active-stage .stage-icon {
+    border-color: var(--color-secondary-accent);
+    background-color: rgba(240, 78, 127, .1);
+    color: var(--color-secondary-accent);
+}
+
+.stage-item.current-stage .stage-icon {
+    box-shadow: 0 0 0 3px rgba(240, 78, 127, .3);
+}
+
+.stage-item.active-stage .stage-label {
+    color: var(--color-primary-dark);
+}
+
+.stage-item .stage-label {
+    text-align: center;
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+}
+
+.stage-item .stage-details {
+    text-align: center;
+    font-size: .6875rem;
+    color: var(--color-text-soft);
+}
+
+/* ========================================= */
+/* 5. TABLEAU (DEVIS) */
+/* ========================================= */
+.table-wrapper {
+    margin-top: var(--space-lg);
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+}
+
+.data-table {
+    min-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .875rem;
+}
+
+.table-header {
+    background-color: #F6F7FB;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--color-text-dim);
+    text-align: left;
+}
+
+.table-header th {
+    padding: .75rem 1.25rem;
+    font-weight: 600;
+}
+
+.table-body {
+    background-color: var(--color-white);
+    color: var(--color-text-soft);
+}
+
+.table-body tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-body tr:last-child {
+    border-bottom: none;
+}
+
+.table-body tr:hover {
+    background-color: #fcfcfc;
+}
+
+.table-body td {
+    padding: 1rem 1.25rem;
+}
+
+.ref-cell,
+.project-name {
+    font-weight: 600;
+    color: var(--color-primary-dark);
+}
+
+.project-date {
+    font-size: .75rem;
+    color: var(--color-text-dim);
+}
+
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border-radius: 9999px;
+    padding: .25rem .75rem;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.status-dot {
+    height: .5rem;
+    width: .5rem;
+    border-radius: 9999px;
+    background-color: currentColor;
+}
+
+/* Statuts définis avec les variables */
+.status-chip.draft {
+    background-color: rgba(100, 116, 139, .1);
+    color: var(--color-text-soft);
+}
+
+.status-chip.pending {
+    background-color: rgba(47, 128, 237, .1);
+    color: var(--color-primary-accent);
+}
+
+.status-chip.approved,
+.status-chip.ordered {
+    background-color: rgba(34, 197, 94, .1);
+    color: var(--color-success);
+}
+
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* ========================================= */
+/* 6. GRILLE DE PRODUITS (FAVORIS) */
+/* ========================================= */
+.product-grid {
+    margin-top: var(--space-lg);
+    display: grid;
+    gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.product-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-3xl);
+    border: 1px solid var(--color-border);
+    background-color: #f8fafc;
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+    cursor: pointer;
+}
+
+.product-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+}
+
+.product-image-container {
+    position: relative;
+    height: 10rem;
+    overflow: hidden;
+}
+
+.product-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform .5s;
+}
+
+.product-item:hover .product-image {
+    transform: scale(1.08);
+}
+
+.product-reference-chip {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, .9);
+    padding: .25rem .75rem;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    backdrop-filter: blur(2px);
+}
+
+.product-details {
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.product-name {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.product-material {
+  font-size: .875rem;
+  color: var(--color-text-soft);
+  margin-top: .25rem;
+}
+
+/* ========================================= */
+/* 7. RÉSUMÉ DU PANIER (CART SUMMARY) */
+/* ========================================= */
+.cart-summary-card {
+    overflow: hidden;
+    position: relative;
+}
+
+.cart-summary-card::before {
+    content: '';
+    position: absolute;
+    top: -3rem;
+    right: -5rem;
+    height: 12rem;
+    width: 12rem;
+    border-radius: 9999px;
+    background-color: rgba(240, 78, 127, .3);
+    filter: blur(3rem);
+    z-index: 1;
+}
+
+.card-header, .cart-body {
+    position: relative;
+    z-index: 2;
+}
+
+.cart-body {
+    position: relative;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cart-count-chip {
+    border-radius: 9999px;
+    padding: .25rem 1rem;
+    font-size: .75rem;
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, .1);
+    color: var(--color-white);
+}
+
+.cart-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    font-size: .875rem;
+}
+
+.stat-box {
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, .2);
+    background-color: rgba(255, 255, 255, .05);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.stat-category {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: #F7E6EC;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-white);
+    line-height: 1;
+}
+
+.stat-details {
+    font-size: .75rem;
+    color: #F7E6EC;
+}
+
+.primary-cta-button {
+    width: 100%;
+    justify-content: center;
+    background-color: var(--color-white);
+    color: var(--color-primary-dark);
+    border-radius: var(--radius-xl);
+    padding: .75rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.primary-cta-button:hover {
+    background-color: #e2e8f0;
+}
+
+/* ========================================= */
+/* 8. DIVERS */
+/* ========================================= */
+.contact-email-standalone {
+    text-align: center;
+    padding: var(--space-lg);
+    color: var(--color-text-dim);
+    font-size: .75rem;
+}

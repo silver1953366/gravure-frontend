@@ -1,11 +1,11 @@
-<div class="selector-container">
-  <h3 class="selector-title">1. Sélection de la Forme</h3>
-  <div class="button-list">
-    <button *ngFor="let shape of shapes" (click)="selectShape(shape)" 
-            [class.selected]="selectedShape === shape.name"
-            class="shape-btn">
-      <i [class]="shape.icon" class="icon-style"></i>
-      <span>{{ shape.name }}</span>
+<div class="shape-selection-grid">
+    <button *ngFor="let shape of availableShapes" 
+            [class.selected]="shape.id === selectedShapeId"
+            (click)="selectShape(shape.id)"
+            class="shape-tile">
+        <div class="shape-icon">
+            <svg></svg> 
+        </div>
+        <span class="shape-name">{{ shape.name }}</span>
     </button>
-  </div>
 </div>

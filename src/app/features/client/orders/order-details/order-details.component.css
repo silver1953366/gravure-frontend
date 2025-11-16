@@ -1,0 +1,229 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.back-link {
+    color: #4f46e5; 
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    text-decoration: none;
+}
+.back-link:hover {
+    color: #3730a3;
+}
+
+.card {
+    background-color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-header h1 {
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: #1a202c;
+}
+
+/* --- Statut Chip (pour Détail) --- */
+.status-pill {
+    padding: 0.25rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    color: white;
+    text-transform: uppercase;
+    /* Les couleurs de fond seront définies via ngClass dans le TS */
+}
+
+/* Couleurs de statut du composant de DÉTAIL (couleurs foncées) */
+.bg-status-paid { background-color: #059669; } /* green-600 */
+.bg-status-pending_payment { background-color: #d97706; } /* yellow-600 */
+.bg-status-processing { background-color: #2563eb; } /* blue-600 */
+.bg-status-shipped { background-color: #7c3aed; } /* purple-600 */
+.bg-status-completed { background-color: #4b5563; } /* gray-600 */
+.bg-status-canceled { background-color: #dc2626; } /* red-600 */
+
+
+/* --- Grille de Détail --- */
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+/* --- Blocs d'Information --- */
+.detail-block h2,
+.detail-block h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4f46e5; /* indigo-700 */
+    margin-bottom: 0.75rem;
+}
+
+.data-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.data-list > div {
+    margin-bottom: 0.5rem;
+}
+
+.data-list dt {
+    font-weight: 500;
+    color: #6b7280; /* gray-500 */
+    font-size: 0.875rem;
+}
+
+.data-list dd {
+    color: #1a202c;
+}
+
+.final-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #047857; /* green-700 */
+}
+
+/* Bouton de Paiement */
+.payment-button {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+    background-color: #10b981; /* green-600 */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.payment-button:hover {
+    background-color: #059669; /* green-700 */
+}
+
+address {
+    font-style: normal;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.instructions-block {
+    margin-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1.5rem;
+}
+
+.instructions-block p {
+    font-size: 0.875rem;
+    color: #4a5568;
+    white-space: pre-wrap;
+}
+
+/* --- Correction sur l'utilisation du template OrderDetailComponent --- */
+/* Le OrderCreateComponent utilise ce même fichier CSS, les styles suivants sont pour le formulaire */
+.order-create-card {
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.price-summary {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background-color: #e0e7ff; /* indigo-50 */
+    border-left: 4px solid #4f46e5; /* indigo-500 */
+    color: #2a3562; /* indigo-800 */
+}
+
+.price-summary p.total {
+    font-size: 1.875rem;
+    font-weight: 700;
+}
+
+.form-group {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group legend {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #4a5568;
+    padding: 0 0.5rem;
+}
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-field label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.25rem;
+}
+
+.form-field input {
+    display: block;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    padding: 0.5rem;
+    transition: border-color 0.2s;
+}
+
+.form-field input:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+
+.validation-error {
+    color: #e53e3e;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+    background-color: #10b981; /* green-600 */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+    background-color: #059669; /* green-700 */
+}
+
+.submit-button:disabled {
+    background-color: #a0aec0; /* gray-400 */
+    cursor: not-allowed;
+}

@@ -1,0 +1,324 @@
+/* ----------------------------------- */
+/* 0. VARIABLES & OVERLAY ET FOND DU MODAL (Centrage) */
+/* ----------------------------------- */
+
+:root {
+    --primary-color: #007bff; /* Bleu E.M.E.S. */
+    --primary-dark: #0056b3; 
+    --error-color: #f87171;
+}
+
+.modal-overlay-bg {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050; 
+    background-color: rgba(17, 24, 39, 0.75); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ----------------------------------- */
+/* 1. STYLES DU CONTENEUR ET BOUTON FERMER */
+/* ----------------------------------- */
+
+.container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative; 
+    overflow: hidden;
+    width: 768px;
+    max-width: 90%; 
+    min-height: 480px;
+    z-index: 1060; 
+}
+
+.close-button-top-right {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    z-index: 1000;
+    padding: 0;
+    height: auto;
+    width: auto;
+    transition: color 0.2s;
+    text-transform: none; 
+    letter-spacing: normal;
+    font-weight: normal;
+}
+
+.close-button-top-right:hover {
+    color: var(--primary-color);
+}
+
+
+/* ----------------------------------- */
+/* 2. FORMULAIRES ET TYPOGRAPHIE */
+/* ----------------------------------- */
+
+h1 {
+    font-weight: bold;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.form-container form {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.social-container {
+    margin: 20px 0;
+}
+
+.social-container a {
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+}
+
+/* ----------------------------------- */
+/* 3. STYLES POUR LES ICÔNES ET LES CHAMPS */
+/* ----------------------------------- */
+
+.input-group {
+    position: relative; 
+    width: 100%;
+    margin: 8px 0; 
+}
+
+.input-group .icon, 
+.input-group .eye-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* Positionnement de l'icône à gauche (user, envelope, lock) */
+.input-group .icon {
+    left: 15px; 
+}
+
+/* Positionnement de l'icône "œil" (à droite) */
+.input-group .eye-icon {
+    right: 15px; 
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.input-group .eye-icon:hover {
+    color: var(--primary-color); 
+}
+
+/* Ajustement du padding de l'input pour laisser la place aux icônes */
+.form-container input {
+    background: #eee;
+    border: none;
+    padding: 12px 40px 12px 40px; 
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+
+/* ----------------------------------- */
+/* 4. BOUTONS ET MESSAGES D'ERREUR */
+/* ----------------------------------- */
+
+button {
+    border-radius: 20px;
+    border: 1px solid var(--primary-color);
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in, background-color 0.3s;
+    cursor: pointer;
+    margin-top: 15px; 
+}
+
+button:hover {
+    background: var(--primary-dark);
+}
+
+button.ghost {
+    background: transparent;
+    border-color: #fff;
+}
+
+button.ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* ----------------------------------- */
+/* 5. LOGIQUE D'ANIMATION ET OVERLAY PANELS */
+/* ----------------------------------- */
+
+/* STYLES POUR LE LOGO DANS L'OVERLAY */
+.logo-container {
+    position: absolute;
+    top: 30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.overlay-logo {
+    max-width: 120px; 
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); 
+}
+/* Fin des styles du logo */
+
+.overlay {
+    background: var(--primary-color);
+    background: linear-gradient(to right, var(--primary-color), var(--primary-dark)) no-repeat 0 0 / cover;
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all .6s ease-in-out;
+}
+
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;    
+    padding: 0 0px;
+    height: 100%;
+    width: 50%;
+    text-align: center;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+/* --- CLASSES D'ANIMATION --- */
+
+.container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.container.right-panel-active .overlay-left {
+    transform: translateX(0%);
+}
+
+.container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}

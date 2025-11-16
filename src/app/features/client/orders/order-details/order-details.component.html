@@ -1,0 +1,118 @@
+<div class="container">
+  <a routerLink="/client/orders" class="back-link">
+      ← Retour à l'historique des commandes
+  </a>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      Chargement des détails de la commande...
+    </div>
+  } @else if (error()) {
+    <div class="error-message">
+      {{ error() }}
+    </div>
+  } @else if (order()) {
+    <div class="card detail-page-card">
+      <div class="p-8">
+        <header class="card-header">
+          <h1 class="card-header-title">
+            Commande #{{ order()!.reference }}
+          </h1>
+          <span class="{{ getStatusClass(order()!.status) }}">
+            {{ order()!.status | uppercase }}
+          </span>
+        </header>
+
+        <div class="detail-grid">
+          
+          <div class="detail-block">
+            <h2>Statut & Paiement</h2>
+            <dl class="data-list">
+              <div>
+                <dt>Date de commande:</dt>
+                <dd>{{ order()!.created_at | date: 'fullDate' }}</dd>
+              </div>
+              <div>
+                <dt>Montant total:</dt>
+                <dd class="final-price">{{ order()!.final_price_fcfa | number:'1.0-0' }} FCFA</dd>
+              </div>
+              @if (order()!.payment_id) {
+                <div>
+                  <dt>ID Transaction:</dt>
+                  <dd>{{ order()!.payment_id }}</dd>
+                </div>
+              }
+            </dl>
+            
+            @if (order()!.status === 'pending_payment') {
+              <button (click)="handlePayment()"
+                      class="payment-button">
+                Procéder au Paiement
+              </button>
+            } @else if (order()!.status === 'completed') {
+              <p class="completed-message">La commande est terminée. Merci.</p>
+            }
+          </div>
+
+          <div class="detail-block">
+            <h2>Adresse de Livraison</h2>
+            <address>
+              <p class="font-semibold">{{ order()!.client_details.name }}</p>
+              <p>{{ order()!.shipping_address.street }}</p>
+              <p>{{ order()!.shipping_address.postal_code }} {{ order()!.shipping_address.city }}</p>
+              <p>Tél: {{ order()!.client_details.phone }}</p>
+              <p>Email: {{ order()!.client_details.email }}</p>
+            </address>
+          </div>
+
+          <div class="detail-block">
+            <h2>Produit commandé</h2>
+            <dl class="data-list">
+              <div>
+                <dt>Matériau:</dt>
+                <dd>{{ order()!.material?.name || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Forme:</dt>
+                <dd>{{ order()!.shape?.name || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Dimension:</dt>
+                <dd>{{ order()!.material_dimension?.dimension_label || 'N/A' }}</dd> 
+              </div>
+              <div>
+                <dt>Quantité:</dt>
+                <dd class="quantity">{{ order()!.quantity }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        
+        <div class="instructions-attachments-section full-width">
+            <h3>Instructions du Client</h3>
+            <p>
+                {{ order()!.details_snapshot.description || 'Aucune instruction ou description fournie lors de la commande.' }}
+            </p>
+
+            @if (order()!.attachments?.length) {
+                <h3 class="mt-6">Fichiers Joints</h3>
+                <ul class="attachment-list">
+                    @for (att of order()!.attachments; track att.id) {
+                        <li class="attachment-item">
+                            <span class="file-name">{{ att.original_name }}</span> 
+                            <div class="file-info-actions">
+                                <span class="file-size">{{ att.size | number:'1.0-0':'fr' }} octets</span>
+                                <a [href]="getAttachmentDownloadUrl(att.id)" target="_blank" class="download-link" title="Télécharger">
+                                    Télécharger
+                                    <svg class="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-4-4l4 4 4-4"/></svg>
+                                </a>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+      </div>
+    </div>
+  }
+</div>

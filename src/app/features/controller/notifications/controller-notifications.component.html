@@ -1,0 +1,35 @@
+<div class="notifications-container">
+    <h2>Notifications et Alertes</h2>
+    <p>Messages importants concernant la production, l'inventaire et les commandes.</p>
+
+    <div *ngIf="isLoading">Chargement des notifications...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <ng-container *ngIf="!isLoading && notifications.length > 0">
+        <div 
+            *ngFor="let notification of notifications" 
+            class="notification-item"
+            [class.unread]="!notification.read"
+        >
+            <div class="content">
+                <strong>[{{ notification.type | uppercase }}]</strong> 
+                <span class="message">{{ notification.message }}</span>
+            </div>
+            
+            <div class="actions">
+                <span class="date">{{ notification.created_at | date:'shortTime' }}</span>
+                
+                <button 
+                    (click)="markAsRead(notification)" 
+                    class="btn-sm btn-link"
+                    [class.btn-mark-read]="!notification.read">
+                    {{ notification.read ? 'Voir' : 'Marquer Lu & Voir' }}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+    
+    <div *ngIf="!isLoading && notifications.length === 0 && !error" class="alert-info">
+        Aucune nouvelle notification.
+    </div>
+</div>

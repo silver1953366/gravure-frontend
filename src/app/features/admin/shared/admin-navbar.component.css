@@ -1,0 +1,97 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Styles Déconnexion */
+.btn-logout {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+}
+.btn-logout:hover { background-color: #c0392b; }
+
+.icon-logout { margin-right: 5px; font-style: normal; }
+
+/* Styles Notifications */
+.notification-area {
+    position: relative;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.icon-bell {
+    font-size: 1.5em;
+    color: #34495e;
+}
+
+.badge {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: #e67e22;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 20;
+    padding: 10px;
+}
+
+.notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.btn-read {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75em;
+    flex-shrink: 0;
+}
+.view-all {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #3498db;
+    text-decoration: none;
+    font-size: 0.9em;
+}

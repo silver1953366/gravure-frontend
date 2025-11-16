@@ -1,0 +1,78 @@
+/* Styles pour admin-quotes.component.css et admin-orders.component.css */
+
+.admin-quotes-container, .admin-orders-container {
+    padding: 20px;
+    background-color: #f4f7f6;
+    border-radius: 8px;
+}
+
+h2 { color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+
+/* Styles Messages d'état */
+.alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+.alert-success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+
+/* Styles Tableau */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+th, td { padding: 12px; border: 1px solid #e9ecef; text-align: left; font-size: 0.95em; }
+th { background-color: #e9ecef; font-weight: 700; color: #495057; }
+.price-col { font-weight: 700; color: #28a745; }
+
+/* Boutons d'action */
+.btn-convert, .btn-view, .btn-danger {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.btn-convert { background-color: #3498db; color: white; }
+.btn-convert:hover { background-color: #2980b9; }
+
+.btn-view { background-color: #f39c12; color: white; }
+.btn-view:hover { background-color: #e67e22; }
+
+.btn-danger { background-color: #e74c3c; color: white; }
+.btn-danger:hover { background-color: #c0392b; }
+
+/* Styles Statuts (Devis & Commandes) */
+[class^="status-"] {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 700;
+    display: inline-block;
+}
+
+/* Statuts de Devis */
+.status-draft { background-color: #fcf8e3; color: #8a6d3b; } /* Jaune pâle */
+.status-submitted { background-color: #d9edf7; color: #31708f; } /* Bleu clair */
+.status-rejected { background-color: #f2dede; color: #a94442; } /* Rouge pâle */
+.status-ordered { background-color: #dff0d8; color: #3c763d; } /* Vert pâle */
+
+/* Statuts de Commande */
+.status-pending_payment { background-color: #f0ad4e; color: white; } /* Orange */
+.status-processing { background-color: #3498db; color: white; } /* Bleu */
+.status-ready_for_pickup { background-color: #2ecc71; color: white; } /* Vert vif */
+.status-completed { background-color: #1abc9c; color: white; } /* Turquoise */
+.status-cancelled { background-color: #95a5a6; color: white; } /* Gris */
+
+/* Styles pour le select de statut (Admin Orders) */
+.status-select {
+    border: 1px solid #ccc;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    font-weight: 600;
+    padding: 5px;
+}

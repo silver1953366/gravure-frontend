@@ -1,0 +1,82 @@
+/* src/app/features/controller/shared/controller-sidebar/controller-sidebar.component.css */
+
+.sidebar {
+    width: 250px;
+    background-color: #3f51b5; /* Bleu sombre/violet - Couleur distinctive du Contrôleur */
+    color: white;
+    padding: 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #5c6bc0;
+}
+
+.sidebar-header h1 {
+    font-size: 1.4em;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.menu-list {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.menu-item a, .submenu-toggle {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #e8eaf6;
+    font-size: 1em;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.menu-item a:hover, .submenu-toggle:hover {
+    background-color: #5c6bc0; /* Couleur au survol */
+    color: white;
+}
+
+.menu-item .icon {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+/* Styles Lien Actif */
+.active-link {
+    background-color: #7986cb; /* Couleur de lien actif */
+    color: white !important;
+    border-left: 5px solid #303f9f;
+    padding-left: 15px !important;
+}
+
+/* Styles Sous-Menu */
+.submenu {
+    background-color: #4c5bb5; 
+    /* ... (Autres styles de transition identiques) */
+}
+
+.submenu li a {
+    padding: 10px 20px 10px 50px;
+    font-size: 0.9em;
+    display: block;
+}
+
+.active-sub-link {
+    background-color: #5c6bc0;
+    font-weight: 600;
+}
+/* Ajoutez les styles pour la flèche (arrow-icon) et l'ouverture (open) du sous-menu comme dans l'Admin */

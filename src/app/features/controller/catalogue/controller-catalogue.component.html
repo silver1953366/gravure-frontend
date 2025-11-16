@@ -1,0 +1,40 @@
+<div class="catalogue-container">
+    <h2>Catalogue des Produits (Référence)</h2>
+    <p>Liste des produits et de leurs spécifications techniques pour la vérification de la production.</p>
+
+    <div *ngIf="isLoading">Chargement du catalogue...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && products.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Référence</th>
+                <th>Nom du Produit</th>
+                <th>Coût Unitaire (Ref)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let product of products">
+                <td>{{ product.id }}</td>
+                <td>{{ product.reference }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.unit_cost | currency:'EUR':'symbol' }}</td>
+                <td>
+                    <button (click)="goToProductDetail(product.id)" class="btn-view">
+                        Voir Spécifications
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div *ngIf="!isLoading && products.length === 0 && !error" class="alert-info">
+        Aucun produit trouvé dans le catalogue.
+    </div>
+</div>
+
+<p class="disclaimer">
+    *Toute modification des produits et des coûts est réservée au rôle Administrateur.
+</p>

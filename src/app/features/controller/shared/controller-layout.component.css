@@ -1,0 +1,19 @@
+/* src/app/features/controller/shared/controller-layout/controller-layout.component.css */
+/* Styles similaires au Layout Admin, mais adaptables pour une identité visuelle différente si souhaité */
+
+.controller-layout-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f7f9fa; /* Arrière-plan général plus clair */
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content {
+    padding: 20px;
+    flex-grow: 1;
+}

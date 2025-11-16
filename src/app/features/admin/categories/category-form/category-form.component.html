@@ -1,0 +1,50 @@
+<div class="category-form-container">
+    <a routerLink="/admin/categories" class="back-link">← Retour à la liste des catégories</a>
+    
+    <h3>{{ isEditMode ? 'Modifier la catégorie' : 'Ajouter une nouvelle catégorie' }}</h3>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+        
+        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
+        
+        <div class="form-group">
+            <label for="name">Nom de la Catégorie</label>
+            <input id="name" type="text" formControlName="name" (input)="onNameChange()">
+            <div *ngIf="categoryForm.controls['name'].touched && categoryForm.controls['name'].invalid" class="error-message">
+                Le nom est requis.
+            </div>
+            <div *ngIf="apiErrors.name" class="error-message">{{ apiErrors.name }}</div>
+        </div>
+
+        <div class="form-group">
+            <label for="slug">Slug (URL)</label>
+            <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode">
+            <small *ngIf="!isEditMode">Généré automatiquement à partir du nom.</small>
+            <div *ngIf="categoryForm.controls['slug'].touched && categoryForm.controls['slug'].invalid" class="error-message">
+                Le slug est requis et doit être au format 'minuscule-tirets'.
+            </div>
+            <div *ngIf="apiErrors.slug" class="error-message">{{ apiErrors.slug }}</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description"></textarea>
+            <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
+        </div>
+
+        <div class="form-group">
+            <label for="is_active">Statut</label>
+            <select id="is_active" formControlName="is_active">
+                <option [ngValue]="true">Actif</option>
+                <option [ngValue]="false">Inactif</option>
+            </select>
+            <div *ngIf="apiErrors.is_active" class="error-message">{{ apiErrors.is_active }}</div>
+        </div>
+
+
+        <button type="submit" [disabled]="categoryForm.invalid || isLoading">
+            {{ isEditMode ? 'Sauvegarder la catégorie' : 'Créer la catégorie' }}
+        </button>
+        <div *ngIf="isLoading">Sauvegarde en cours...</div>
+    </form>
+</div>

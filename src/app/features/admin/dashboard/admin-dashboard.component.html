@@ -1,0 +1,67 @@
+<div class="admin-dashboard-container">
+    <h2>Tableau de Bord - Aperçu Général</h2>
+    
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <div class="stats-cards">
+        <div class="card" routerLink="/admin/quotes">
+            <h3 class="card-title">Devis Soumis</h3>
+            <div class="card-value" *ngIf="stats">{{ stats.activeQuotes | number }}</div>
+            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
+            <p class="card-footer">En attente de traitement/conversion</p>
+        </div>
+
+        <div class="card" routerLink="/admin/admin-orders">
+            <h3 class="card-title">Commandes en Cours</h3>
+            <div class="card-value" *ngIf="stats">{{ stats.pendingOrders | number }}</div>
+            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
+            <p class="card-footer">Paiement en attente ou en fabrication</p>
+        </div>
+
+        <div class="card primary-card" routerLink="/admin/reports">
+            <h3 class="card-title">Chiffre d'Affaires Total (CA)</h3>
+            <div class="card-value" *ngIf="stats">{{ stats.totalRevenue | number:'1.0-0' }} FCFA</div>
+            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
+            <p class="card-footer">Basé sur les commandes complétées</p>
+        </div>
+
+        <div class="card danger-card" routerLink="/admin/inventory">
+            <h3 class="card-title">Alertes Inventaire</h3>
+            <div class="card-value" *ngIf="stats">{{ stats.inventoryAlerts | number }}</div>
+            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
+            <p class="card-footer">Articles en dessous du seuil min.</p>
+        </div>
+    </div>
+    
+    <div class="dashboard-details">
+        
+        <div class="chart-panel">
+            <h3>Évolution du Chiffre d'Affaires</h3>
+            <div class="chart-area">
+                <p *ngIf="revenueData">
+                    Simulation de graphique : {{ revenueData.period.join(', ') }} vs Revenu.
+                </p>
+                <div *ngIf="!revenueData" class="alert-info">
+                    Données de graphique non disponibles ou service non implémenté.
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-panel">
+            <h3>Journal d'Activité Récente</h3>
+            <div *ngIf="isLoadingActivity" class="loading-message">Chargement du journal...</div>
+            <ul class="activity-list" *ngIf="!isLoadingActivity && recentActivities.length > 0">
+                <li *ngFor="let activity of recentActivities">
+                    <span class="activity-time">{{ activity.created_at | date:'shortTime' }}</span>
+                    <span class="activity-desc">{{ formatActivity(activity) }}</span>
+                </li>
+                <li class="view-all-activity">
+                    <a routerLink="/admin/activity-log">Voir tout le journal d'activité...</a>
+                </li>
+            </ul>
+            <div *ngIf="!isLoadingActivity && recentActivities.length === 0" class="alert-info">
+                Aucune activité récente.
+            </div>
+        </div>
+    </div>
+</div>

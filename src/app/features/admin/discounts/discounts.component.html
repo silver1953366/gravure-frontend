@@ -1,0 +1,123 @@
+<div class="discounts-container">
+    <h2>🏷️ Gestion des Réductions et Codes Promo</h2>
+
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+
+    <div class="form-panel" *ngIf="isCreating || isEditing">
+        <h3>{{ isCreating ? 'Créer une Nouvelle Réduction' : 'Modifier le Code ' + (selectedDiscount?.code || selectedDiscount?.name) }}</h3>
+        
+        <form #discountForm="ngForm" (ngSubmit)="saveDiscount(discountForm)"> 
+            
+            <div class="form-group">
+                <label for="name">Nom de la réduction</label>
+                <input type="text" id="name" name="name" [(ngModel)]="currentDiscount.name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="code">Code Promotionnel (Optionnel)</label>
+                <input type="text" id="code" name="code" [(ngModel)]="currentDiscount.code">
+            </div>
+
+            <div class="form-group">
+                <label for="type">Type de Réduction</label>
+                <select id="type" name="type" [(ngModel)]="currentDiscount.type" required>
+                    <option value="percentage">Pourcentage (%)</option>
+                    <option value="fixed">Montant Fixe (FCFA)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="value">Valeur ({{ currentDiscount.type === 'percentage' ? '%' : 'FCFA' }})</label>
+                <input type="number" 
+                       id="value" 
+                       name="value" 
+                       [(ngModel)]="currentDiscount.value" 
+                       required 
+                       min="0" 
+                       [max]="currentDiscount.type === 'percentage' ? 100 : null"> </div>
+
+            <div class="form-group">
+                <label for="min_order_amount">Montant minimum de commande (Optionnel)</label>
+                <input type="number" id="min_order_amount" name="min_order_amount" [(ngModel)]="currentDiscount.min_order_amount" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="expires_at">Date d'expiration (Optionnel)</label>
+                <input type="date" id="expires_at" name="expires_at" [(ngModel)]="currentDiscount.expires_at"> 
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="is_active" name="is_active" [(ngModel)]="currentDiscount.is_active">
+                <label for="is_active">Réduction active</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="discountForm.invalid">
+                    <span *ngIf="isCreating">Créer la Réduction</span>
+                    <span *ngIf="isEditing">Sauvegarder</span>
+                </button>
+                <button type="button" (click)="cancelOperation()" class="btn btn-secondary">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="action-bar">
+        <button (click)="startCreation()" class="btn-primary-admin" *ngIf="!isCreating && !isEditing">
+            + Ajouter une Réduction
+        </button>
+    </div>
+    
+    <hr>
+
+    <div class="discounts-list">
+        <h3>Codes de Réduction Existants</h3>
+
+        <div *ngIf="isLoading" class="loading-message">Chargement des réductions...</div>
+
+        <table *ngIf="!isLoading && discounts.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Valeur</th>
+                    <th>Min. Commande</th>
+                    <th>Expire le</th>
+                    <th>Actif</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let discount of discounts">
+                    <td>#{{ discount.id }}</td>
+                    <td>{{ discount.name }}</td>
+                    <td><span class="code-tag">{{ discount.code || 'N/A' }}</span></td>
+                    <td>{{ getTypeLabel(discount.type) }}</td>
+                    <td>
+                        {{ discount.value }} 
+                        {{ discount.type === 'percentage' ? '%' : 'FCFA' }}
+                    </td>
+                    <td>
+                         {{ discount.min_order_amount | currency:'XOF':'symbol':'1.0-2' }}
+                    </td>
+                    <td>{{ discount.expires_at ? (discount.expires_at | date:'shortDate') : 'Jamais' }}</td>
+                    <td>
+                        <span [class]="discount.is_active ? 'status-active' : 'status-inactive'">
+                            {{ discount.is_active ? 'Oui' : 'Non' }}
+                        </span>
+                    </td>
+                    <td class="actions-col">
+                        <button (click)="startEditing(discount)" class="btn-edit" [disabled]="isCreating || isEditing">Modifier</button>
+                        <button (click)="deleteDiscount(discount.id!)" class="btn-delete" [disabled]="isCreating || isEditing">Supprimer</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div *ngIf="!isLoading && discounts.length === 0" class="alert-info">
+            Aucune réduction n'a été trouvée. Commencez par en créer une !
+        </div>
+    </div>
+</div>

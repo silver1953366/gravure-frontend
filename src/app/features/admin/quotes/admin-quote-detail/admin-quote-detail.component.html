@@ -1,0 +1,69 @@
+<div class="quote-detail-container">
+    <button (click)="router.navigate(['/admin/quotes'])" class="btn-back">
+        &larr; Retour à la liste des devis
+    </button>
+
+    <h2 *ngIf="quote">Détail du Devis #{{ quote.id }}</h2>
+    <h2 *ngIf="!quote && !isLoading">Détail du Devis</h2>
+
+    <div *ngIf="isLoading" class="loading-message">Chargement des détails du devis...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+
+    <div *ngIf="quote && !isLoading" class="detail-card">
+        
+        <div class="info-section">
+            <div class="info-box">
+                <h3>Informations Client</h3>
+                <p><strong>Nom du Client :</strong> {{ quote.user?.name || 'Utilisateur ID ' + quote.user_id }}</p>
+                <p><strong>Créé le :</strong> {{ quote.created_at | date:'medium' }}</p>
+            </div>
+
+            <div class="info-box status-box">
+                <h3>Statut Actuel</h3>
+                <span [class]="'status-tag status-' + quote.status">{{ quote.status | uppercase }}</span>
+                <p class="mt-10"><strong>Montant Total :</strong> <span class="price-total">{{ quote.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span></p>
+            </div>
+        </div>
+
+        <div class="action-buttons mt-20">
+            <button 
+                *ngIf="quote.status === 'submitted'" 
+                (click)="onConvertQuote()" 
+                [disabled]="isProcessing"
+                class="btn-convert">
+                Convertir en Commande
+            </button>
+            <button (click)="onDeleteQuote()" class="btn-danger">Supprimer le Devis</button>
+            
+            <span *ngIf="quote.status === 'ordered'" class="alert-info ml-20">
+                ✅ Ce devis a été converti en commande.
+            </span>
+        </div>
+
+        <h3>Articles Détaillés ({{ quote.items.length }})</h3>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Prix Unitaire</th>
+                    <th>Quantité</th>
+                    <th>Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of quote.items">
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.unit_price | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.subtotal | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-summary">
+            <strong>TOTAL FINAL :</strong> 
+            <span class="price-total">{{ quote.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span>
+        </div>
+    </div>
+</div>

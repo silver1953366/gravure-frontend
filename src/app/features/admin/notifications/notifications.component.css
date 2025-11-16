@@ -1,0 +1,145 @@
+.notifications-container {
+    padding: 20px;
+}
+
+h2 {
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #555;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+/* Formulaire d'envoi */
+.send-notification-section {
+    padding: 20px;
+    background-color: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button[type="submit"]:disabled {
+    background-color: #a0c3e8;
+    cursor: not-allowed;
+}
+
+.alert-error {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Tableau de liste */
+.notifications-list-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.notifications-list-section th, .notifications-list-section td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.notifications-list-section th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+
+/* Badges de type */
+.type-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+.type-info { background-color: #007bff; }
+.type-warning { background-color: #ffc107; color: #333;}
+.type-success { background-color: #28a745; }
+.type-error { background-color: #dc3545; }
+
+/* Statut lu/non lu */
+.status-read { color: #28a745; font-weight: bold; }
+.status-unread { color: #dc3545; font-weight: bold; }
+
+/* Boutons d'action */
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.btn-link {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+}

@@ -1,1 +1,95 @@
-<p>notifications works!</p>
+<div class="notifications-container">
+    <h2>Gestion et Journal des Notifications Système</h2>
+
+    <div class="send-notification-section">
+        <h3>Envoyer une Notification Manuelle</h3>
+        <form [formGroup]="notificationForm" (ngSubmit)="onSendNotification()">
+
+            <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
+            <div *ngIf="sendSuccessMessage" class="alert-success">{{ sendSuccessMessage }}</div>
+
+            <div class="form-group">
+                <label for="user_ids">IDs Utilisateurs Destinataires (séparés par une virgule)</label>
+                <input id="user_ids" type="text" formControlName="user_ids" placeholder="Ex: 1, 5, 8">
+                <div *ngIf="notificationForm.controls['user_ids'].touched && notificationForm.controls['user_ids'].invalid" class="error-message">
+                    Le ou les IDs utilisateurs sont requis et doivent être des nombres séparés par des virgules.
+                </div>
+                <div *ngIf="apiErrors.user_id" class="error-message">{{ apiErrors.user_id }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="type">Type de Notification</label>
+                <select id="type" formControlName="type">
+                    <option *ngFor="let t of notificationTypes" [value]="t">{{ t | uppercase }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Titre</label>
+                <input id="title" type="text" formControlName="title">
+                <div *ngIf="apiErrors.title" class="error-message">{{ apiErrors.title }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" formControlName="message"></textarea>
+                <div *ngIf="apiErrors.message" class="error-message">{{ apiErrors.message }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="link">Lien (URL, optionnel)</label>
+                <input id="link" type="url" formControlName="link">
+                <div *ngIf="apiErrors.link" class="error-message">{{ apiErrors.link }}</div>
+            </div>
+
+            <button type="submit" [disabled]="notificationForm.invalid || isSending">
+                {{ isSending ? 'Envoi en cours...' : 'Envoyer la Notification' }}
+            </button>
+        </form>
+    </div>
+
+    <hr>
+    
+    <div class="notifications-list-section">
+        <h3>Journal des Notifications Système Envoyées</h3>
+
+        <div *ngIf="isLoadingNotifications" class="loading-message">Chargement du journal des notifications...</div>
+        <div *ngIf="errorNotifications" class="alert-error">{{ errorNotifications }}</div>
+        
+        <table *ngIf="!isLoadingNotifications && allNotifications.length > 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Destinataire</th>
+                    <th>Type</th>
+                    <th>Titre</th>
+                    <th>Lue</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let notification of allNotifications">
+                    <td>{{ notification.id }}</td>
+                    <td>{{ notification.user?.name || 'Inconnu' }} (ID: {{ notification.user_id }})</td>
+                    <td><span class="type-badge type-{{ notification.type }}">{{ notification.type | uppercase }}</span></td>
+                    <td>{{ notification.title }}</td>
+                    <td>
+                        <span [class]="notification.is_read ? 'status-read' : 'status-unread'">
+                            {{ notification.is_read ? 'Oui' : 'Non' }}
+                        </span>
+                    </td>
+                    <td>{{ notification.created_at | date:'short' }}</td>
+                    <td>
+                        <a *ngIf="notification.link" [href]="notification.link" target="_blank" class="btn-link">Voir</a>
+                        <button (click)="onDeleteNotification(notification.id)" class="btn-danger">Supprimer</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!isLoadingNotifications && allNotifications.length === 0 && !errorNotifications">
+            Le journal des notifications est vide.
+        </div>
+    </div>
+</div>

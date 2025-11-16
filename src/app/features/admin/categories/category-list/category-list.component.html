@@ -1,0 +1,42 @@
+<div class="category-management-container">
+    <h2>Gestion des Catégories de Produits</h2>
+
+    <div class="header-actions">
+        <button (click)="onCreateCategory()">+ Ajouter une nouvelle catégorie</button>
+    </div>
+
+    <div *ngIf="isLoading">Chargement des catégories...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && categories.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Slug</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let category of categories">
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.slug }}</td>
+                <td>
+                    <span [class]="category.is_active ? 'status-active' : 'status-inactive'">
+                        {{ category.is_active ? 'Actif' : 'Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <button (click)="onEditCategory(category.id)">Modifier</button>
+                    <button (click)="onDeleteCategory(category.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && categories.length === 0 && !error">
+        Aucune catégorie trouvée.
+    </div>
+</div>

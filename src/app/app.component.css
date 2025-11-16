@@ -1,24 +1,54 @@
-.app-layout {
-    display: flex;
+:host {
+    /* Variables de Layout */
+    --sidebar-width: 16rem; 
+    --color-background: #f1f5f9; /* Couleur d'arrière-plan du contenu */
+    display: block; 
     min-height: 100vh;
-    background-color: #f1f5f9; /* Ou var(--color-background) si défini globalement */
+    overflow-x: hidden; /* Empêche le défilement horizontal lorsque la sidebar glisse */
 }
 
-.app-main-content {
-    flex-grow: 1;
+.app-container {
+    min-height: 100vh;
+    background-color: var(--color-background); 
+}
+
+.content-wrapper {
+    /* Organisation verticale: Navbar, Main, Footer */
+    flex-grow: 1; 
     display: flex;
-    flex-direction: column;
-    /* Permet au contenu de défiler */
-    min-width: 0; 
+    flex-direction: column; 
+    min-height: 100vh; 
+    width: 100%; 
+    
+    /* Animation de transition pour le décalage (marge) */
+    transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* Par défaut (Mobile), pas de décalage */
+    margin-left: 0;
+    width: 100%;
 }
 
-/* Wrapper qui contiendra le Dashboard, pour appliquer le padding général */
-.page-content-wrapper {
-    flex-grow: 1;
-    /* Padding du contenu principal, simulant le wrapper de votre dashboard */
-    padding: 2.5rem 1rem 4rem; 
+/* --- Gestion de l'espace sur Grand Écran (Desktop/Large) --- */
+@media (min-width: 1025px) {
+    
+    /* 🚨 L'état 'poussé' (quand la Sidebar est ouverte - isSidebarOpen=true) 🚨 */
+    .content-wrapper.lg-pushed {
+        /* Décalage le contenu à droite de la largeur de la sidebar */
+        margin-left: var(--sidebar-width); 
+        /* Le contenu prend l'espace restant */
+        width: calc(100% - var(--sidebar-width)); 
+    }
+    
+    /* Si la Sidebar est fermée sur Desktop (content-wrapper:not(.lg-pushed)) */
+    .content-wrapper:not(.lg-pushed) {
+        margin-left: 0; /* Revient à la gauche */
+        width: 100%;
+    }
 }
 
-/* Ajustement pour le dashboard.component.css */
-/* Dans dashboard.component.css, retirez le padding du .dashboard-content-wrapper 
-   ou ajustez-le, car il est désormais géré par .page-content-wrapper */
+.page-content {
+    /* Prend l'espace vertical disponible entre navbar et footer */
+    flex-grow: 1; 
+    padding: 1.5rem; 
+    width: 100%;
+}

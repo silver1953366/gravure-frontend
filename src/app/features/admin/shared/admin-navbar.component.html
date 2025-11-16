@@ -1,0 +1,35 @@
+<header class="navbar">
+    <div class="navbar-left">
+        <span>Bienvenue, **{{ user.name }}** | Rôle : {{ user.role }}</span>
+    </div>
+
+    <div class="navbar-right">
+        <div class="notification-area" (click)="toggleNotificationDropdown()">
+            <i class="icon-bell">🔔</i>
+            <ng-container *ngIf="unreadNotifications$ | async as notifications">
+                <span class="badge" *ngIf="notifications.length > 0">
+                    {{ notifications.length }}
+                </span>
+                
+                <div class="notification-dropdown" *ngIf="showNotificationDropdown" (click)="$event.stopPropagation()">
+                    <h4>Notifications Récentes ({{ notifications.length }})</h4>
+                    <div *ngIf="notifications.length === 0" class="empty-message">Aucune notification non lue.</div>
+
+                    <div *ngFor="let notif of notifications.slice(0, 5)" class="notification-item">
+                        <div class="notif-content">
+                            <strong>{{ notif.title }}</strong>
+                            <p>{{ notif.message | slice:0:40 }}...</p>
+                        </div>
+                        <button (click)="markAsRead(notif, $event)" class="btn-read">Lu</button>
+                    </div>
+
+                    <a routerLink="/admin/notifications" class="view-all">Voir tout le journal</a>
+                </div>
+            </ng-container>
+        </div>
+
+        <button (click)="onLogout()" class="btn-logout">
+            <i class="icon-logout">🚪</i> Déconnexion
+        </button>
+    </div>
+</header>

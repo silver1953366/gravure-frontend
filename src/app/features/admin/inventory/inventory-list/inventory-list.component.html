@@ -1,0 +1,44 @@
+<div class="inventory-management-container">
+    <h2>Gestion de l'Inventaire (Admin / Controller)</h2>
+
+    <div class="header-actions" *ngIf="canAdministerInventory">
+        <button (click)="onCreateItem()">+ Ajouter un article</button>
+    </div>
+
+    <div *ngIf="isLoading">Chargement de l'inventaire...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && inventory.length > 0">
+        <thead>
+            <tr>
+                <th>Réf.</th>
+                <th>Description</th>
+                <th>Quantité</th>
+                <th>Localisation</th>
+                <th>Prix Unitaire</th>
+                <th *ngIf="canAdministerInventory">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of inventory">
+                <td>{{ item.reference }}</td>
+                <td>{{ item.description }}</td>
+                <td>
+                    <span [class]="item.quantity < 10 ? 'low-stock' : ''">
+                        {{ item.quantity }}
+                    </span>
+                </td>
+                <td>{{ item.location }}</td>
+                <td>{{ item.price_per_unit | currency:'EUR':'symbol' }}</td>
+                <td *ngIf="canAdministerInventory">
+                    <button (click)="onEditItem(item.id)">Modifier</button>
+                    <button (click)="onDeleteItem(item.id)" class="btn-danger">Supprimer</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && inventory.length === 0 && !error">
+        Aucun article en stock trouvé.
+    </div>
+</div>

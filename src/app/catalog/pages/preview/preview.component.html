@@ -1,22 +1,12 @@
-<div class="preview-container">
-  <h1 class="page-header">Aperçu Détaillé et Simulation</h1>
-  <div class="details-box">
-    
-    <div class="visual-area">
-      <p class="visual-placeholder-text">Schéma Technique du Produit Configurée</p>
+<div class="product-preview-box">
+    <div class="preview-visual">
+        <svg *ngIf="config.shape" [attr.class]="'shape-' + config.shape" viewBox="0 0 100 100">
+            </svg>
+        <p *ngIf="!config.shape" class="placeholder-text">Choisissez une forme pour l'aperçu...</p>
     </div>
-
-    <h2 class="details-title">Détails de la Commande</h2>
-    <ul class="detail-list">
-      <li class="detail-item"><span>Forme :</span> <span class="detail-value">Rectangle</span></li>
-      <li class="detail-item"><span>Matériau :</span> <span class="detail-value">Acier Inoxydable (304)</span></li>
-      <li class="detail-item"><span>Dimensions :</span> <span class="detail-value">1200mm x 800mm x 5mm</span></li>
-      <li class="detail-item"><span>Finition :</span> <span class="detail-value">Brossée</span></li>
-      <li class="detail-item total-price"><span>Prix Estimé :</span> <span class="price-value">950,50 € HT</span></li>
-    </ul>
-    
-    <button class="main-action-button">
-      Sauvegarder et Ajouter au Devis
-    </button>
-  </div>
+    <div class="preview-details">
+        <p>Matériau: <strong>{{ config.materialName || 'N/A' }}</strong></p>
+        <p>Forme: <strong>{{ config.shape || 'N/A' }}</strong></p>
+        <p *ngIf="config.width">Dimensions: <strong>{{ config.width }} x {{ config.height }} mm</strong></p>
+    </div>
 </div>

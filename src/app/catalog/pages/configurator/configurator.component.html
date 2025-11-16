@@ -1,35 +1,154 @@
-<div class="config-page">
-  <h1 class="page-header">Configuration de Produit</h1>
-  
-  <div class="config-grid">
-    
-    <div class="controls-panel">
-      
-      <app-shape-selector></app-shape-selector>
-      <hr class="separator">
-      
-      <app-material-selector></app-material-selector>
-      <hr class="separator">
-      
-      <app-dimension-selector></app-dimension-selector>
-    </div>
-    
-    <div class="visualization-panel">
-      
-      <div class="visual-block">
-        <p class="visual-placeholder">Zone de Visualisation 3D (Future)</p>
-      </div>
-      
-      <div class="price-action-block">
-        <app-price-display></app-price-display>
+<div class="configurator-container">
+    <header class="configurator-header">
+        <h1>🛠️ Configurator de Plaque - Votre Création</h1>
+    </header>
+
+    <div class="configurator-grid">
         
-        <button class="action-button primary">
-          Ajouter au Devis
-        </button>
-        <a routerLink="/catalog/preview" class="action-button secondary">
-          Voir la Simulation Détaillée
-        </a>
-      </div>
+        <div class="config-sidebar-area">
+            
+            <div class="step-vertical-menu">
+                
+                <button class="step-item" [class.active]="currentStep() >= 1" (click)="currentStep.set(1)">
+                    <i class="fas fa-layer-group step-icon"></i> 
+                    <span class="step-label">1. Matériau</span>
+                </button>
+
+                <button class="step-item" [class.active]="currentStep() >= 2" [disabled]="currentStep() < 2" (click)="currentStep.set(2)">
+                    <i class="fas fa-square step-icon"></i> 
+                    <span class="step-label">2. Forme</span>
+                </button>
+
+                <button class="step-item" [class.active]="currentStep() >= 3" [disabled]="currentStep() < 3" (click)="currentStep.set(3)">
+                    <i class="fas fa-ruler-combined step-icon"></i> 
+                    <span class="step-label">3. Dimensions/Taille</span>
+                </button>
+
+                <button class="step-item" [class.active]="currentStep() >= 4" [disabled]="currentStep() < 4" (click)="currentStep.set(4)">
+                    <i class="fas fa-screwdriver step-icon"></i> 
+                    <span class="step-label">4. Fixation</span>
+                </button>
+                
+                <button class="step-item" [class.active]="currentStep() >= 5" [disabled]="currentStep() < 5" (click)="currentStep.set(5)">
+                    <i class="fas fa-palette step-icon"></i> 
+                    <span class="step-label">5. Bordure/Couleur</span>
+                </button>
+
+                <button class="step-item" [class.active]="currentStep() >= 6" [disabled]="currentStep() < 6" (click)="currentStep.set(6)">
+                    <i class="fas fa-text-height step-icon"></i> 
+                    <span class="step-label">6. Texte</span>
+                </button>
+
+                <button class="step-item" [class.active]="currentStep() >= 7" [disabled]="currentStep() < 7" (click)="currentStep.set(7)">
+                    <i class="fas fa-calculator step-icon"></i> 
+                    <span class="step-label">7. Prix & Devis</span>
+                </button>
+            </div>
+            
+            <div class="preview-sticky-wrapper">
+                <app-preview 
+                    [selectedDimension]="finalProduct()" 
+                    [borderOptions]="selectedBorder()"
+                    [textContent]="currentTextContent()"
+                />
+            </div>
+
+        </div>
+
+        <div class="config-main-content">
+            
+            @if (errorMessage()) {
+                <div class="alert-message {{ errorMessage()!.startsWith('✅') ? 'success' : 'error' }}">
+                    {{ errorMessage() }}
+                </div>
+            }
+
+            <div class="step-panels-wrapper">
+                
+                <div *ngIf="currentStep() === 1" class="config-step-panel">
+                    <h2>Étape 1: Sélection du Matériau</h2>
+                    <app-material-selector 
+                        [materials]="allMaterials()" 
+                        [selectedMaterial]="selectedMaterial()"
+                        (materialSelected)="onMaterialSelected($event)"
+                    />
+                </div>
+
+                <div *ngIf="currentStep() === 2" class="config-step-panel">
+                    <h2>Étape 2: Sélection de la Forme</h2>
+                    <app-shape-selector 
+                        [material]="selectedMaterial()"
+                        [shapes]="availableShapes()"
+                        [selectedShape]="selectedShape()"
+                        (shapeSelected)="onShapeSelected($event)"
+                    />
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 1</button>
+                    </div>
+                </div>
+                
+                <div *ngIf="currentStep() === 3" class="config-step-panel">
+                    <h2>Étape 3: Dimensions et Taille</h2>
+                    <app-dimension-selector
+                        [material]="selectedMaterial()"
+                        [shape]="selectedShape()"
+                        [dimensions]="availableDimensions()"
+                        [selectedDimension]="selectedDimension()"
+                        (dimensionSelected)="onDimensionSelected($event)"
+                    />
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 2</button>
+                    </div>
+                </div>
+
+                <div *ngIf="currentStep() === 4" class="config-step-panel">
+                    <h2>Étape 4: Type de Fixation</h2>
+                    <app-fixation-selector
+                        [selectedFixation]="selectedFixation()"
+                        (fixationSelected)="onFixationSelected($event)"
+                    />
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 3</button>
+                    </div>
+                </div>
+
+                <div *ngIf="currentStep() === 5" class="config-step-panel">
+                    <h2>Étape 5: Bordure et Couleur</h2>
+                    <app-border-selector 
+                        (borderSelected)="onBorderSelected($event)"
+                    />
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 4</button>
+                    </div>
+                </div>
+                
+                <div *ngIf="currentStep() === 6" class="config-step-panel">
+                    <h2>Étape 6: Saisie de Texte et Gravure</h2>
+                    <app-text-editor 
+                        (textUpdated)="onTextContentUpdated($event)"
+                    />
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 5</button>
+                    </div>
+                </div>
+
+
+                <div *ngIf="currentStep() === 7" class="config-step-panel final-step">
+                    <h2>Étape 7: Validation de votre Configuration</h2>
+                    
+                    <app-price-display [selectedDimension]="finalProduct()"></app-price-display>
+                    
+                    <div class="final-actions">
+                        <button class="primary-cta-button" (click)="finalizeConfiguration()" [disabled]="!finalProduct()">
+                            <i class="fas fa-shopping-cart"></i> Ajouter au Devis / Panier
+                        </button>
+                    </div>
+                    
+                    <div class="navigation-controls">
+                        <button class="step-back-btn" (click)="prevStep()">← Modifier Texte</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

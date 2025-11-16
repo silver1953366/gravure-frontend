@@ -1,0 +1,31 @@
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <h1 routerLink="/admin/dashboard">E.M.E.S Admin</h1>
+    </div>
+
+    <ul class="menu-list">
+        <ng-container *ngFor="let menu of menus">
+            <li *ngIf="!menu.children" class="menu-item">
+                <a [routerLink]="menu.link" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                    <span class="icon">{{ menu.icon }}</span>
+                    <span>{{ menu.label }}</span>
+                </a>
+            </li>
+
+            <li *ngIf="menu.children" class="menu-item has-submenu" [class.open]="isSubMenuOpen[menu.label]">
+                <div class="submenu-toggle" (click)="toggleSubMenu(menu.label)">
+                    <span class="icon">{{ menu.icon }}</span>
+                    <span>{{ menu.label }}</span>
+                    <span class="arrow-icon"></span>
+                </div>
+                <ul class="submenu" [class.show]="isSubMenuOpen[menu.label]">
+                    <li *ngFor="let child of menu.children">
+                        <a [routerLink]="child.link" routerLinkActive="active-sub-link" [routerLinkActiveOptions]="{exact: true}">
+                            {{ child.label }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ng-container>
+    </ul>
+</nav>

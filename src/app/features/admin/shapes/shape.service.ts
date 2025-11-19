@@ -12,42 +12,45 @@ export interface Shape {
     is_active: boolean;
 }
 
+// Typage minimal pour le payload sans fichier
+type ShapePayload = {
+    name: string;
+    slug?: string;
+    description?: string;
+    is_active?: boolean;
+}; 
+
 @Injectable({
     providedIn: 'root'
 })
 export class ShapeService {
-    // Route API: CRUD pour les formes (Admin SEUL)
     private readonly apiUrl = `${environment.apiUrl}/admin/shapes`; 
 
     constructor(private http: HttpClient) {}
 
     /** GET: Récupère la liste de toutes les formes */
     getShapes(): Observable<Shape[]> {
-        // Route API: GET /api/admin/shapes
         return this.http.get<Shape[]>(this.apiUrl);
     }
     
     /** GET: Récupère une seule forme par ID */
     getShape(shapeId: number): Observable<Shape> {
-        // Route API: GET /api/admin/shapes/{id}
         return this.http.get<Shape>(`${this.apiUrl}/${shapeId}`);
     }
 
-    /** POST: Crée une nouvelle forme */
-    createShape(shapeData: any): Observable<Shape> {
-        // Route API: POST /api/admin/shapes
+    /** POST: Crée une nouvelle forme (accepte FormData ou ShapePayload) */
+    createShape(shapeData: FormData | ShapePayload): Observable<Shape> {
         return this.http.post<Shape>(this.apiUrl, shapeData);
     }
 
-    /** PUT/PATCH: Met à jour une forme existante */
-    updateShape(shapeId: number, shapeData: any): Observable<Shape> {
-        // Route API: PUT/PATCH /api/admin/shapes/{id}
-        return this.http.put<Shape>(`${this.apiUrl}/${shapeId}`, shapeData);
+    /** POST: Met à jour une forme existante (utilise POST pour FormData + _method=PUT) */
+    updateShape(shapeId: number, shapeData: FormData | Partial<ShapePayload>): Observable<Shape> {
+        // La méthode PUT/PATCH est gérée dans le composant via FormData.append('_method', 'PUT').
+        return this.http.post<Shape>(`${this.apiUrl}/${shapeId}`, shapeData);
     }
 
     /** DELETE: Supprime une forme */
     deleteShape(shapeId: number): Observable<void> {
-        // Route API: DELETE /api/admin/shapes/{id}
         return this.http.delete<void>(`${this.apiUrl}/${shapeId}`);
     }
 }

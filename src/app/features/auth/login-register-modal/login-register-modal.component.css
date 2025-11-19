@@ -1,12 +1,22 @@
-/* ----------------------------------- */
-/* 0. VARIABLES & OVERLAY ET FOND DU MODAL (Centrage) */
-/* ----------------------------------- */
+/* src/app/features/auth/login-register-modal/login-register-modal.component.css */
+
+/* =================================================== */
+/* 0. VARIABLES (HIGH CONTRAST THEME: DEEP CYAN/TEAL) */
+/* =================================================== */
 
 :root {
-    --primary-color: #007bff; /* Bleu E.M.E.S. */
-    --primary-dark: #0056b3; 
-    --error-color: #f87171;
+    --primary-color: #00bcd4; /* Deep Cyan/Aqua */
+    --primary-dark: #00838f; /* Darker Teal for hover/gradient end */
+    --text-color: #1f2937; /* Very dark gray for body text */
+    --input-bg: #f5f5f5; /* Light input background */
+    --border-color: #e0e0e0;
+    --error-color: #ef4444; /* Vivid Red */
+    --link-color: #00bcd4;
 }
+
+/* =================================================== */
+/* 0. OVERLAY ET FOND DU MODAL (Centrage) */
+/* =================================================== */
 
 .modal-overlay-bg {
     position: fixed;
@@ -14,76 +24,101 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1050; 
-    background-color: rgba(17, 24, 39, 0.75); 
+    
+    /* 🛑 Z-INDEX CORRIGÉ : TRÈS HAUT pour être au-dessus de tout */
+    z-index: 99999; 
+    
+    background-color: rgba(17, 24, 39, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
 
-/* ----------------------------------- */
+/* =================================================== */
 /* 1. STYLES DU CONTENEUR ET BOUTON FERMER */
-/* ----------------------------------- */
+/* =================================================== */
 
 .container {
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    position: relative; 
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    position: relative;
     overflow: hidden;
     width: 768px;
-    max-width: 90%; 
+    max-width: 90%;
     min-height: 480px;
-    z-index: 1060; 
+    
+    /* 🛑 Z-INDEX CORRIGÉ : ENCORE PLUS HAUT QUE L'OVERLAY */
+    z-index: 100000; 
+    
+    transform: scale(0.9);
+    animation: scaleIn 0.3s ease-out forwards;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .close-button-top-right {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 15px;
+    right: 20px;
     background: none;
     border: none;
-    font-size: 24px;
-    color: #333;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--text-color);
     cursor: pointer;
     z-index: 1000;
     padding: 0;
-    height: auto;
-    width: auto;
-    transition: color 0.2s;
-    text-transform: none; 
-    letter-spacing: normal;
-    font-weight: normal;
+    transition: color 0.2s, transform 0.2s;
 }
 
 .close-button-top-right:hover {
-    color: var(--primary-color);
+    color: var(--primary-dark);
+    transform: rotate(90deg);
 }
 
 
-/* ----------------------------------- */
+/* =================================================== */
 /* 2. FORMULAIRES ET TYPOGRAPHIE */
-/* ----------------------------------- */
+/* =================================================== */
 
 h1 {
-    font-weight: bold;
+    font-weight: 700;
     margin: 0;
-    color: var(--primary-color);
+    color: var(--text-color);
+    font-size: 1.8rem;
+    letter-spacing: 0.5px;
 }
 
 p {
     font-size: 14px;
-    font-weight: 100;
-    line-height: 20px;
+    font-weight: 400;
+    line-height: 22px;
     letter-spacing: 0.5px;
-    margin: 20px 0 30px;
+    margin: 15px 0 25px;
+    color: #6b7280;
 }
 
 a {
-    color: #333;
+    color: var(--link-color);
     font-size: 14px;
     text-decoration: none;
-    margin: 15px 0;
+    margin: 10px 0 20px;
+    transition: color 0.2s;
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
 }
 
 .form-container form {
@@ -98,140 +133,164 @@ a {
 }
 
 .social-container {
-    margin: 20px 0;
+    margin: 25px 0 20px;
 }
 
 .social-container a {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0 5px;
-    height: 40px;
-    width: 40px;
+    margin: 0 8px;
+    height: 45px;
+    width: 45px;
+    color: var(--text-color);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
-/* ----------------------------------- */
+.social-container a:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+
+/* =================================================== */
 /* 3. STYLES POUR LES ICÔNES ET LES CHAMPS */
-/* ----------------------------------- */
+/* =================================================== */
 
 .input-group {
-    position: relative; 
+    position: relative;
     width: 100%;
-    margin: 8px 0; 
+    margin: 10px 0;
 }
 
-.input-group .icon, 
+.input-group .icon,
 .input-group .eye-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     color: #999;
-    font-size: 14px;
+    font-size: 16px;
     z-index: 10;
 }
 
-/* Positionnement de l'icône à gauche (user, envelope, lock) */
 .input-group .icon {
-    left: 15px; 
+    left: 15px;
 }
 
-/* Positionnement de l'icône "œil" (à droite) */
 .input-group .eye-icon {
-    right: 15px; 
+    right: 15px;
     cursor: pointer;
     transition: color 0.2s;
+    font-size: 1.1rem;
 }
 
 .input-group .eye-icon:hover {
-    color: var(--primary-color); 
+    color: var(--primary-color);
 }
 
-/* Ajustement du padding de l'input pour laisser la place aux icônes */
 .form-container input {
-    background: #eee;
-    border: none;
-    padding: 12px 40px 12px 40px; 
+    background: var(--input-bg);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 14px 45px 14px 45px;
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 1rem;
+    color: var(--text-color);
 }
 
 .form-container input:focus {
+    background: #fff;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
     outline: none;
 }
 
 
-/* ----------------------------------- */
+/* =================================================== */
 /* 4. BOUTONS ET MESSAGES D'ERREUR */
-/* ----------------------------------- */
+/* =================================================== */
 
 button {
-    border-radius: 20px;
+    border-radius: 25px;
     border: 1px solid var(--primary-color);
     background: var(--primary-color);
     color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 50px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: transform 80ms ease-in, background-color 0.3s;
+    transition: transform 80ms ease-in, background-color 0.3s, box-shadow 0.3s;
     cursor: pointer;
-    margin-top: 15px; 
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
 }
 
 button:hover {
     background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 131, 143, 0.3);
 }
 
 button.ghost {
     background: transparent;
     border-color: #fff;
+    box-shadow: none;
 }
 
 button.ghost:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: none;
 }
 
 button:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .error-message {
     color: var(--error-color);
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    padding: 10px 15px;
+    border-radius: 5px;
     font-size: 14px;
-    margin-bottom: 10px;
-    font-weight: bold;
+    margin-bottom: 20px;
+    font-weight: 600;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* ----------------------------------- */
+/* =================================================== */
 /* 5. LOGIQUE D'ANIMATION ET OVERLAY PANELS */
-/* ----------------------------------- */
+/* =================================================== */
 
-/* STYLES POUR LE LOGO DANS L'OVERLAY */
 .logo-container {
     position: absolute;
-    top: 30px; 
+    top: 25px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
 }
 
 .overlay-logo {
-    max-width: 120px; 
+    max-width: 100px;
     height: auto;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); 
+    /* 🛑 CORRECTION : Retirer ou mettre à 'none' */
+    filter: none; 
 }
-/* Fin des styles du logo */
 
 .overlay {
     background: var(--primary-color);
-    background: linear-gradient(to right, var(--primary-color), var(--primary-dark)) no-repeat 0 0 / cover;
+    background: linear-gradient(to right, #00d4ff, var(--primary-dark)) no-repeat 0 0 / cover;
     color: #fff;
     position: relative;
     left: -100%;
@@ -276,8 +335,8 @@ button:disabled {
     top: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
-    align-items: center;    
+    justify-content: center;
+    align-items: center;
     padding: 0 0px;
     height: 100%;
     width: 50%;
@@ -295,8 +354,7 @@ button:disabled {
     transform: translateX(-20%);
 }
 
-/* --- CLASSES D'ANIMATION --- */
-
+/* --- CLASSES D'ANIMATION DU MODAL --- */
 .container.right-panel-active .sign-in-container {
     transform: translateX(100%);
 }
@@ -321,4 +379,70 @@ button:disabled {
 
 .container.right-panel-active .overlay-right {
     transform: translateX(20%);
+}
+
+/* =================================================== */
+/* 6. MEDIA QUERIES (ADAPTATION MOBILE) */
+/* =================================================== */
+
+@media (max-width: 768px) {
+    .container {
+        min-height: 550px;
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* Masquer l'overlay visuel sur mobile et basculer via l'opacité */
+    .overlay-container {
+        display: none;
+    }
+
+    .form-container {
+        position: absolute;
+        width: 100%;
+        min-height: 450px;
+        padding: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .form-container form {
+        padding: 0 25px;
+    }
+
+    .sign-in-container {
+        opacity: 1;
+        transform: none;
+    }
+    
+    .sign-up-container {
+        opacity: 0;
+        transform: none;
+    }
+
+    .container.right-panel-active .sign-in-container {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    .container.right-panel-active .sign-up-container {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    /* Montrer le bouton de bascule de mode sur mobile */
+    .form-container form button.ghost {
+        display: block;
+        margin-top: 10px;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: transparent;
+    }
+    .form-container form button.ghost:hover {
+        background: rgba(0, 188, 212, 0.1);
+    }
+
+    /* Cacher le lien "Mot de passe oublié" pour gagner de la place */
+    .form-container.sign-in-container a {
+        display: none; 
+    }
 }

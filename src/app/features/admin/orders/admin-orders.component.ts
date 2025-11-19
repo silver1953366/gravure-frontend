@@ -1,16 +1,17 @@
-// src/app/features/admin/orders/admin-orders.component.ts
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Pour le select du statut
+import { CommonModule, DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // <-- CORRECTION: Import de FormsModule
 import { TransactionService, Order } from '../../../core/services/transaction.service';
+import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-admin-orders',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './admin-orders.component.html',
-  styleUrls: ['./admin-orders.component.css']
+    selector: 'app-admin-orders',
+    standalone: true,
+    // CORRECTION: Ajout de FormsModule
+    imports: [CommonModule, DatePipe, DecimalPipe, UpperCasePipe, FormsModule], 
+    templateUrl: './admin-orders.component.html',
+    styleUrls: ['./admin-orders.component.css']
 })
 export class AdminOrdersComponent implements OnInit {
 
@@ -18,25 +19,25 @@ export class AdminOrdersComponent implements OnInit {
     isLoading = true;
     error: string | null = null;
     successMessage: string | null = null;
+    isProcessing = false;
+    
+    // CORRECTION: Renommage en availableStatuses
+    availableStatuses = ['pending_payment', 'processing', 'ready_for_pickup', 'completed', 'cancelled']; 
 
-    // Liste des statuts disponibles pour la mise à jour (adaptée à votre API)
-    availableStatuses: Order['status'][] = [
-        'pending_payment', 
-        'processing', 
-        'ready_for_pickup', 
-        'completed', 
-        'cancelled'
-    ];
+    statusLabels: { [key: string]: string } = {
+        'pending_payment': 'En attente de Paiement',
+        'processing': 'En Préparation',
+        'ready_for_pickup': 'Prêt à Enlever',
+        'completed': 'Terminée',
+        'cancelled': 'Annulée'
+    };
 
-    constructor(private transactionService: TransactionService) {}
+    constructor(private transactionService: TransactionService, private router: Router) {}
 
     ngOnInit(): void {
         this.loadOrders();
     }
 
-    /**
-     * Charge toutes les commandes du système.
-     */
     loadOrders(): void {
         this.isLoading = true;
         this.error = null;
@@ -45,39 +46,59 @@ export class AdminOrdersComponent implements OnInit {
                 this.orders = data;
                 this.isLoading = false;
             },
-            error: (err) => {
+            error: (err: HttpErrorResponse) => {
                 this.error = 'Erreur lors du chargement des commandes.';
                 this.isLoading = false;
                 console.error('API Error:', err);
             }
         });
     }
+    
+    goToDetails(id: number): void {
+        this.router.navigate(['/admin/orders', id]);
+    }
 
     /**
-     * Met à jour le statut d'une commande.
-     * @param order - La commande à modifier
-     * @param newStatus - Le nouveau statut sélectionné (via le select)
+     * Renvoie un label lisible pour un statut donné.
+     * <-- CORRECTION: Ajout de getStatusLabel
      */
-    onStatusChange(order: Order, newStatus: Order['status']): void {
-        this.successMessage = null;
-        this.error = null;
-        
-        // Empêcher l'appel API si le statut n'a pas changé
+    getStatusLabel(status: string): string {
+        return this.statusLabels[status] || status;
+    }
+
+    /**
+     * Met à jour le statut d'une commande directement depuis la liste.
+     * <-- CORRECTION: Renommage en onStatusChange
+     */
+    onStatusChange(order: Order, newStatus: string): void {
+        // Le code reste le même, mais le nom de la fonction est corrigé.
         if (order.status === newStatus) return;
 
-        // Mise à jour de l'affichage local immédiatement pour un meilleur UX
-        const oldStatus = order.status;
-        order.status = newStatus;
+        if (!confirm(`Changer le statut de la Commande #${order.id} à ${this.getStatusLabel(newStatus).toUpperCase()} ?`)) {
+            // Recharger pour rétablir la valeur visuelle si l'utilisateur annule
+            this.loadOrders(); 
+            return;
+        }
+
+        this.isProcessing = true;
+        this.error = null;
+        this.successMessage = null;
 
         this.transactionService.updateOrderStatus(order.id, newStatus).subscribe({
-            next: () => {
-                this.successMessage = `Statut de la commande #${order.id} mis à jour à '${newStatus}' avec succès.`;
+            next: (updatedOrder) => {
+                const index = this.orders.findIndex(o => o.id === updatedOrder.id);
+                if (index !== -1) {
+                    this.orders[index] = updatedOrder;
+                }
+                this.successMessage = `Statut de la Commande #${order.id} mis à jour à ${newStatus.toUpperCase()}.`;
+                this.isProcessing = false;
             },
-            error: (err) => {
+            error: (err: HttpErrorResponse) => {
                 this.error = `Erreur lors de la mise à jour du statut de la commande #${order.id}.`;
+                this.isProcessing = false;
+                // Forcer le rechargement pour afficher le statut réel après l'échec
+                this.loadOrders(); 
                 console.error('API Error:', err);
-                // Annuler la mise à jour locale en cas d'échec
-                order.status = oldStatus;
             }
         });
     }

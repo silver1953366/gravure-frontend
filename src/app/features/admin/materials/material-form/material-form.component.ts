@@ -76,16 +76,16 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
     }
 
     patchForm(material: Material): void {
-         this.materialForm.patchValue({
-             name: material.name,
-             slug: material.slug,
-             description: material.description,
-             price_per_sq_meter: material.price_per_sq_meter,
-             thickness_options: material.thickness_options,
-             is_active: material.is_active,
-             image_url: material.image_url || '', // Conserver l'URL existante
-         });
-         this.imageUrlPreview = material.image_url || null; // Afficher l'image existante
+           this.materialForm.patchValue({
+               name: material.name,
+               slug: material.slug,
+               description: material.description,
+               price_per_sq_meter: material.price_per_sq_meter,
+               thickness_options: material.thickness_options,
+               is_active: material.is_active,
+               image_url: material.image_url || '', // Conserver l'URL existante
+           });
+           this.imageUrlPreview = material.image_url || null; // Afficher l'image existante
     }
 
     onFileSelected(event: Event): void {
@@ -122,7 +122,15 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
         Object.keys(rawData).forEach(key => {
             // Exclure le champ image_url car il est géré par l'upload
             if (key !== 'image_url') { 
-                formData.append(key, rawData[key] !== null ? rawData[key] : '');
+                // Ajouter tous les autres champs
+                let value = rawData[key];
+                
+                // Gérer les valeurs booléennes pour FormData
+                if (key === 'is_active') {
+                    value = value ? '1' : '0'; // Envoyer 1 ou 0 pour les booléens
+                }
+                
+                formData.append(key, value !== null ? value : '');
             }
         });
         
@@ -144,8 +152,9 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 this.isLoading = false;
-                // La clé d'erreur pour le fichier est généralement 'image' dans Laravel
-                if (err.status === 422 && err.error.errors) {
+                
+                if (err.status === 422 && err.error && err.error.errors) {
+                    // Mappage des erreurs de validation Laravel
                     this.apiErrors = err.error.errors;
                 } else {
                     this.apiErrors = { general: "Une erreur inattendue est survenue lors de la sauvegarde." };
@@ -156,14 +165,16 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
     }
     
     onNameChange(): void {
+        // Le slug n'est généré automatiquement qu'en mode création
         if (!this.isEditMode) {
             const name = this.materialForm.get('name')?.value;
             if (name) {
                 const slug = name.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '')
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Supprimer les accents
+                    .replace(/[^a-z0-9\s-]/g, '') // Supprimer les caractères spéciaux sauf espaces et tirets
                     .trim()
-                    .replace(/\s+/g, '-');
-                this.materialForm.get('slug')?.setValue(slug);
+                    .replace(/\s+/g, '-'); // Remplacer les espaces par des tirets
+                this.materialForm.get('slug')?.setValue(slug, { emitEvent: false }); // Pas besoin de trigger un autre event
             }
         }
     }

@@ -1,78 +1,250 @@
-/* Styles pour admin-quotes.component.css et admin-orders.component.css */
-
-.admin-quotes-container, .admin-orders-container {
-    padding: 20px;
-    background-color: #f4f7f6;
-    border-radius: 8px;
+/* ---------------------------------------------------- */
+/* --- 1. KEYFRAMES ET VARIABLES --- */
+/* ---------------------------------------------------- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-h2 { color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-/* Styles Messages d'état */
-.alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-.alert-success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-.alert-info { background-color: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+@keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
 
-/* Styles Tableau */
+@keyframes pulse-border-pending {
+    0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(243, 156, 18, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+}
+
+:root {
+    --color-primary: #1e3c72; /* Bleu Nuit */
+    --color-convert: #007bff; /* Bleu Conversion */
+    --color-success: #2ecc71;
+    --color-danger: #e74c3c;
+    --bg-card: #ffffff;
+}
+
+/* ---------------------------------------------------- */
+/* --- 2. CONTENEUR ET HEADER --- */
+/* ---------------------------------------------------- */
+.admin-quotes-container {
+    max-width: 1400px;
+    margin: 50px auto;
+    padding: 35px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7f9fa 100%); 
+    border-radius: 16px; 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); 
+    animation: fadeIn 0.8s ease-out;
+}
+
+h2 {
+    color: var(--color-primary); 
+    border-bottom: 3px solid #e0e6f0;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* ---------------------------------------------------- */
+/* --- 3. MESSAGES ET LOADING --- */
+/* ---------------------------------------------------- */
+.alert-error, .alert-success, .alert-info {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    animation: fadeIn 0.4s ease-out;
+}
+.alert-error {
+    background-color: #fef0f0;
+    color: var(--color-danger);
+    border: 1px solid #f9d7da;
+}
+.alert-success {
+    background-color: #e8f7ed;
+    color: var(--color-success);
+    border: 1px solid #c8e6c9;
+}
+.alert-info {
+    background-color: #f0f8ff;
+    color: var(--color-primary);
+    border: 1px solid #d4e3f4;
+    text-align: center;
+}
+
+.loading-message {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.2em;
+    color: var(--color-primary);
+}
+
+/* ---------------------------------------------------- */
+/* --- 4. TABLEAU (Animation & Esthétique) --- */
+/* ---------------------------------------------------- */
 table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-th, td { padding: 12px; border: 1px solid #e9ecef; text-align: left; font-size: 0.95em; }
-th { background-color: #e9ecef; font-weight: 700; color: #495057; }
-.price-col { font-weight: 700; color: #28a745; }
-
-/* Boutons d'action */
-.btn-convert, .btn-view, .btn-danger {
-    padding: 6px 12px;
-    margin-right: 5px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-    font-weight: 500;
+    border-collapse: separate; 
+    border-spacing: 0;
+    margin-top: 25px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
-.btn-convert { background-color: #3498db; color: white; }
-.btn-convert:hover { background-color: #2980b9; }
+th, td {
+    padding: 18px 25px;
+    text-align: left;
+    border-bottom: 1px solid #e0e6f0;
+}
 
-.btn-view { background-color: #f39c12; color: white; }
-.btn-view:hover { background-color: #e67e22; }
-
-.btn-danger { background-color: #e74c3c; color: white; }
-.btn-danger:hover { background-color: #c0392b; }
-
-/* Styles Statuts (Devis & Commandes) */
-[class^="status-"] {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
+th {
+    background-color: #e0e6f0; 
     font-weight: 700;
-    display: inline-block;
+    color: #556080;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
 }
 
-/* Statuts de Devis */
-.status-draft { background-color: #fcf8e3; color: #8a6d3b; } /* Jaune pâle */
-.status-submitted { background-color: #d9edf7; color: #31708f; } /* Bleu clair */
-.status-rejected { background-color: #f2dede; color: #a94442; } /* Rouge pâle */
-.status-ordered { background-color: #dff0d8; color: #3c763d; } /* Vert pâle */
+tbody tr {
+    transition: all 0.3s ease-in-out;
+    animation: slideInUp 0.5s ease-out both; 
+}
 
-/* Statuts de Commande */
-.status-pending_payment { background-color: #f0ad4e; color: white; } /* Orange */
-.status-processing { background-color: #3498db; color: white; } /* Bleu */
-.status-ready_for_pickup { background-color: #2ecc71; color: white; } /* Vert vif */
-.status-completed { background-color: #1abc9c; color: white; } /* Turquoise */
-.status-cancelled { background-color: #95a5a6; color: white; } /* Gris */
+tbody tr:nth-child(even) {
+    background-color: #fcfcfc;
+}
 
-/* Styles pour le select de statut (Admin Orders) */
-.status-select {
-    border: 1px solid #ccc;
+tbody tr:hover {
+    background-color: #e8f5ff; 
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.1);
+    transform: scale(1.005); 
     cursor: pointer;
-    text-transform: uppercase;
-    font-size: 0.85em;
+}
+
+.price-col {
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+/* ---------------------------------------------------- */
+/* --- 5. ÉTATS DE STATUT (Tags) --- */
+/* ---------------------------------------------------- */
+.status-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 25px;
+    font-size: 0.75em;
+    font-weight: 800;
+    text-align: center;
+    min-width: 80px;
+    transition: all 0.3s ease;
+}
+
+.status-draft {
+    background-color: #fef3e3;
+    color: #e67e22; /* Orange */
+}
+.status-submitted, .status-sent {
+    background-color: #f7f7e7; /* Jaune pâle */
+    color: #f39c12; /* Jaune vif - En attente de traitement Admin */
+    animation: pulse-border-pending 1.5s infinite;
+}
+.status-calculated {
+    background-color: #eaf8ff;
+    color: #3498db; /* Bleu - Prêt à être commandé par le client */
+    animation: pulse-border 1.5s infinite;
+}
+.status-ordered {
+    background-color: #e6f7eb;
+    color: var(--color-success); /* Vert */
+}
+.status-rejected, .status-archived {
+    background-color: #f7e6e6;
+    color: var(--color-danger); /* Rouge */
+}
+
+
+/* ---------------------------------------------------- */
+/* --- 6. BOUTONS D'ACTION (Ligne) --- */
+/* ---------------------------------------------------- */
+.action-col {
+    white-space: nowrap;
+}
+
+.btn-action {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: 600;
-    padding: 5px;
+    margin-right: 8px;
+    font-size: 0.85em;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    display: inline-block; 
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-view {
+    background-color: #95a5a6; 
+    color: white;
+}
+.btn-view:hover {
+    background-color: #7f8c8d;
+    transform: translateY(-1px);
+}
+
+/* Bouton pour l'action de Calcul (Admin/Controller) */
+.btn-calculate {
+    background-color: #27ae60; /* Vert foncé, pour l'action de validation/prix */
+    color: white;
+}
+.btn-calculate:hover:not(:disabled) {
+    background-color: #2ecc71;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(46, 204, 113, 0.4);
+}
+
+/* Bouton pour l'action de Rejet (Admin/Controller) */
+.btn-reject {
+    background-color: #f39c12; /* Jaune/Orange, couleur d'avertissement */
+    color: white;
+}
+.btn-reject:hover:not(:disabled) {
+    background-color: #e67e22;
+    transform: translateY(-1px);
+}
+
+/* Style danger pour la suppression */
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+.btn-danger:hover:not(:disabled) {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}
+
+.btn-action:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
 }

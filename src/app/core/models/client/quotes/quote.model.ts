@@ -1,20 +1,65 @@
-// src/app/core/models/client/quotes/quote.model.ts
+import { Attachment } from './attachment.model'; 
 
-import { Attachment } from './attachment.model'; // <-- CORRECTION: Import de Attachment
+// --- Définitions d'Interfaces ---
 
-// NOTE: Remplacer 'any' par vos interfaces Material, Shape, MaterialDimension si elles existent.
+export type QuoteStatus = 'draft' | 'sent' | 'calculated' | 'ordered' | 'rejected' | 'archived';
+
+export interface UserInfo { 
+    id: number; 
+    name: string; 
+    email: string; 
+    address?: string; 
+}
+
+export interface QuoteItem {
+    id?: number;
+    product_name: string;
+    unit_price: number;
+    quantity: number;
+    subtotal: number;
+}
+
+export interface OrderItem {
+    id?: number;
+    product_name: string;
+    unit_price: number;
+    quantity: number;
+    subtotal: number;
+    quote_item_id?: number; 
+}
+
+export interface Order {
+    id: number;
+    user_id: number;
+    user?: UserInfo;
+    quote_id: number;
+    status: 'pending_payment' | 'processing' | 'ready_for_pickup' | 'completed' | 'cancelled';
+    total_price: number;
+    created_at: Date;
+    items: OrderItem[];
+}
+
+export interface MaterialDimension {
+    dimension_label: string; 
+    // ...
+}
+export interface Material { /* ... */ }
+export interface Shape { /* ... */ }
 
 export interface Quote {
     id: number;
     user_id: number;
     reference: string;
-    // Utilisation de snake_case basée sur le backend Laravel
     client_ref?: string | null; 
-    status: 'draft' | 'sent' | 'calculated' | 'ordered' | 'rejected' | 'archived';
-    final_price_fcfa: number;
+    
+    status: QuoteStatus; 
+    
+    // PRIX FINAL RÉEL DANS LE MODÈLE (Utilisé dans les templates)
+    final_price_fcfa: number; 
     base_price_fcfa: number;
     discount_amount_fcfa: number;
-    quantity: number;
+    
+    quantity: number; 
     order_id: number | null;
     
     material_id: number;
@@ -27,16 +72,16 @@ export interface Quote {
     created_at: Date;
     updated_at: Date;
 
-    material?: any; 
-    shape?: any;     
-    materialDimension?: {
-        dimension_label: string; // Ajout/confirmation pour le correctif de la liste
-        // ... autres propriétés
-    }; 
+    material?: Material; 
+    shape?: Shape; 
+    materialDimension?: MaterialDimension; 
     attachments?: Attachment[]; 
+    
+    // CORRECTION APPLIQUÉE ICI
+    user?: UserInfo; 
+    items: QuoteItem[];
 }
 
-// CORRECTION: Ajout des exports pour résoudre les erreurs dans client-quote.service.ts
 export interface QuotePayload {
     // Définition de la charge utile de création/mise à jour d'un devis
 }

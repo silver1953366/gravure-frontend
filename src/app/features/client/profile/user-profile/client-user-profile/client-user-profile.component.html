@@ -1,10 +1,14 @@
 <div class="profile-container">
     <h2>Mon Profil Client 👤</h2>
-    <p class="role-tag">Bienvenue, **{{ user?.name }}**.</p>
+    
+    <p class="role-tag" *ngIf="user">Bienvenue, **{{ user.name }}**.</p>
+    <p class="role-tag" *ngIf="!user && !isLoading && !error">Bienvenue.</p>
 
-    <div *ngIf="isLoading">Chargement de votre profil...</div>
-    <div *ngIf="error" class="alert-error">{{ error }}</div>
-    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div> 
+    
+    <ng-container *ngIf="user && !isLoading">
+        </ng-container>
+
 
     <ng-container *ngIf="user && !isLoading">
         

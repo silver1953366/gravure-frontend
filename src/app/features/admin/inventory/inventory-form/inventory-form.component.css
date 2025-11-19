@@ -1,0 +1,219 @@
+/* Variables de base - Cohérence avec l'application */
+:root {
+    --primary-color: #0e7490; /* Teal Profond pour l'accentuation et le focus */
+    --primary-hover: #0f7689; /* Teal plus clair pour le survol */
+    --text-color: #1f2937; /* Gris foncé (Texte principal) */
+    --border-color: #d1d5db; /* Gris clair (Bordures des champs) */
+    --error-color: #ef4444; /* Rouge (Messages d'erreur) */
+    --bg-light: #f3f4f6; /* Gris très clair (Fond des champs read-only) */
+    --shadow-color: rgba(14, 116, 144, 0.2); /* Ombre basée sur la couleur primaire */
+}
+
+/* ----------------------------------- */
+/* 1. Conteneur et Général */
+/* ----------------------------------- */
+
+.inventory-form-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 16px;
+    /* Ombre plus douce et élégante */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.back-link {
+    display: inline-flex; /* Pour aligner le texte et l'icône */
+    align-items: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s, transform 0.2s;
+    font-size: 1.05em;
+}
+.back-link:hover {
+    color: var(--primary-hover);
+    transform: translateX(-3px); /* Petit effet de glissement */
+}
+
+h3 {
+    font-size: 2.2em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    border-bottom: 4px solid var(--primary-color); /* Ligne de séparation forte */
+    padding-bottom: 10px;
+    font-weight: 800;
+}
+
+/* ----------------------------------- */
+/* 2. Fieldset et Legend */
+/* ----------------------------------- */
+
+fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 12px; /* Coins plus arrondis */
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+fieldset:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(14, 116, 144, 0.1);
+}
+legend {
+    font-weight: 700;
+    font-size: 1.2em;
+    color: var(--primary-color);
+    padding: 0 15px;
+    background-color: #fff; /* Fond blanc pour couper la ligne de bordure */
+    margin-left: -10px;
+}
+
+/* ----------------------------------- */
+/* 3. Layout de Formulaire */
+/* ----------------------------------- */
+
+.form-row {
+    display: flex;
+    gap: 24px; /* Espacement accru */
+}
+.form-row.three-cols .form-group {
+    flex: 1 1 30%;
+}
+.form-group.half-width {
+    flex: 1 1 50%;
+}
+.form-group {
+    margin-bottom: 20px;
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* ----------------------------------- */
+/* 4. Inputs et Textareas */
+/* ----------------------------------- */
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600; /* Plus de gras */
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px 14px; /* Plus de padding */
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Plus arrondis */
+    box-sizing: border-box;
+    font-size: 1em;
+    color: var(--text-color);
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--primary-color);
+    /* Ombre subtile pour le focus */
+    box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.2); 
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Inputs en lecture seule (reserved_quantity) */
+input:disabled, input[readonly] {
+    background-color: var(--bg-light);
+    color: #4b5563; /* Gris un peu plus foncé */
+    cursor: not-allowed;
+    border-style: dashed; /* Indicateur visuel clair */
+}
+
+/* ----------------------------------- */
+/* 5. Messages d'Erreur */
+/* ----------------------------------- */
+
+.error-message {
+    color: var(--error-color);
+    background-color: #fef2f2; /* Fond très clair */
+    padding: 8px 10px;
+    border-radius: 4px;
+    border-left: 3px solid var(--error-color);
+    font-size: 0.85em;
+    margin-top: 5px;
+    font-weight: 500;
+}
+.alert-error {
+    background-color: #fee2e2;
+    color: var(--error-color);
+    padding: 15px;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+}
+
+/* ----------------------------------- */
+/* 6. Bouton de Soumission (Action Forte) */
+/* ----------------------------------- */
+
+.btn-submit {
+    display: block;
+    width: 100%;
+    padding: 14px 20px; /* Plus grand */
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.15em;
+    font-weight: 700; /* Plus de gras */
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    margin-top: 30px;
+    
+    /* Style de bouton fort (identique aux boutons d'action de la liste) */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+}
+.btn-submit:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px var(--shadow-color); /* Ombre colorée */
+}
+.btn-submit:disabled {
+    background-color: #9ca3af;
+    color: #e5e7eb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* État de chargement */
+.loading-state {
+    text-align: center;
+    font-style: italic;
+    color: var(--primary-color);
+    padding: 20px 0;
+    font-size: 1.1em;
+}
+
+/* Responsivité */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .inventory-form-container {
+        margin: 20px;
+        padding: 20px;
+    }
+}

@@ -1,44 +1,50 @@
 <div class="inventory-management-container">
-    <h2>Gestion de l'Inventaire (Admin / Controller)</h2>
+    <h2>Catalogue & Stock (Admin / Controller)</h2>
 
     <div class="header-actions" *ngIf="canAdministerInventory">
-        <button (click)="onCreateItem()">+ Ajouter un article</button>
+        <button class="btn-primary" (click)="onCreateItem()">+ Ajouter un article</button>
     </div>
 
-    <div *ngIf="isLoading">Chargement de l'inventaire...</div>
+    <div *ngIf="isLoading" class="loading-message">Chargement de l'inventaire...</div>
     <div *ngIf="error" class="alert-error">{{ error }}</div>
 
     <table *ngIf="!isLoading && inventory.length > 0">
         <thead>
             <tr>
                 <th>Réf.</th>
-                <th>Description</th>
-                <th>Quantité</th>
+                <th>Article / Description</th>
+                <th class="text-center">Stock Total</th>
+                <th class="text-center">Réservé</th>
+                <th class="text-center">Disponible</th>
+                <th class="text-center">Seuil Min.</th>
                 <th>Localisation</th>
-                <th>Prix Unitaire</th>
-                <th *ngIf="canAdministerInventory">Actions</th>
+                <th class="text-right">Prix Unitaire</th>
+                <th *ngIf="canAdministerInventory" class="text-center actions-cell">Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let item of inventory">
                 <td>{{ item.reference }}</td>
                 <td>{{ item.description }}</td>
-                <td>
-                    <span [class]="item.quantity < 10 ? 'low-stock' : ''">
-                        {{ item.quantity }}
+                <td class="text-center">{{ item.stock_quantity }}</td>
+                <td class="text-center reserved-stock">{{ item.reserved_quantity }}</td>
+                <td class="text-center"> <!-- 💡 Alignement de la colonne Disponible -->
+                    <span class="status-badge" [class]="getStockStatusClass(item)">
+                        {{ item.available_quantity }}
                     </span>
                 </td>
+                <td class="text-center">{{ item.minimum_threshold }}</td> <!-- 💡 Alignement de la colonne Seuil Min. -->
                 <td>{{ item.location }}</td>
-                <td>{{ item.price_per_unit | currency:'EUR':'symbol' }}</td>
-                <td *ngIf="canAdministerInventory">
-                    <button (click)="onEditItem(item.id)">Modifier</button>
+                <td class="text-right">{{ item.price_per_unit | currency:'EUR':'symbol':'1.2-2' }}</td>
+                <td *ngIf="canAdministerInventory" class="text-center actions-cell">
+                    <button (click)="onEditItem(item.id)" class="btn-edit">Modifier</button>
                     <button (click)="onDeleteItem(item.id)" class="btn-danger">Supprimer</button>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <div *ngIf="!isLoading && inventory.length === 0 && !error">
+    <div *ngIf="!isLoading && inventory.length === 0 && !error" class="empty-list">
         Aucun article en stock trouvé.
     </div>
 </div>

@@ -1,0 +1,224 @@
+/* Variables de base - Palette enrichie */
+:root {
+    --main-bg-color: #f7f7f7;
+    --card-bg-color: #ffffff;
+    
+    /* NOUVEAUX COULEURS BOUTONS (Teal pour Ajouter, fort contraste) */
+    --primary-color: #0e7490; /* Teal Profond pour Ajouter */
+    --primary-hover: #0f7689; 
+    
+    --edit-color: #1e40af; /* Bleu Royal Profond pour Modifier */
+    --edit-hover: #1d4ed8; 
+
+    --danger-color: #991b1b; /* Rouge Bordeaux Profond pour Supprimer/Alerte */
+    --danger-hover: #b91c1c; 
+    
+    /* Autres couleurs conservées */
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --border-color: #e5e7eb;
+}
+
+/* ----------------------------------- */
+/* 1. Conteneur et Général */
+/* ----------------------------------- */
+
+body {
+    background-color: var(--main-bg-color); 
+}
+
+.inventory-management-container {
+    max-width: 1400px;
+    margin: 40px auto; 
+    padding: 30px;
+    background-color: var(--card-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+h2 {
+    font-size: 2.2em;
+    color: var(--text-color);
+    margin-bottom: 25px;
+    border-bottom: 4px solid var(--primary-color);
+    padding-bottom: 10px;
+    font-weight: 800;
+}
+
+.loading-message, .empty-list {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.1em;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* ----------------------------------- */
+/* 2. Style du Tableau */
+/* ----------------------------------- */
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.95em;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead th {
+    background-color: #f9f9f9;
+    color: var(--text-light);
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border-color);
+}
+
+tbody tr {
+    transition: background-color 0.3s ease, transform 0.1s;
+}
+tbody tr:nth-child(even) {
+    background-color: #fcfcfd;
+}
+tbody tr:hover {
+    background-color: #e6f7ff; 
+    transform: scale(1.005);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f3f4f6; 
+    color: var(--text-color);
+}
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Alignement des contenus des cellules de données */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* ----------------------------------- */
+/* 3. Badges de Statut (Vifs pour contraste) */
+/* ----------------------------------- */
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 25px;
+    font-size: 0.85em;
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* OK (Vert Vif) */
+.status-ok { 
+    background-color: #d1fae5; 
+    color: #059669; 
+    border: 1px solid #059669;
+}
+/* BAS (Orange Vif) */
+.status-low { 
+    background-color: #fffbeb; 
+    color: #f97316; 
+    border: 1px solid #f97316;
+} 
+/* CRITIQUE (Rouge Intense) */
+.status-alert { 
+    background-color: #fee2e2; 
+    color: #ef4444; 
+    border: 1px solid #ef4444;
+} 
+/* VIDE (Animation + Fond Rouge Clair) */
+.status-empty { 
+    background-color: #fecaca; 
+    color: var(--danger-color);
+    border: 2px solid var(--danger-color);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.reserved-stock {
+    color: #1e3a8a; 
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(153, 27, 27, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(153, 27, 27, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(153, 27, 27, 0); }
+}
+
+/* ----------------------------------- */
+/* 4. Boutons d'Action (Mise à jour pour un meilleur 'pop') */
+/* ----------------------------------- */
+
+.header-actions {
+    margin-bottom: 30px;
+    text-align: right;
+}
+
+.btn-primary, .btn-edit, .btn-danger {
+    padding: 10px 18px;
+    border: 1px solid transparent; /* Bordure par défaut */
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    margin-left: 10px;
+    
+    /* Ombre plus prononcée pour l'effet de profondeur */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    
+    /* Gradient subtil pour la texture */
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+    color: white; /* Texte blanc sur fond foncé */
+}
+
+/* BOUTON AJOUTER (Teal Profond) */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: #0d9488;
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.25);
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+.actions-cell button {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* BOUTON MODIFIER (Bleu Royal Profond) */
+.btn-edit {
+    background-color: var(--edit-color); 
+    border-color: #3b82f6; 
+}
+.btn-edit:hover {
+    background-color: var(--edit-hover);
+    transform: scale(1.05);
+}
+
+/* BOUTON SUPPRIMER (Rouge Bordeaux Profond) */
+.btn-danger {
+    background-color: var(--danger-color); 
+    border-color: #ef4444; 
+}
+.btn-danger:hover {
+    background-color: var(--danger-hover);
+    transform: scale(1.05);
+}

@@ -1,46 +1,61 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common'; 
 
-// 1. Assurez-vous que les chemins d'accès sont corrects par rapport à la racine 'app'
-// J'ai corrigé les chemins d'accès pour des importations standard dans une structure Angular
-import { HeaderComponent } from './catalog/shared/navbar/header/header.component'; 
-import { FooterComponent } from '../app/catalog/shared/footer/footer.component'; // NOUVEL IMPORT
+// Retirer les imports de NavbarComponent et FooterComponent
 import { LoginRegisterModalComponent } from './features/auth/login-register-modal/login-register-modal.component'; 
-import { AuthService } from './core/services/auth.service'; // Correction du chemin
+import { PublicLayoutComponent } from './shared/layouts/public-layout/public-layout.component'; 
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule, 
-    RouterOutlet,
-    HeaderComponent, 
-    FooterComponent, // Ajout du Footer
-    LoginRegisterModalComponent 
+    RouterOutlet, 
+    LoginRegisterModalComponent,
+    
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  private authService = inject(AuthService);
-  
-  title = 'E.M.E.S.';
-  
-  // État du modal de connexion/inscription
+export class AppComponent implements OnDestroy {
+  title = 'E.M.E.S Application';
   isLoginModalOpen = signal(false);
   
-  // Simulation de l'état de la sidebar (utile pour le CSS)
-  isSidebarOpen = signal(false); // Initialisation à faux
-
-  // État de connexion de l'utilisateur (utilisé pour le Header)
-  isAuthenticated = this.authService.isAuthenticated;
+  // 🛑 CORRECTION : Utilisation de 'any' pour la souscription de l'Output
+  private subscription: any | null = null; 
 
   openLoginModal(): void {
     this.isLoginModalOpen.set(true);
+    console.log("Modal de connexion ouvert."); 
   }
 
   closeLoginModal(): void {
     this.isLoginModalOpen.set(false);
+    console.log("Modal de connexion fermé."); 
+  }
+
+  /**
+   * 🚀 Intercepte l'activation d'un composant dans la router-outlet pour gérer la souscription à l'événement du modal.
+   */
+  onActivate(componentRef: any): void {
+    // Nettoyer l'ancienne souscription
+    if (this.subscription) {
+        this.subscription.unsubscribe();
+        this.subscription = null;
+    }
+
+    if (componentRef instanceof PublicLayoutComponent) {
+        // Souscrire à l'événement openLoginModalEvent émis par le PublicLayout
+        this.subscription = componentRef.openLoginModalEvent.subscribe(() => {
+            this.openLoginModal();
+        });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+        this.subscription.unsubscribe();
+    }
   }
 }

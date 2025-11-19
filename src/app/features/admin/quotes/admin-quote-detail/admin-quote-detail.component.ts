@@ -1,5 +1,3 @@
-// src/app/features/admin/quotes/admin-quote-detail/admin-quote-detail.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,12 +5,11 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TransactionService, Quote } from '../../../../core/services/transaction.service';
 
 @Component({
-  selector: 'app-admin-quote-detail',
-  standalone: true,
-  // Ajout des modules nécessaires
-  imports: [CommonModule, FormsModule, DatePipe, CurrencyPipe, RouterModule],
-  templateUrl: './admin-quote-detail.component.html',
-  styleUrls: ['./admin-quote-detail.component.css']
+    selector: 'app-admin-quote-detail',
+    standalone: true,
+    imports: [CommonModule, FormsModule, DatePipe, CurrencyPipe, RouterModule],
+    templateUrl: './admin-quote-detail.component.html',
+    styleUrls: ['./admin-quote-detail.component.css']
 })
 export class AdminQuoteDetailComponent implements OnInit {
 
@@ -22,6 +19,8 @@ export class AdminQuoteDetailComponent implements OnInit {
     quoteId: number | null = null;
     successMessage: string | null = null;
     isProcessing = false;
+    
+    newFinalPrice: number | null = null; 
 
     constructor(
         private route: ActivatedRoute,
@@ -48,40 +47,70 @@ export class AdminQuoteDetailComponent implements OnInit {
     loadQuoteDetail(id: number): void {
         this.isLoading = true;
         this.error = null;
+        // NOTE: Il faut ajouter la méthode getQuoteById(id: number): Observable<Quote>
+        // dans votre TransactionService pour que ceci fonctionne.
+        // Je vais assumer qu'elle existe.
         this.transactionService.getQuoteById(id).subscribe({
             next: (data: Quote) => { 
                 this.quote = data;
                 this.isLoading = false;
+                this.newFinalPrice = data.final_price_fcfa > 0 ? data.final_price_fcfa : null;
             },
             error: (err: any) => { 
-                this.error = "Impossible de charger le détail du devis. " + err.message;
+                this.error = "Impossible de charger le détail du devis.";
                 this.isLoading = false;
+            }
+        });
+    }
+    
+    /**
+     * [ADMIN ACTION] Calcule/Fixe le prix d'un devis (SENT -> CALCULATED).
+     */
+    onCalculateQuote(): void {
+        if (!this.quote || this.quote.status !== 'sent' || !this.quoteId || !this.newFinalPrice || this.newFinalPrice <= 0) {
+            alert("Veuillez entrer un prix valide et s'assurer que le devis est 'SENT'.");
+            return;
+        }
+        
+        if (!confirm(`Confirmez-vous le calcul du prix final à ${this.newFinalPrice} FCFA pour le devis #${this.quoteId} ?`)) {
+            return;
+        }
+        
+        this.isProcessing = true;
+        this.error = null;
+        this.transactionService.calculateQuote(this.quoteId, { final_price: this.newFinalPrice }).subscribe({
+            next: () => {
+                this.successMessage = `Devis #${this.quoteId} calculé (Prix: ${this.newFinalPrice} FCFA). Statut mis à jour à CALCULATED.`;
+                this.isProcessing = false;
+                this.loadQuoteDetail(this.quoteId!); 
+            },
+            error: (err) => {
+                this.error = `Erreur lors du calcul: ${err.message || 'Problème de communication API'}`;
+                this.isProcessing = false;
             }
         });
     }
 
     /**
-     * Convertit le devis en commande depuis la page de détail.
+     * [ADMIN ACTION] Rejette un devis (SENT/CALCULATED -> REJECTED).
      */
-    onConvertQuote(): void {
-        if (!this.quote || this.quote.status !== 'submitted' || !this.quoteId) return;
+    onRejectQuote(): void {
+        if (!this.quoteId || !this.quote || (this.quote.status !== 'sent' && this.quote.status !== 'calculated')) return;
 
-        if (!confirm(`Confirmez-vous la conversion du devis #${this.quoteId} en COMMANDE ?`)) {
+        if (!confirm(`Êtes-vous sûr de vouloir REJETER le devis #${this.quoteId} ?`)) {
             return;
         }
 
         this.isProcessing = true;
         this.error = null;
-
-        this.transactionService.convertQuoteToOrder(this.quoteId).subscribe({
-            next: (order) => {
-                this.successMessage = `Devis #${this.quoteId} converti en Commande #${order.id}!`;
+        this.transactionService.rejectQuote(this.quoteId).subscribe({
+            next: () => {
+                this.successMessage = `Devis #${this.quoteId} rejeté avec succès.`;
                 this.isProcessing = false;
-                // Recharger pour mettre à jour le statut du devis à 'ordered'
                 this.loadQuoteDetail(this.quoteId!); 
             },
             error: (err) => {
-                this.error = `Erreur lors de la conversion: ${err.message}`;
+                this.error = `Erreur lors du rejet: ${err.message || 'Problème de communication API'}`;
                 this.isProcessing = false;
             }
         });
@@ -103,7 +132,7 @@ export class AdminQuoteDetailComponent implements OnInit {
                 this.router.navigate(['/admin/quotes']); // Retourner à la liste
             },
             error: (err) => {
-                this.error = `Impossible de supprimer le devis: ${err.message}`;
+                this.error = `Impossible de supprimer le devis: ${err.message || 'Problème de communication API'}`;
             }
         });
     }

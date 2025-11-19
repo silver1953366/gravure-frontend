@@ -1,92 +1,140 @@
-// src/app/features/admin/admin.routes.ts
-
 import { Routes } from '@angular/router';
-import { AdminLayoutComponent } from './shared/admin-layout.component';
 
-// --- IMPORTS DES COMPOSANTS ADMIN EXISTANTS ---
-// Module Utilisateurs
-import { UserListComponent } from './users/user-list/user-list.component';
-import { UserFormComponent } from './users/user-form/user-form.component';
-
-// Module Inventaire
-import { InventoryListComponent } from './inventory/inventory-list/inventory-list.component';
-import { InventoryFormComponent } from './inventory/inventory-form/inventory-form.component';
-
-// Modules Catalogue (CRUD)
-import { MaterialListComponent } from './materials/material-list/material-list.component';
-import { MaterialFormComponent } from './materials/material-form/material-form.component';
-import { CategoryListComponent } from './categories/category-list/category-list.component';
-import { CategoryFormComponent } from './categories/category-form/category-form.component';
-import { ShapeListComponent } from './shapes/shape-list/shape-list.component';
-import { ShapeFormComponent } from './shapes/shape-form/shape-form.component';
-
-// Modules Métier & Système
-import { PricingComponent } from './pricing/pricing.component';
-import { ReportsComponent } from './reports/reports.component';
-import { NotificationsComponent } from './notifications/notifications.component';
-import { ActivityLogComponent } from './activity-log/activity-log/activity-log.component';
-import { DiscountsComponent } from './discounts/discounts.component'; 
-import { AdminDashboardComponent } from './dashboard/admin-dashboard.component';
-
-// 🛑 IMPORTS DES NOUVEAUX MODULES DE TRANSACTION (Devis & Commandes)
-import { AdminQuotesComponent } from './quotes/admin-quotes.component'; 
-import { AdminOrdersComponent } from './orders/admin-orders.component'; 
-import { AdminOrderDetailComponent } from './orders/admin-order-detail/admin-order-detail.component'; 
-
-
+/**
+ * Définition de toutes les routes de l'interface d'administration (Lazy Loading).
+ * Les routes sont définies comme des routes enfants sous un composant de layout principal.
+ */
 export const ADMIN_ROUTES: Routes = [
     {
         path: '',
-        // J'utilise votre syntaxe 'loadComponent' pour AdminLayoutComponent
-        loadComponent: () => import('./shared/admin-layout.component').then(m => m.AdminLayoutComponent),
+        // Composant de layout principal (avec Sidebar/Header commun)
+        loadComponent: () => import('./../admin/shared/admin-layout.component').then(m => m.AdminLayoutComponent),
         children: [
-            {
-                path: 'dashboard',
-                component: AdminDashboardComponent
+            // Route par défaut (Redirection vers le tableau de bord)
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            
+            // --- 1. Tableau de Bord ---
+            { 
+                path: 'dashboard', 
+                loadComponent: () => import('./dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
             },
             
-            // 🛑 MODULES DEVIS (QUOTES)
-            { path: 'quotes', component: AdminQuotesComponent },
-            // Ajout potentiel pour le détail du devis :
-            // { path: 'quotes/:id', component: AdminQuoteDetailComponent }, 
+            // --- 2. MODULES DEVIS (QUOTES) ---
+            { 
+                path: 'quotes', 
+                loadComponent: () => import('./quotes/admin-quotes.component').then(m => m.AdminQuotesComponent) 
+            }, 
+            { 
+                path: 'quotes/:id', 
+                loadComponent: () => import('./quotes/admin-quote-detail/admin-quote-detail.component').then(m => m.AdminQuoteDetailComponent) 
+            }, 
             
-            // 🛑 MODULES COMMANDES (ORDERS)
-            { path: 'orders', component: AdminOrdersComponent }, // Liste des commandes
-            { path: 'orders/:id', component: AdminOrderDetailComponent }, // Détail de la commande
+            // --- 3. MODULES COMMANDES (ORDERS) ---
+            { 
+                path: 'orders', 
+                loadComponent: () => import('./orders/admin-orders.component').then(m => m.AdminOrdersComponent) 
+            }, 
+            { 
+                path: 'orders/:id', 
+                loadComponent: () => import('./orders/admin-order-detail/admin-order-detail.component').then(m => m.AdminOrderDetailComponent) 
+            }, 
 
-            // --- MODULE UTILISATEURS (Admin SEUL) ---
-            { path: 'users', component: UserListComponent },
-            { path: 'users/create', component: UserFormComponent },
-            { path: 'users/edit/:id', component: UserFormComponent },
+            // --- 4. MODULE UTILISATEURS ---
+            { 
+                path: 'users', 
+                loadComponent: () => import('./users/user-list/user-list.component').then(m => m.UserListComponent) 
+            },
+            { 
+                path: 'users/create', 
+                loadComponent: () => import('./users/user-form/user-form.component').then(m => m.UserFormComponent) 
+            },
+            { 
+                path: 'users/edit/:id', 
+                loadComponent: () => import('./users/user-form/user-form.component').then(m => m.UserFormComponent) 
+            },
             
-            // --- MODULE INVENTAIRE (Lecture/Ecriture Admin) ---
-            { path: 'inventory', component: InventoryListComponent },
-            { path: 'inventory/create', component: InventoryFormComponent },
-            { path: 'inventory/edit/:id', component: InventoryFormComponent },
+            // --- 5. MODULE INVENTAIRE ---
+            { 
+                path: 'inventory', 
+                loadComponent: () => import('./inventory/inventory-list/inventory-list.component').then(m => m.InventoryListComponent) 
+            },
+            { 
+                path: 'inventory/create', 
+                loadComponent: () => import('./inventory/inventory-form/inventory-form.component').then(m => m.InventoryFormComponent) 
+            },
+            { 
+                path: 'inventory/edit/:id', 
+                loadComponent: () => import('./inventory/inventory-form/inventory-form.component').then(m => m.InventoryFormComponent) 
+            },
 
-            // --- MODULE CATALOGUE & PRIX (CRUD Admin) ---
-            { path: 'materials', component: MaterialListComponent },
-            { path: 'materials/create', component: MaterialFormComponent },
-            { path: 'materials/edit/:id', component: MaterialFormComponent },
+            // --- 6. MODULE CATALOGUE: Matériaux ---
+            { 
+                path: 'materials', 
+                loadComponent: () => import('./materials/material-list/material-list.component').then(m => m.MaterialListComponent) 
+            },
+            { 
+                path: 'materials/create', 
+                loadComponent: () => import('./materials/material-form/material-form.component').then(m => m.MaterialFormComponent) 
+            },
+            { 
+                path: 'materials/edit/:id', 
+                loadComponent: () => import('./materials/material-form/material-form.component').then(m => m.MaterialFormComponent) 
+            },
             
-            { path: 'categories', component: CategoryListComponent },
-            { path: 'categories/create', component: CategoryFormComponent },
-            { path: 'categories/edit/:id', component: CategoryFormComponent },
+            // --- 7. MODULE CATALOGUE: Catégories ---
+            { 
+                path: 'categories', 
+                loadComponent: () => import('./categories/category-list/category-list.component').then(m => m.CategoryListComponent) 
+            },
+            { 
+                path: 'categories/create', 
+                loadComponent: () => import('./categories/category-form/category-form.component').then(m => m.CategoryFormComponent) 
+            },
+            { 
+                path: 'categories/edit/:id', 
+                loadComponent: () => import('./categories/category-form/category-form.component').then(m => m.CategoryFormComponent) 
+            },
             
-            { path: 'shapes', component: ShapeListComponent },
-            { path: 'shapes/create', component: ShapeFormComponent },
-            { path: 'shapes/edit/:id', component: ShapeFormComponent },
+            // --- 8. MODULE CATALOGUE: Formes ---
+            { 
+                path: 'shapes', 
+                loadComponent: () => import('./shapes/shape-list/shape-list.component').then(m => m.ShapeListComponent) 
+            },
+            { 
+                path: 'shapes/create', 
+                loadComponent: () => import('./shapes/shape-form/shape-form.component').then(m => m.ShapeFormComponent) 
+            },
+            { 
+                path: 'shapes/edit/:id', 
+                loadComponent: () => import('./shapes/shape-form/shape-form.component').then(m => m.ShapeFormComponent) 
+            },
 
-            { path: 'pricing', component: PricingComponent },
-            { path: 'discounts', component: DiscountsComponent }, 
+            // --- 9. MODULES DE GESTION (Tarification/Règles) ---
+            { 
+                path: 'pricing', 
+                loadComponent: () => import('./pricing/pricing.component').then(m => m.PricingComponent) 
+            },
+            { 
+                path: 'discounts', 
+                loadComponent: () => import('./discounts/discounts.component').then(m => m.DiscountsComponent) 
+            }, 
 
-            // --- MODULES SYSTÈME & RAPPORTS ---
-            { path: 'activity-log', component: ActivityLogComponent },
-            { path: 'reports', component: ReportsComponent },
-            { path: 'notifications', component: NotificationsComponent },
-
-            // Route par défaut
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+            // --- 10. MODULES SYSTÈME & RAPPORTS ---
+            { 
+                path: 'activity-log', 
+                loadComponent: () => import('./activity-log/activity-log/activity-log.component').then(m => m.ActivityLogComponent) 
+            },
+            { 
+                path: 'reports', 
+                loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent) 
+            },
+            { 
+                path: 'notifications', 
+                loadComponent: () => import('./notifications/notifications.component').then(m => m.NotificationsComponent) 
+            },
+            
+            // Route Wildcard (Gestion des chemins non trouvés)
+            { path: '**', redirectTo: 'dashboard' } 
         ]
     }
 ];

@@ -1,154 +1,125 @@
-<div class="configurator-container">
-    <header class="configurator-header">
-        <h1>🛠️ Configurator de Plaque - Votre Création</h1>
-    </header>
-
-    <div class="configurator-grid">
-        
-        <div class="config-sidebar-area">
-            
-            <div class="step-vertical-menu">
-                
-                <button class="step-item" [class.active]="currentStep() >= 1" (click)="currentStep.set(1)">
-                    <i class="fas fa-layer-group step-icon"></i> 
-                    <span class="step-label">1. Matériau</span>
-                </button>
-
-                <button class="step-item" [class.active]="currentStep() >= 2" [disabled]="currentStep() < 2" (click)="currentStep.set(2)">
-                    <i class="fas fa-square step-icon"></i> 
-                    <span class="step-label">2. Forme</span>
-                </button>
-
-                <button class="step-item" [class.active]="currentStep() >= 3" [disabled]="currentStep() < 3" (click)="currentStep.set(3)">
-                    <i class="fas fa-ruler-combined step-icon"></i> 
-                    <span class="step-label">3. Dimensions/Taille</span>
-                </button>
-
-                <button class="step-item" [class.active]="currentStep() >= 4" [disabled]="currentStep() < 4" (click)="currentStep.set(4)">
-                    <i class="fas fa-screwdriver step-icon"></i> 
-                    <span class="step-label">4. Fixation</span>
-                </button>
-                
-                <button class="step-item" [class.active]="currentStep() >= 5" [disabled]="currentStep() < 5" (click)="currentStep.set(5)">
-                    <i class="fas fa-palette step-icon"></i> 
-                    <span class="step-label">5. Bordure/Couleur</span>
-                </button>
-
-                <button class="step-item" [class.active]="currentStep() >= 6" [disabled]="currentStep() < 6" (click)="currentStep.set(6)">
-                    <i class="fas fa-text-height step-icon"></i> 
-                    <span class="step-label">6. Texte</span>
-                </button>
-
-                <button class="step-item" [class.active]="currentStep() >= 7" [disabled]="currentStep() < 7" (click)="currentStep.set(7)">
-                    <i class="fas fa-calculator step-icon"></i> 
-                    <span class="step-label">7. Prix & Devis</span>
-                </button>
-            </div>
-            
-            <div class="preview-sticky-wrapper">
-                <app-preview 
-                    [selectedDimension]="finalProduct()" 
-                    [borderOptions]="selectedBorder()"
-                    [textContent]="currentTextContent()"
-                />
-            </div>
-
-        </div>
-
-        <div class="config-main-content">
-            
-            @if (errorMessage()) {
-                <div class="alert-message {{ errorMessage()!.startsWith('✅') ? 'success' : 'error' }}">
-                    {{ errorMessage() }}
-                </div>
-            }
-
-            <div class="step-panels-wrapper">
-                
-                <div *ngIf="currentStep() === 1" class="config-step-panel">
-                    <h2>Étape 1: Sélection du Matériau</h2>
-                    <app-material-selector 
-                        [materials]="allMaterials()" 
-                        [selectedMaterial]="selectedMaterial()"
-                        (materialSelected)="onMaterialSelected($event)"
-                    />
-                </div>
-
-                <div *ngIf="currentStep() === 2" class="config-step-panel">
-                    <h2>Étape 2: Sélection de la Forme</h2>
-                    <app-shape-selector 
-                        [material]="selectedMaterial()"
-                        [shapes]="availableShapes()"
-                        [selectedShape]="selectedShape()"
-                        (shapeSelected)="onShapeSelected($event)"
-                    />
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 1</button>
-                    </div>
-                </div>
-                
-                <div *ngIf="currentStep() === 3" class="config-step-panel">
-                    <h2>Étape 3: Dimensions et Taille</h2>
-                    <app-dimension-selector
-                        [material]="selectedMaterial()"
-                        [shape]="selectedShape()"
-                        [dimensions]="availableDimensions()"
-                        [selectedDimension]="selectedDimension()"
-                        (dimensionSelected)="onDimensionSelected($event)"
-                    />
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 2</button>
-                    </div>
-                </div>
-
-                <div *ngIf="currentStep() === 4" class="config-step-panel">
-                    <h2>Étape 4: Type de Fixation</h2>
-                    <app-fixation-selector
-                        [selectedFixation]="selectedFixation()"
-                        (fixationSelected)="onFixationSelected($event)"
-                    />
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 3</button>
-                    </div>
-                </div>
-
-                <div *ngIf="currentStep() === 5" class="config-step-panel">
-                    <h2>Étape 5: Bordure et Couleur</h2>
-                    <app-border-selector 
-                        (borderSelected)="onBorderSelected($event)"
-                    />
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 4</button>
-                    </div>
-                </div>
-                
-                <div *ngIf="currentStep() === 6" class="config-step-panel">
-                    <h2>Étape 6: Saisie de Texte et Gravure</h2>
-                    <app-text-editor 
-                        (textUpdated)="onTextContentUpdated($event)"
-                    />
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Retour à l'étape 5</button>
-                    </div>
-                </div>
-
-
-                <div *ngIf="currentStep() === 7" class="config-step-panel final-step">
-                    <h2>Étape 7: Validation de votre Configuration</h2>
-                    
-                    <app-price-display [selectedDimension]="finalProduct()"></app-price-display>
-                    
-                    <div class="final-actions">
-                        <button class="primary-cta-button" (click)="finalizeConfiguration()" [disabled]="!finalProduct()">
-                            <i class="fas fa-shopping-cart"></i> Ajouter au Devis / Panier
-                        </button>
-                    </div>
-                    
-                    <div class="navigation-controls">
-                        <button class="step-back-btn" (click)="prevStep()">← Modifier Texte</button>
+<div class="configurator-wrapper">
+    <div class="preview-zone">
+        <div class="preview-container">
+            <h2 class="preview-title">Aperçu du Produit</h2>
+            <div class="plaque-display-area">
+                <div class="plaque-render-wrapper">
+                    <div
+                        class="simulated-plaque"
+                        [ngStyle]="simulatedStyles()" 
+                        [style.backgroundColor]="selectedMaterial()?.color || '#FFFFFF'"
+                        [style.borderColor]="selectedMaterial()?.color || '#E2E8F0'"
+                    >
+                        <p class="engraving-text-display">
+                            {{ engravingText() || 'Entrez votre texte ici' }}
+                        </p>
+                        <p class="dimension-label-display">
+                            ({{ selectedDimension()?.dimension_label || 'Dimension ?' }})
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="steps-column">
+
+        <div *ngIf="currentStep() === 1" class="step-section step-1-material">
+            <h3 class="step-title">1. Choisir le Matériau</h3>
+            <div *ngIf="isLoadingMaterials()">Chargement des matériaux...</div>
+            <app-material-selector 
+                *ngIf="!isLoadingMaterials()"
+                [materials]="availableMaterials()" 
+                [selectedMaterial]="selectedMaterial()"
+                [isLoading]="isLoadingMaterials()"
+                (materialSelected)="onMaterialSelect($event)">
+            </app-material-selector>
+        </div>
+
+        <div *ngIf="currentStep() === 2" class="step-section step-2-shape">
+            <button class="back-button" (click)="goBack()">
+                ← Matériau Précédent
+            </button>
+            <h3 class="step-title">2. Choisir la Forme</h3>
+            <div *ngIf="isLoadingShapes()">Chargement des formes...</div>
+            <app-shape-selector
+                *ngIf="!isLoadingShapes()"
+                [shapes]="availableShapes()"
+                [selectedShape]="selectedShape()"
+                [isLoading]="isLoadingShapes()"
+                (shapeSelected)="onShapeSelect($event)">
+            </app-shape-selector>
+        </div>
+
+        <div *ngIf="currentStep() === 3" class="step-section step-3-dimension">
+            <button class="back-button" (click)="goBack()">
+                ← Forme Précédente
+            </button>
+            <h3 class="step-title">3. Choisir la Dimension</h3>
+            <app-dimension-selector
+                [dimensions]="availableDimensions()"
+                [selectedDimension]="selectedDimension()"
+                (dimensionSelected)="onDimensionSelect($event)">
+            </app-dimension-selector>
+        </div>
+        
+        <div *ngIf="currentStep() === 4" class="step-section step-4-finition">
+            <button class="back-button" (click)="goBack()">
+                ← Dimension Précédente
+            </button>
+            <h3 class="step-title">4. Gravure, Finition, Fixation et Quantité</h3>
+            
+            <div class="option-box engraving-option-box">
+                <label class="input-label engraving-label">Texte à Graver</label>
+                <input 
+                    type="text" 
+                    placeholder="Ex: E.M.E.S - Salle 101"
+                    class="input-field"
+                    [value]="engravingText()"
+                    (input)="onEngravingTextChange($event)"
+                    maxlength="100"
+                />
+            </div>
+            
+            <div class="mounting-option-box option-box">
+                <label class="input-label">Type de fixation</label>
+                <select class="select-field" [(ngModel)]="mountingOption">
+                    <option [ngValue]="'none'">Sans trous</option>
+                    <option [ngValue]="'4-corners'">4 trous aux coins</option>
+                    <option [ngValue]="'adhesive'">Bande adhésive</option>
+                </select>
+            </div>
+
+            <div class="option-box quantity-control-box">
+                <label class="quantity-label">Quantité :</label>
+                <button class="quantity-button" (click)="updateQuantity(-1)">-</button>
+                <span class="quantity-value">{{ quantity() }}</span>
+                <button class="quantity-button" (click)="updateQuantity(1)">+</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<footer class="configurator-footer">
+    <div class="footer-content-wrapper">
+        <div class="price-details">
+            <span class="price-label">PRIX TOTAL HT</span>
+            <span class="total-price-value">{{ totalPrice() | number:'1.2-2' }} FCFA</span>
+            
+            <span class="engraving-cost-info">
+                Coût de la gravure ({{ engravingCost() | number:'1.0-0':'fr' }} FCFA/unité) 
+                <span *ngIf="engravingCost() === 0">non</span> inclus.
+            </span>
+        </div>
+        
+        <div class="footer-actions">
+            <button 
+                class="action-button primary-button" 
+                (click)="onAddToCart()"
+                [disabled]="!selectedDimension()"
+            >
+                Ajouter au panier
+            </button>
+        </div>
+    </div>
+</footer>

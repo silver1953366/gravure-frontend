@@ -1,0 +1,210 @@
+/* ---------------------------------------------------- */
+/* --- CONTENEUR ET HEADER --- */
+/* ---------------------------------------------------- */
+.shape-management-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+    color: #1a202c; 
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+/* ---------------------------------------------------- */
+/* --- BOUTONS D'ACTION GLOBALE --- */
+/* ---------------------------------------------------- */
+.btn-create-shape {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    background-color: #3b82f6; /* Bleu primaire */
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+}
+
+.btn-create-shape:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-create-shape .icon-plus {
+    font-size: 1.2em;
+    margin-right: 8px;
+    font-weight: 900;
+}
+
+/* ---------------------------------------------------- */
+/* --- TABLEAU --- */
+/* ---------------------------------------------------- */
+
+.shapes-table {
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+th, td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+th {
+    background-color: #f7f9fb; 
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #edf2f7; 
+}
+
+/* Colonnes spécifiques */
+.shape-name-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+}
+.shape-name-link:hover {
+    text-decoration: underline;
+}
+
+.shape-slug {
+    font-family: monospace;
+    background-color: #f0f4f8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #4a5568;
+}
+
+/* ---------------------------------------------------- */
+/* --- ÉTATS (Actif/Inactif) --- */
+/* ---------------------------------------------------- */
+.status-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 700;
+    text-align: center;
+}
+
+.status-active {
+    background-color: #d1fae5; /* Vert très clair */
+    color: #059669; /* Vert foncé */
+}
+
+.status-inactive {
+    background-color: #fee2e2; /* Rouge très clair */
+    color: #ef4444; /* Rouge foncé */
+}
+
+/* ---------------------------------------------------- */
+/* --- IMAGES et ACTIONS --- */
+/* ---------------------------------------------------- */
+
+.shape-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: contain;
+    border: 1px solid #e2e8f0;
+    padding: 5px;
+}
+
+.no-image-placeholder {
+    font-size: 1.5em;
+    display: block;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+}
+
+.action-cell button {
+    padding: 8px 15px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-right: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.btn-edit {
+    background-color: #fcd34d; /* Jaune */
+    color: #333;
+}
+.btn-edit:hover {
+    background-color: #fbbf24;
+    box-shadow: 0 4px 8px rgba(252, 211, 77, 0.4);
+}
+
+.btn-danger {
+    background-color: #f87171; /* Rouge */
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #ef4444;
+    box-shadow: 0 4px 8px rgba(248, 113, 113, 0.4);
+}
+
+/* Messages d'état */
+.alert-error, .loading-state, .empty-state {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.alert-error {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+
+.loading-state {
+    color: #3b82f6;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

@@ -17,6 +17,8 @@ export interface Category {
 export class CategoryService {
     // Route API: CRUD pour les catégories (Admin SEUL)
     private readonly apiUrl = `${environment.apiUrl}/admin/categories`; 
+    // Route API pour les catégories visibles publiquement (pour les formulaires)
+    private readonly publicApiUrl = `${environment.apiUrl}/public/categories`; 
 
     constructor(private http: HttpClient) {}
 
@@ -25,6 +27,15 @@ export class CategoryService {
         return this.http.get<Category[]>(this.apiUrl);
     }
     
+    /** 🎯 GET: Récupère UNIQUEMENT la liste des catégories ACTIVES. 🎯
+     * Ceci est la méthode qui était manquante pour le MaterialFormComponent.
+     */
+    getAllActiveCategories(): Observable<Category[]> {
+        // Supposons que l'API a un endpoint pour filtrer les catégories actives.
+        // Si votre API n'a pas cette route, vous devrez filtrer après l'appel à getCategories().
+        return this.http.get<Category[]>(`${this.publicApiUrl}/active`);
+    }
+
     /** GET: Récupère une seule catégorie par ID */
     getCategory(categoryId: number): Observable<Category> {
         return this.http.get<Category>(`${this.apiUrl}/${categoryId}`);

@@ -1,68 +1,46 @@
-import { Component, input, output, signal } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Nécessaire pour [(ngModel)]
-// Importation propre depuis l'index du dossier catalog/
-import { Material } from '../../../core/models/material.model';
-import { Shape } from '../../../core/models/shape.model';
-import { MaterialDimension } from '../../../core/models/material-dimension.model'; 
-// ------------------------------
+import { Component, input, output } from '@angular/core';
+import { CommonModule, NgClass, DecimalPipe } from '@angular/common';
+import { MaterialDimension } from '../../../core/models/material-dimension.model';
 
 @Component({
-  selector: 'app-dimension-selector',
-  standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe],
-  template: `
-    <div class="p-4 bg-white rounded-xl shadow-lg border border-gray-200">
-      <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-        </svg>
-        Choisir la Dimension
-      </h3>
+  selector: 'app-dimension-selector',
+  standalone: true,
+  imports: [CommonModule, NgClass, DecimalPipe],
+  template: `
+    @if (!dimensions().length) {
+        <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg text-center font-medium">
+            ⚠️ Aucune dimension disponible pour cette combinaison.
+        </div>
+    }
 
-      @if (dimensions().length > 0) {
-        <select 
-          [(ngModel)]="selectedDimension"
-          (ngModelChange)="onDimensionChange($event)"
-          class="block w-full p-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
-        >
-          <option [ngValue]="null" disabled>-- Sélectionnez une dimension --</option>
-          @for (dimension of dimensions(); track dimension.id) {
-            <option [ngValue]="dimension" class="p-2">
-              {{ dimension.dimension_label }} ({{ dimension.unit_price_fcfa | number:'1.2-2' }} FCFA)
-            </option>
-          }
-        </select>
-        
-      } @else if (material() && shape()) {
-        <div class="p-4 text-center bg-yellow-50 rounded-lg text-yellow-800 border border-yellow-200">
-          <p class="font-medium">Aucune dimension disponible pour cette combinaison Matériau/Forme.</p>
-        </div>
-      } @else {
-        <div class="p-4 text-center bg-gray-50 rounded-lg text-gray-500">
-          <p>Veuillez d'abord sélectionner un **Matériau** et une **Forme**.</p>
-        </div>
-      }
-    </div>
-  `,
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        @for (dimension of dimensions(); track dimension.id) {
+          <div 
+            (click)="selectDimension(dimension)"
+            [class.ring-2]="dimension.id === selectedDimension()?.id"
+            [class.ring-indigo-500]="dimension.id === selectedDimension()?.id"
+            class="p-4 border-2 rounded-lg shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md bg-white text-center"
+          >
+            <h4 class="font-bold text-lg" 
+                [ngClass]="{'text-indigo-600': dimension.id === selectedDimension()?.id}">
+              {{ dimension.dimension_label }}
+            </h4>
+            <p class="text-sm text-gray-500 mt-1">
+                {{ dimension.unit_price_fcfa | number:'1.2-2' }} FCFA
+            </p>
+          </div>
+        }
+    </div>
+  `,
 })
 export class DimensionSelectorComponent {
-  // Inputs
-  material = input<Material | null>(null);
-  shape = input<Shape | null>(null);
-  dimensions = input<MaterialDimension[]>([]);
+  dimensions = input<MaterialDimension[]>([]);
+  selectedDimension = input<MaterialDimension | null>(null);
 
-  // Internal state
-  selectedDimension: MaterialDimension | null = null;
-  
-  // Output
-  dimensionSelected = output<MaterialDimension | null>();
+  dimensionSelected = output<MaterialDimension | null>();
 
-  /**
-   * Émet l'événement lorsque la sélection de la dimension change.
-   * @param dimension La nouvelle MaterialDimension sélectionnée.
-   */
-  onDimensionChange(dimension: MaterialDimension | null): void {
-    this.dimensionSelected.emit(dimension);
-  }
+  selectDimension(dimension: MaterialDimension): void {
+    const newSelection = this.selectedDimension()?.id === dimension.id ? null : dimension;
+    this.dimensionSelected.emit(newSelection);
+  }
 }

@@ -1,54 +1,258 @@
-/* src/app/features/admin/quotes/admin-quote-detail/admin-quote-detail.component.css */
-/* Réutiliser les styles pour les détails (detail-card, info-section, items-table, etc.) */
+/* ------------------------------------------------------------------- */
+/* --- STYLES GÉNÉRAUX DE LA FACTURE (Mode Écran) --- */
+/* ------------------------------------------------------------------- */
 
-.quote-detail-container {
-    padding: 30px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    max-width: 1000px;
+.invoice-container {
+    max-width: 900px; 
     margin: 20px auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-h2 { color: #34495e; border-bottom: 2px solid #e9ecef; padding-bottom: 15px; margin-top: 0; margin-bottom: 20px; }
-h3 { color: #2c3e50; margin-top: 25px; margin-bottom: 15px; font-size: 1.2em; }
+.invoice-content {
+    font-family: 'Times New Roman', Times, serif; 
+    color: #333;
+}
 
-.btn-back { background: #bdc3c7; color: #2c3e50; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; font-weight: 600; }
-.btn-back:hover { background: #95a5a6; }
+/* Boutons d'action */
+.non-printable-actions {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
 
-.detail-card { background-color: #ffffff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+/* En-tête */
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #000;
+    margin-bottom: 40px;
+}
 
-.info-section { display: flex; justify-content: space-between; gap: 30px; margin-bottom: 20px; }
-.info-box { flex: 1; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; background-color: #fefefe; }
-.info-box p { margin: 8px 0; line-height: 1.5; }
+.company-logo img {
+    max-width: 200px;
+    height: auto;
+}
 
-.price-total { font-size: 1.4em; font-weight: 700; color: #27ae60; }
-.mt-10 { margin-top: 10px; }
-.mt-20 { margin-top: 20px; }
-.ml-20 { margin-left: 20px; }
+.document-details {
+    text-align: right;
+}
 
-/* Styles Boutons d'Action (réutilisation de admin-quotes.component.css) */
-.btn-convert { background-color: #3498db; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
-.btn-convert:hover { background-color: #2980b9; }
+.document-details h1 {
+    color: #000; 
+    font-size: 32px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.document-details p {
+    margin: 2px 0;
+    font-size: 14px;
+}
 
-.btn-danger { background-color: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
-.btn-danger:hover { background-color: #c0392b; }
+/* Adresses */
+.addresses {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    font-size: 14px;
+}
 
-/* Styles Tableau */
-.items-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-.items-table th, .items-table td { padding: 10px; border: 1px solid #e9ecef; text-align: left; font-size: 0.9em; }
-.items-table th { background-color: #ecf0f1; color: #34495e; }
+.company-info, .client-info {
+    width: 45%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
-.total-summary { text-align: right; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 1.2em; }
+.company-info h3, .client-info h3, .invoice-items h3 {
+    font-size: 18px;
+    color: #000;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
 
-/* Statut tag (réutilisation de admin-quotes.component.css) */
-.status-tag { padding: 6px 10px; border-radius: 4px; font-weight: 700; font-size: 0.9em; display: inline-block; }
-.status-draft { background-color: #fcf8e3; color: #8a6d3b; }
-.status-submitted { background-color: #d9edf7; color: #31708f; }
-.status-rejected { background-color: #f2dede; color: #a94442; }
-.status-ordered { background-color: #dff0d8; color: #3c763d; }
+/* Tableau des Articles */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    font-size: 14px;
+}
 
-.alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-.alert-success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-.alert-info { background-color: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-.loading-message { text-align: center; color: #7f8c8d; }
+.items-table th, .items-table td {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.items-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+.col-qty, .col-price, .col-total {
+    text-align: right;
+    width: 10%;
+}
+.col-unit {
+    width: 20%;
+    font-size: 0.85em;
+    color: #555;
+}
+.col-designation {
+    width: 40%;
+}
+
+/* Totaux */
+.totals-and-terms {
+    display: flex;
+    justify-content: space-between;
+}
+
+.terms-notes {
+    width: 55%;
+    font-size: 13px;
+    padding: 10px;
+}
+
+.totals-summary {
+    width: 40%;
+    padding: 15px;
+    border: 2px solid #000;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+}
+
+.total-final {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #000;
+    font-size: 1.2em;
+}
+
+.price-value {
+    color: #000;
+    font-weight: bold;
+}
+
+/* Pied de Page */
+.invoice-footer {
+    text-align: center;
+    margin-top: 80px; 
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.8em;
+    color: #777;
+}
+
+.signature {
+    margin-bottom: 20px;
+}
+
+.print-date {
+    margin-bottom: 10px;
+    font-style: italic;
+    color: #555;
+    font-size: 0.9em;
+}
+
+/* ------------------------------------------------------------------- */
+/* --- MEDIA PRINT (A4 Professionnel - Masque les éléments admin) --- */
+/* ------------------------------------------------------------------- */
+
+@media print {
+    /* 🛑 1. MASQUAGE AGRESSIF ET ISOLATION DU CONTENU */
+    
+    /* Cachez TOUT ce qui est directement enfant du body */
+    body > * {
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Révélez UNIQUEMENT le conteneur du devis */
+    .invoice-container {
+        visibility: visible !important;
+        position: absolute !important; 
+        left: 0 !important;
+        top: 0 !important;
+        width: 210mm !important; /* A4 Largeur */
+        height: 297mm !important; /* A4 Hauteur */
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 15mm !important; /* Marge A4 */
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        overflow: hidden !important; 
+        z-index: 9999 !important;
+    }
+    
+    /* Révéler le contenu interne de la facture */
+    .invoice-container *, 
+    .invoice-content * {
+        visibility: visible !important;
+    }
+
+    /* Masquer les éléments spécifiques non imprimables (boutons, messages d'état de conversion) */
+    .non-printable-actions, 
+    .status-message {
+        display: none !important;
+    }
+
+    /* 🛑 2. SUPPRESSION DES ENTÊTES/PIEDS DE PAGE DU NAVIGATEUR */
+    @page {
+        margin: 0 !important;
+        size: A4;
+    }
+    
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    /* 3. Finalisation A4 */
+    
+    .invoice-content, 
+    .invoice-content h1, 
+    .invoice-content strong {
+        color: #000 !important;
+    }
+
+    /* Éviter les coupures de lignes d'articles et de totaux */
+    .items-table tr, 
+    .totals-and-terms {
+        page-break-inside: avoid;
+    }
+
+    /* Positionner le pied de page en bas de la page A4 */
+    .invoice-footer {
+        position: fixed !important; 
+        bottom: 10mm !important;
+        width: calc(100% - 30mm) !important; 
+        margin-top: 0 !important;
+        border-top: 1px solid #000 !important;
+        font-size: 9pt !important;
+    }
+    
+    .signature {
+        margin-top: 50px !important;
+    }
+    
+    .print-date {
+        color: #000 !important; 
+    }
+}

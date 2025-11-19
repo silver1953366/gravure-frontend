@@ -1,52 +1,109 @@
-<header class="main-header">
-    <div class="header-content">
-        <div class="header-logo">
-            <a routerLink="/">
-                <img src="../../../../../assets/Logo/logo.png" alt="Logo de l'entreprise E.M.E.S" class="logo-img">
-            </a>
-        </div>
+<header class="header-root">
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-links">
+                <a routerLink="/reviews" class="top-bar-link">
+                    <i class="fas fa-star"></i> Avis clients
+                </a>
+                <a routerLink="/contact" class="top-bar-link">
+                    Nous contacter
+                </a>
+            </div>
+            
+            <div class="top-bar-actions">
+                <div class="dropdown" (click)="toggleLanguageMenu()" (blur)="isLanguageMenuOpen.set(false)">
+                                        <button class="dropdown-trigger top-bar-link" [attr.aria-expanded]="isLanguageMenuOpen()">
+                        Français <i class="fas fa-chevron-down icon-sm"></i>
+                    </button>
+                    @if (isLanguageMenuOpen()) {
+                        <div class="dropdown-content">
+                            <a href="#">Français</a>
+                            <a href="#">English</a>
+                            <a href="#">Nederlands</a>
+                        </div>
+                    }
+                </div>
 
-        <nav class="header-nav">
-            <ul class="nav-list">
-                @for (item of navItems; track item.label) {
-                    <li class="nav-item">
-                        <a [routerLink]="item.link" class="nav-link">{{ item.label }}</a>
-                    </li>
-                }
-                <li class="nav-item">
-                    <a routerLink="/configuration" class="nav-link nav-special">
-                        <i class="fas fa-hammer"></i> Créer une Plaque
-                    </a>
-                </li>
-            </ul>
-        </nav>
+                <div class="dropdown" (click)="toggleTypeMenu()" (blur)="isTypeMenuOpen.set(false)">
+                                        <button class="dropdown-trigger top-bar-link" [attr.aria-expanded]="isTypeMenuOpen()">
+                        Particulier / Entreprise <i class="fas fa-chevron-down icon-sm"></i>
+                    </button>
+                    @if (isTypeMenuOpen()) {
+                        <div class="dropdown-content">
+                            <a href="#">Particulier</a>
+                            <a href="#">Entreprise</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="header-actions">
-            
-            <a class="action-btn cart-btn" routerLink="/cart">
-                <i class="fas fa-shopping-cart icon"></i> Panier (0)
-            </a>
-            
-            @if (!isAuthenticated()) {
-                <button 
-                    class="action-btn account-btn" 
-                    (click)="triggerLoginModal()"
-                >
-                    <i class="fas fa-sign-in-alt icon"></i> Connexion
-                </button>
-            }
+    <div class="main-header-bar">
+        <div class="container main-header-content">
+            <div class="logo-area">
+                <a routerLink="/" class="logo-link">
+                    <img src="../../../../../assets/Logo/logo.png" alt="Logo E.M.E.S" class="logo-img">
+                    <div class="logo-text">
+                        E.M.E.S<span class="logo-accent">.GPI</span>
+                    </div>
+                </a>
+            </div>
 
-            @if (isAuthenticated()) {
-                <a routerLink="/profile" class="action-btn welcome-message">
-                    <i class="fas fa-user-circle icon"></i> 
-                    Bienvenue, **{{ currentUser()?.name || 'Client' }}**
-                </a>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    @for (item of navItems; track item.label) {
+                        <li class="nav-item">
+                            <a [routerLink]="item.link" class="nav-link">{{ item.label }}</a>
+                        </li>
+                    }
+                    <li class="nav-item dropdown-container" (click)="toggleCategoryMenu()" (blur)="isCategoryMenuOpen.set(false)">
+                                                <button class="nav-link nav-dropdown-trigger" [attr.aria-expanded]="isCategoryMenuOpen()">
+                            Assortiment <i class="fas fa-chevron-down icon-sm"></i>
+                        </button>
+                        @if (isCategoryMenuOpen()) {
+                            <div class="dropdown-content nav-dropdown-menu">
+                                <a routerLink="/catalog/category/1">Catégorie 1</a>
+                                <a routerLink="/catalog/category/2">Catégorie 2</a>
+                                <a routerLink="/catalog/category/3">Catégorie 3</a>
+                            </div>
+                        }
+                    </li>
+                </ul>
+            </nav>
 
-                <button class="action-btn logout-btn" (click)="logout()">
-                    <i class="fas fa-sign-out-alt icon"></i> Déconnexion
-                </button>
-            }
+            <div class="search-bar">
+                <div class="input-group">
+                    <input type="search" placeholder="Rechercher des produits" class="input-search">
+                    <button class="btn-icon btn-ghost">
+                        <i class="fas fa-search icon-base"></i>
+                    </button>
+                </div>
+            </div>
 
-        </div>
-    </div>
+            <div class="action-buttons">
+                @if (!isAuthenticated()) {
+                    <button class="btn btn-ghost action-auth" (click)="triggerLoginModal()">
+                        <i class="far fa-user icon-base"></i>
+                        <span>Se connecter</span>
+                    </button>
+                } @else {
+                    <a routerLink="/profile" class="btn btn-ghost action-auth">
+                        <i class="far fa-user icon-base"></i>
+                        <span>{{ currentUser()?.name || 'Profil' }}</span>
+                    </a>
+                    <button class="btn btn-ghost action-logout" (click)="logout()">
+                        <i class="fas fa-sign-out-alt icon-base"></i>
+                    </button>
+                }
+
+                <a routerLink="/cart" class="btn btn-ghost action-cart">
+                    <i class="fas fa-shopping-cart icon-base"></i>
+                    <span class="cart-label">Panier</span>
+                    <span class="badge badge-accent">
+                        0 </span>
+                </a>
+            </div>
+        </div>
+    </div>
 </header>

@@ -1,160 +1,172 @@
 :host {
-    --sidebar-width: 16rem; /* Plus compact que l'Admin ou le Catalogue */
-    --color-primary: #10b981; /* Vert, couleur distincte pour le client */
-    --color-bg-primary: #ffffff;
-    --color-bg-secondary: #f3f4f6;
-    --color-text-default: #1f2937;
     display: block;
+    height: 100%;
+    /* Variables de base */
+    --color-primary-accent: #2F80ED;
+    --color-text-dim: #94a3b8;
+    --color-text-soft: #64748b;
+    --color-primary-dark: #11121C;
+    --sidebar-width-mini: 80px; 
 }
 
-.sidebar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
+.client-sidebar-content {
+    padding: 1rem 0;
     height: 100%;
-    width: var(--sidebar-width);
-    background-color: var(--color-bg-primary);
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-    z-index: 900;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto; /* Permet le défilement si le contenu est trop long */
+    overflow-x: hidden;
 }
 
-/* Sur les grands écrans, la barre est visible, transformée par le conteneur parent */
-@media (min-width: 1025px) {
-    .sidebar-container {
-        transform: translateX(0); /* Toujours visible sur desktop */
-        position: sticky; 
-        top: 0;
-        height: 100vh;
-    }
+/* -------------------------------------- */
+/* 🛑 SECTION FILTRE (AJOUTÉE) 🛑 */
+/* -------------------------------------- */
+.sidebar-filter-section {
+    position: relative;
+    padding: 0 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.sidebar-container.open {
-    transform: translateX(0); /* Force l'ouverture sur mobile */
+.sidebar-search-input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem; /* Espace pour l'icône */
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-primary-dark);
+    transition: all 0.2s;
 }
 
-/* --- En-tête --- */
-.sidebar-header {
+.sidebar-search-input:focus {
+    outline: none;
+    border-color: var(--color-primary-accent);
+    box-shadow: 0 0 0 2px rgba(47, 128, 237, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-dim);
+    font-size: 1rem;
+}
+
+/* -------------------------------------- */
+/* 2. HEADER DE COMPTE */
+/* -------------------------------------- */
+.account-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 0 1rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 1rem;
 }
 
-.sidebar-logo {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--color-primary);
-    text-decoration: none;
-}
-
-.close-button {
-    background: none;
-    border: none;
+.account-icon-wrapper {
+    min-width: 48px;
+    height: 48px;
+    background-color: var(--color-primary-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
     font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--color-text-default);
-    display: block;
-}
-@media (min-width: 1025px) {
-    .close-button {
-        display: none; /* Caché sur desktop car la barre est toujours visible */
-    }
 }
 
-/* --- Navigation --- */
+.account-name {
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    line-height: 1.2;
+}
+
+.account-welcome {
+    font-size: 0.75rem;
+    color: var(--color-text-soft);
+}
+
+/* -------------------------------------- */
+/* 3. NAVIGATION */
+/* -------------------------------------- */
 .sidebar-nav {
     flex-grow: 1;
-    overflow-y: auto;
-    padding: 1rem 0;
 }
 
 .sidebar-nav ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
-.nav-link {
+.nav-item {
     display: flex;
     align-items: center;
     padding: 0.75rem 1rem;
-    color: var(--color-text-default);
+    cursor: pointer;
     text-decoration: none;
+    color: var(--color-primary-dark);
     transition: background-color 0.2s, color 0.2s;
     border-left: 4px solid transparent;
 }
 
-.nav-link:hover {
-    background-color: var(--color-bg-secondary);
-    color: var(--color-primary);
+.nav-item:hover {
+    background-color: #f1f5f9;
 }
 
-.nav-link.active {
-    background-color: var(--color-primary);
-    color: white;
+.nav-item.active {
+    background-color: #e0f2f7; /* Couleur de fond pour l'élément actif */
+    border-left-color: var(--color-primary-accent);
+    color: var(--color-primary-accent);
     font-weight: 600;
-    border-left-color: var(--color-primary); /* Pas visible car BG est la couleur */
-}
-.nav-link.active .nav-icon {
-    color: white;
 }
 
-.nav-icon {
-    width: 1.5rem;
+.nav-item i {
+    font-size: 1.2rem;
+    min-width: 2.5rem; /* Assure que l'icône a une largeur fixe */
     text-align: center;
-    margin-right: 0.75rem;
-    font-size: 1.1rem;
 }
 
-/* --- Pied de Page --- */
-.sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.logout-button {
-    width: 100%;
-    background-color: #fca5a5; /* Rouge clair pour la déconnexion */
-    color: #991b1b;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.logout-button:hover {
-    background-color: #ef4444; /* Rouge plus foncé */
-    color: white;
-}
-
-/* --- Overlay --- */
-.sidebar-overlay {
-    /* Style identique à celui du catalogue pour l'overlay mobile */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 899;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-}
-
-.sidebar-overlay.open {
+.nav-label {
+    white-space: nowrap;
     opacity: 1;
-    visibility: visible;
+    transition: opacity 0.1s;
 }
 
-@media (min-width: 1025px) {
-    .sidebar-overlay {
-        display: none;
-    }
+
+/* -------------------------------------- */
+/* 🛑 MODE MINI STYLES 🛑 */
+/* -------------------------------------- */
+.client-sidebar-content.sidebar-mini-active {
+    padding: 1rem 0; /* Réduire le padding horizontal en mode mini */
+    align-items: center;
+}
+
+.client-sidebar-content.sidebar-mini-active .account-header {
+    justify-content: center;
+    padding: 0.5rem 0.5rem 1rem;
+}
+
+.client-sidebar-content.sidebar-mini-active .nav-item {
+    justify-content: center;
+    padding: 0.75rem 0; /* Centrer le padding en mode mini */
+}
+
+/* 1. Cache le filtre en mode mini */
+.client-sidebar-content.sidebar-mini-active .sidebar-filter-section {
+    display: none;
+}
+
+/* 2. Cache les détails du compte en mode mini */
+.client-sidebar-content.sidebar-mini-active .account-details {
+    display: none;
+}
+
+/* 3. Adapte les icônes de navigation en mode mini */
+.client-sidebar-content.sidebar-mini-active .nav-item i {
+    min-width: auto;
+    width: 100%;
 }

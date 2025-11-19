@@ -6,31 +6,35 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface ClientUser {
-    id: number;
-    name: string;
-    email: string;
-    role: 'CLIENT';
-    phone: string | null;
-    address: string | null; // Ajout important pour le client
-    created_at: string;
+    id: number;
+    name: string;
+    email: string;
+    role: 'CLIENT'; // Assurez-vous que le backend renvoie bien 'CLIENT' ou convertissez-le si nécessaire
+    phone: string | null;
+    address: string | null;
+    created_at: string;
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root'
 })
 export class ClientUserProfileService {
-    // Endpoint API standard pour l'utilisateur connecté
-    private readonly apiUrl = `${environment.apiUrl}/profile`; 
-    
-    constructor(private http: HttpClient) {}
+    // CORRECTION FINALE : L'endpoint pour GET est /user
+    private readonly userApiUrl = `${environment.apiUrl}/user`; 
+    
+    constructor(private http: HttpClient) {}
 
-    /** GET: Récupère les données du client connecté. */
-    getProfile(): Observable<ClientUser> {
-        return this.http.get<ClientUser>(this.apiUrl);
-    }
+    /** GET: Récupère les données de l'utilisateur connecté (/api/user). */
+    getProfile(): Observable<ClientUser> {
+        // Appel vers /api/user
+        return this.http.get<ClientUser>(this.userApiUrl);
+    }
 
-    /** PUT: Mise à jour des données du profil client. */
-    updateProfile(data: Partial<ClientUser>): Observable<ClientUser> {
-        return this.http.put<ClientUser>(this.apiUrl, data);
-    }
+    /** PUT: Mise à jour des données du profil client.
+     * Le backend Laravel utilise souvent aussi /user pour la mise à jour (PUT/PATCH).
+     */
+    updateProfile(data: Partial<ClientUser>): Observable<ClientUser> {
+        // Appel vers /api/user pour la mise à jour
+        return this.http.put<ClientUser>(this.userApiUrl, data);
+    }
 }

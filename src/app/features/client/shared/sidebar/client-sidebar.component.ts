@@ -1,27 +1,37 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router'; 
+import { Component, Input, signal, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+// 🛑 FormsModule EST SUPPRIMÉ
+
+interface NavItem {
+  icon: string;
+  label: string;
+  route: string;
+}
 
 @Component({
-  selector: 'app-client-sidebar', 
+  selector: 'app-client-sidebar',
   standalone: true,
-  // C'EST L'IMPORT CRITIQUE QUI CORRIGE LE ROUTAGE DANS LE TEMPLATE
-  imports: [CommonModule, RouterLink, RouterLinkActive, DatePipe], 
-  templateUrl: './client-sidebar.component.html', 
+  // 🛑 Correction : FormsModule est retiré
+  imports: [CommonModule, RouterLink], 
+  templateUrl: './client-sidebar.component.html',
   styleUrls: ['./client-sidebar.component.css']
 })
-export class ClientSidebarComponent { // La classe est bien nommée!
-    
-    // Ces inputs DOIVENT exister pour que le Dashboard (parent) puisse y lier les données
-    @Input() userName: string = 'Utilisateur';
-    @Input() memberSince: Date = new Date();
-    @Input() isSidebarOpen: boolean = false; 
-    @Output() closeSidebar = new EventEmitter<void>(); 
+export class ClientSidebarComponent {
+  
+  @Input() isMini: boolean = false;
+  // Émet l'événement de bascule vers le composant parent (Dashboard)
+  @Output() toggleSidebar = new EventEmitter<void>(); 
+  
+  // 🛑 searchTerm EST SUPPRIMÉ
+  
+  navItems: NavItem[] = [
+    { icon: 'fa-table-columns', label: 'Tableau de bord', route: '/client/dashboard' },
+    { icon: 'fa-file-invoice', label: 'Mes Devis', route: '/client/quotes' },
+    { icon: 'fa-truck', label: 'Mes Commandes', route: '/client/orders' },
+    { icon: 'fa-heart', label: 'Mes Favoris', route: '/client/favorites' },
+    { icon: 'fa-user-group', label: 'Mon Équipe', route: '/client/team' },
+  ];
 
-    navItems = [
-        { label: 'Tableau de bord', path: '/client/dashboard', icon: 'tachometer-alt' },
-        { label: 'Mes Commandes', path: '/client/orders', icon: 'box' },
-        { label: 'Mon Compte', path: '/client/account', icon: 'user-circle' },
-        { label: 'Paramètres', path: '/client/settings', icon: 'cog' },
-    ];
+  // 🛑 onSearchChange EST SUPPRIMÉ
 }

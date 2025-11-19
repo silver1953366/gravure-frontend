@@ -1,60 +1,92 @@
 <div class="inventory-form-container">
-    <a routerLink="/admin/inventory" class="back-link">← Retour à l'inventaire</a>
-    
-    <h3>{{ isEditMode ? 'Modifier l\'article' : 'Ajouter un article au stock' }}</h3>
+    <a routerLink="/admin/inventory" class="back-link">← Retour à l'inventaire</a>
+    
+    <h3>{{ isEditMode ? 'Modifier l\'article d\'inventaire' : 'Ajouter un nouvel article' }}</h3>
+    
+    <div *ngIf="isLoading && isEditMode" class="loading-state">Chargement des données...</div>
 
-    <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
-        
-        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
-        
-        <div class="form-group">
-            <label for="reference">Référence</label>
-            <input id="reference" type="text" formControlName="reference">
-            <div *ngIf="inventoryForm.controls['reference'].touched && inventoryForm.controls['reference'].invalid" class="error-message">
-                La référence est requise.
-            </div>
-            <div *ngIf="apiErrors.reference" class="error-message">{{ apiErrors.reference }}</div>
-        </div>
+    <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading || !isEditMode">
+        
+        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
+        
+        <fieldset>
+            <legend>Détails du produit et prix</legend>
 
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" formControlName="description"></textarea>
-            <div *ngIf="inventoryForm.controls['description'].touched && inventoryForm.controls['description'].invalid" class="error-message">
-                La description est requise.
-            </div>
-            <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
-        </div>
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="reference">Référence *</label>
+                    <input id="reference" type="text" formControlName="reference" placeholder="Ex: R-3450-A">
+                    <div *ngIf="inventoryForm.controls['reference']?.errors?.['required'] && inventoryForm.controls['reference']?.touched" class="error-message">
+                        La référence est requise (max 50).
+                    </div>
+                    <div *ngIf="apiErrors.reference" class="error-message">{{ apiErrors.reference }}</div>
+                </div>
 
-        <div class="form-group">
-            <label for="quantity">Quantité en stock</label>
-            <input id="quantity" type="number" formControlName="quantity">
-            <div *ngIf="inventoryForm.controls['quantity'].invalid" class="error-message">
-                La quantité doit être un nombre positif.
-            </div>
-            <div *ngIf="apiErrors.quantity" class="error-message">{{ apiErrors.quantity }}</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="location">Localisation (Entrepôt/Étagère)</label>
-            <input id="location" type="text" formControlName="location">
-            <div *ngIf="inventoryForm.controls['location'].invalid" class="error-message">
-                La localisation est requise.
-            </div>
-            <div *ngIf="apiErrors.location" class="error-message">{{ apiErrors.location }}</div>
-        </div>
+                <div class="form-group half-width">
+                    <label for="price_per_unit">Prix Unitaire * (€)</label>
+                    <input id="price_per_unit" type="number" formControlName="price_per_unit" step="0.01" placeholder="Ex: 12.50">
+                    <div *ngIf="(inventoryForm.controls['price_per_unit']?.errors?.['required'] || inventoryForm.controls['price_per_unit']?.errors?.['min']) && inventoryForm.controls['price_per_unit']?.touched" class="error-message">
+                        Le prix unitaire est requis et doit être positif.
+                    </div>
+                    <div *ngIf="apiErrors.price_per_unit" class="error-message">{{ apiErrors.price_per_unit }}</div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="price_per_unit">Prix Unitaire</label>
-            <input id="price_per_unit" type="number" formControlName="price_per_unit" step="0.01">
-            <div *ngIf="inventoryForm.controls['price_per_unit'].invalid" class="error-message">
-                Le prix unitaire est requis.
-            </div>
-            <div *ngIf="apiErrors.price_per_unit" class="error-message">{{ apiErrors.price_per_unit }}</div>
-        </div>
+            <div class="form-group">
+                <label for="description">Description détaillée *</label>
+                <textarea id="description" formControlName="description" placeholder="Ex: Vis M8 Acier Inoxydable 316. Résistant à la corrosion marine."></textarea>
+                 <div *ngIf="(inventoryForm.controls['description']?.errors?.['required'] || inventoryForm.controls['description']?.errors?.['maxlength']) && inventoryForm.controls['description']?.touched" class="error-message">
+                    La description est requise (max 500).
+                </div>
+                <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
+            </div>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Quantités et Localisation</legend>
 
-        <button type="submit" [disabled]="inventoryForm.invalid || isLoading">
-            {{ isEditMode ? 'Sauvegarder l\'article' : 'Ajouter au stock' }}
-        </button>
-        <div *ngIf="isLoading">Sauvegarde en cours...</div>
-    </form>
+            <div class="form-row three-cols">
+                
+                <div class="form-group">
+                    <label for="stock_quantity">Quantité en stock (Physique) *</label>
+                    <input id="stock_quantity" type="number" formControlName="stock_quantity">
+                     <div *ngIf="(inventoryForm.controls['stock_quantity']?.errors?.['required'] || inventoryForm.controls['stock_quantity']?.errors?.['min']) && inventoryForm.controls['stock_quantity']?.touched" class="error-message">
+                        Le stock total doit être un nombre positif.
+                    </div>
+                    <div *ngIf="apiErrors.stock_quantity" class="error-message">{{ apiErrors.stock_quantity }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reserved_quantity">Stock Réservé</label>
+                    <input id="reserved_quantity" type="number" formControlName="reserved_quantity" readonly title="Le stock réservé est mis à jour automatiquement par le système de commande.">
+                    <div *ngIf="apiErrors.reserved_quantity" class="error-message">{{ apiErrors.reserved_quantity }}</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="minimum_threshold">Seuil d'Alerte (Min.) *</label>
+                    <input id="minimum_threshold" type="number" formControlName="minimum_threshold" placeholder="Ex: 50">
+                     <div *ngIf="(inventoryForm.controls['minimum_threshold']?.errors?.['required'] || inventoryForm.controls['minimum_threshold']?.errors?.['min']) && inventoryForm.controls['minimum_threshold']?.touched" class="error-message">
+                        Le seuil minimum doit être un nombre positif.
+                    </div>
+                    <div *ngIf="apiErrors.minimum_threshold" class="error-message">{{ apiErrors.minimum_threshold }}</div>
+                </div>
+
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Localisation (Entrepôt/Étagère) *</label>
+                <input id="location" type="text" formControlName="location" placeholder="Ex: Etagère A1 / Zone 3">
+                 <div *ngIf="inventoryForm.controls['location']?.invalid && inventoryForm.controls['location']?.touched" class="error-message">
+                    La localisation est requise.
+                </div>
+                <div *ngIf="apiErrors.location" class="error-message">{{ apiErrors.location }}</div>
+            </div>
+            
+        </fieldset>
+
+        <button type="submit" class="btn-submit" [disabled]="inventoryForm.invalid || isLoading">
+            <span *ngIf="isLoading">Sauvegarde en cours...</span>
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Sauvegarder les modifications' : 'Ajouter au stock' }}</span>
+        </button>
+    </form>
 </div>

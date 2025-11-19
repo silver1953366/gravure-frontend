@@ -1,69 +1,142 @@
-<div class="quote-detail-container">
-    <button (click)="router.navigate(['/admin/quotes'])" class="btn-back">
-        &larr; Retour à la liste des devis
-    </button>
-
-    <h2 *ngIf="quote">Détail du Devis #{{ quote.id }}</h2>
-    <h2 *ngIf="!quote && !isLoading">Détail du Devis</h2>
+<div class="invoice-container">
+    
+    <div class="non-printable-actions">
+        <button (click)="router.navigate(['/admin/quotes'])" class="btn-back btn-action">
+            &larr; Retour à la liste des devis
+        </button>
+        <button onclick="window.print()" class="btn-print btn-action ml-10"> 
+            🖨️ Imprimer le devis (A4)
+        </button>
+    </div>
 
     <div *ngIf="isLoading" class="loading-message">Chargement des détails du devis...</div>
     <div *ngIf="error" class="alert-error">{{ error }}</div>
     <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
-
-    <div *ngIf="quote && !isLoading" class="detail-card">
+    
+    <div *ngIf="quote && !isLoading" class="invoice-content">
         
-        <div class="info-section">
-            <div class="info-box">
-                <h3>Informations Client</h3>
-                <p><strong>Nom du Client :</strong> {{ quote.user?.name || 'Utilisateur ID ' + quote.user_id }}</p>
-                <p><strong>Créé le :</strong> {{ quote.created_at | date:'medium' }}</p>
+        <div class="invoice-header">
+            <div class="company-logo">
+                <img src="/assets/logo.png" alt="Logo de l'entreprise">
             </div>
-
-            <div class="info-box status-box">
-                <h3>Statut Actuel</h3>
-                <span [class]="'status-tag status-' + quote.status">{{ quote.status | uppercase }}</span>
-                <p class="mt-10"><strong>Montant Total :</strong> <span class="price-total">{{ quote.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span></p>
+            <div class="document-details">
+                <h1>DEVIS N° {{ quote.id }}</h1>
+                <p>Référence : **{{ quote.reference }}**</p>
+                <p>Date : **{{ quote.created_at | date:'dd/MM/yyyy' }}**</p>
+                <p>Statut : <span [class]="'status-tag status-' + quote.status">{{ quote.status | uppercase }}</span></p>
             </div>
         </div>
 
-        <div class="action-buttons mt-20">
-            <button 
-                *ngIf="quote.status === 'submitted'" 
-                (click)="onConvertQuote()" 
-                [disabled]="isProcessing"
-                class="btn-convert">
-                Convertir en Commande
-            </button>
-            <button (click)="onDeleteQuote()" class="btn-danger">Supprimer le Devis</button>
+        <div class="addresses">
+            <div class="company-info">
+                <h3>Informations Émetteur</h3>
+                <p><strong>[Nom de votre Société]</strong></p>
+                <p>[Votre Adresse Complète]</p>
+                <p>Tel: [Votre Numéro]</p>
+                <p>Email: [Votre Email]</p>
+            </div>
+            <div class="client-info">
+                <h3>Informations Client</h3>
+                <p><strong>{{ quote.user?.name || 'Utilisateur ID ' + quote.user_id }}</strong></p>
+                <p>{{ quote.user?.address || 'Adresse non spécifiée' }}</p>
+                <p>Email: {{ quote.user?.email || 'Non spécifié' }}</p>
+                <p>Réf. Client: {{ quote.client_ref || '-' }}</p>
+            </div>
+        </div>
+
+        <div class="non-printable-actions action-panel-admin">
+            <h3>Actions Administrateur</h3>
             
-            <span *ngIf="quote.status === 'ordered'" class="alert-info ml-20">
-                ✅ Ce devis a été converti en commande.
+            <div class="action-box">
+                <input 
+                    type="number" 
+                    [(ngModel)]="newFinalPrice" 
+                    placeholder="Prix Final FCFA"
+                    [disabled]="quote.status !== 'sent'"
+                    class="input-price"
+                >
+                <button 
+                    (click)="onCalculateQuote()" 
+                    [disabled]="isProcessing || quote.status !== 'sent'"
+                    class="btn-action btn-calculate">
+                    Fixer Prix & Valider (SENT &rarr; CALCULATED)
+                </button>
+            </div>
+
+            <button 
+                (click)="onRejectQuote()" 
+                [disabled]="isProcessing || (quote.status !== 'sent' && quote.status !== 'calculated')"
+                class="btn-action btn-reject">
+                Rejeter le Devis
+            </button>
+            
+            <button 
+                (click)="onDeleteQuote()" 
+                [disabled]="isProcessing || quote.order_id"
+                class="btn-action btn-danger">
+                Supprimer le Devis
+            </button>
+            
+            <span *ngIf="quote.order_id" class="status-message ml-20 alert-info">
+                ✅ Converti en commande #{{ quote.order_id }}.
             </span>
         </div>
+        <hr class="non-printable-actions">
 
-        <h3>Articles Détaillés ({{ quote.items.length }})</h3>
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Article</th>
-                    <th>Prix Unitaire</th>
-                    <th>Quantité</th>
-                    <th>Sous-total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of quote.items">
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.unit_price | currency:'FCFA':'symbol':'1.2-2' }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.subtotal | currency:'FCFA':'symbol':'1.2-2' }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="invoice-items">
+            <h3>Articles Détaillés ({{ quote.items.length }})</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="col-designation">Article / Description</th>
+                        <th class="col-price">Prix Unitaire</th>
+                        <th class="col-qty">Quantité</th>
+                        <th class="col-total">Sous-total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of quote.items">
+                        <td>
+                            **{{ item.product_name }}**
+                            <p class="col-unit">
+                                *Détails: [Matériau, Dimensions...]</p>
+                        </td>
+                        <td class="col-price">{{ item.unit_price | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                        <td class="col-qty">{{ item.quantity }}</td>
+                        <td class="col-total price-value">{{ item.subtotal | currency:'FCFA':'symbol':'1.2-2' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <div class="total-summary">
-            <strong>TOTAL FINAL :</strong> 
-            <span class="price-total">{{ quote.total_price | currency:'FCFA':'symbol':'1.2-2' }}</span>
+        <div class="totals-and-terms">
+            <div class="terms-notes">
+                <h3>Notes et Conditions</h3>
+                <p>Devis valable 30 jours à compter de la date d'émission.</p>
+                <p>TVA non applicable, Article 257 bis du CGI (à adapter).</p>
+                <p>Toute commande engage le client.</p>
+            </div>
+
+            <div class="totals-summary">
+                <div class="total-line">
+                    <span>Sous-total HT :</span>
+                    <span class="price-value">{{ quote.base_price_fcfa | currency:'FCFA':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="total-line">
+                    <span>Remises :</span>
+                    <span class="price-value">- {{ quote.discount_amount_fcfa | currency:'FCFA':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="total-line total-final">
+                    <strong>TOTAL NET À PAYER :</strong> 
+                    <span class="price-value">{{ quote.final_price_fcfa | currency:'FCFA':'symbol':'1.2-2' }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="invoice-footer">
+            <p class="signature">Fait à [Votre Ville], le {{ 'now' | date:'longDate' }}</p>
+            <p>Signature et Cachet de l'Émetteur</p>
+            <p class="print-date">Ce document est un devis non contractuel jusqu'à acceptation formelle du client.</p>
         </div>
     </div>
 </div>

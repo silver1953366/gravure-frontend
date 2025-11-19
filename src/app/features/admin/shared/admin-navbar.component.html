@@ -1,11 +1,12 @@
 <header class="navbar">
     <div class="navbar-left">
-        <span>Bienvenue, **{{ user.name }}** | Rôle : {{ user.role }}</span>
+        <span class="welcome-message">Bienvenue, **{{ user.name }}** | Rôle : {{ user.role }}</span>
     </div>
 
     <div class="navbar-right">
         <div class="notification-area" (click)="toggleNotificationDropdown()">
-            <i class="icon-bell">🔔</i>
+            <i class="material-icons icon-bell">notifications</i> 
+            
             <ng-container *ngIf="unreadNotifications$ | async as notifications">
                 <span class="badge" *ngIf="notifications.length > 0">
                     {{ notifications.length }}
@@ -29,7 +30,7 @@
         </div>
 
         <button (click)="onLogout()" class="btn-logout">
-            <i class="icon-logout">🚪</i> Déconnexion
+            <i class="material-icons icon-logout">logout</i> Déconnexion
         </button>
     </div>
 </header>

@@ -1,114 +1,164 @@
+/* src/app/components/navbar/navbar.component.css */
+
+/* --- Couleurs et Base --- */
 :host {
-    /* Variables locales */
-    --navbar-height: 4rem;
-    --color-primary: #2563eb;
-    --color-primary-hover: #1e40af;
-    --color-secondary: #4b5563; /* Gris foncé */
-    --color-secondary-hover: #1f2937;
-    --color-bg: #ffffff;
     display: block;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Niveau de base pour la navbar */
 }
 
-.navbar-header {
-    height: var(--navbar-height);
-    background-color: var(--color-bg);
+.navbar-container {
+    background-color: #172554; /* Bleu foncé professionnel (Navy Blue) */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #f1f5f9; 
+}
+
+.navbar-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1.5rem;
-    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 24px;
 }
 
-/* --- Bouton Toggle Sidebar/Filtres --- */
-.toggle-sidebar-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    color: var(--color-secondary);
-    font-weight: 600;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
-    transition: color 0.2s, background-color 0.2s;
-    display: flex; /* Toujours affiché pour toggler les filtres */
-    align-items: center;
-}
-
-.toggle-sidebar-button:hover {
-    color: var(--color-primary);
-    background-color: #f3f4f6;
-}
-
-/* --- Logo --- */
-.logo-container {
-    position: absolute; /* Position absolue pour centrer sur la page */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.app-logo {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--color-primary);
-    text-decoration: none;
-    letter-spacing: 0.05em;
-}
-
-/* --- Liens d'Action --- */
-.action-links {
+/* --- Section 1: Marque (Gauche) --- */
+.brand-section {
     display: flex;
     align-items: center;
+    /* Retiré flex-grow: 1 pour ne prendre que l'espace nécessaire */
 }
 
-.btn-primary, .btn-secondary {
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.9rem;
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo {
+    height: 35px;
+    margin-right: 8px;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white; 
+    letter-spacing: 1px;
+    white-space: nowrap; /* Empêche le texte de se casser */
+}
+
+/* --- Section 2: Option Principale (Milieu) --- */
+.main-options-section {
+    flex-grow: 1; /* Permet d'occuper l'espace central */
+    text-align: center;
+    margin: 0 20px; /* Ajout d'une marge pour séparer les sections */
+}
+
+.main-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #2563eb; /* Bleu vif pour attirer l'attention */
+    color: white;
     font-weight: 600;
     text-decoration: none;
+    border-radius: 6px;
     transition: background-color 0.2s;
+    font-size: 1rem;
+    white-space: nowrap; /* Empêche le texte de se casser */
 }
 
-.btn-primary {
-    background-color: var(--color-primary);
+.main-cta:hover {
+    background-color: #3b82f6;
+}
+
+.cta-icon {
+    font-size: 1.1rem;
+}
+
+/* --- Section 3: Actions Utilisateur (Droite) --- */
+.user-actions-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Boutons et liens d'action */
+.action-btn, .action-link {
     color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.2s;
 }
 
-.btn-primary:hover {
-    background-color: var(--color-primary-hover);
+.action-btn {
+    border: 1px solid white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap; /* Empêche le bouton de se casser */
 }
 
-.btn-secondary {
-    background-color: transparent;
-    color: var(--color-secondary);
-    border: 1px solid transparent;
+.action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.btn-secondary:hover {
-    background-color: #f3f4f6;
-    color: var(--color-secondary-hover);
+.cart-link {
+    position: relative;
+    font-size: 1.5rem;
 }
 
-/* --- Responsivité --- */
-@media (max-width: 768px) {
-    .navbar-header {
-        padding: 0 1rem;
-    }
-    .logo-container {
-        /* Dégager la place sur mobile si les éléments sont trop serrés */
-        position: static;
-        transform: none;
-        order: -1; /* Placer le logo à gauche si besoin */
-    }
-    .toggle-sidebar-button {
-        order: -2; /* Placer le toggle tout à gauche */
-    }
-    .action-links {
-        /* Masquer le bouton d'inscription pour ne garder que la connexion */
-        order: 3;
-    }
-    .action-links .btn-primary {
-        display: none;
-    }
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ef4444; /* Rouge pour la notification */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Style général des icônes pour le professionnalisme */
+.fa-solid {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+}
+
+.user-actions-section .logout-btn {
+    /* Reprendre le style de login-btn ou donner un style distinct (ex: rouge) */
+    background-color: #f44336; /* Exemple de couleur rouge */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 4px;
+    margin-left: 10px; /* Ajouter un petit espace */
+}
+
+.user-actions-section .action-btn {
+    /* Styles communs pour les boutons d'action */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+/* S'assurer que les liens d'action comme le profil sont alignés */
+.user-actions-section .action-link {
+    margin-left: 10px;
+    color: var(--primary-color, #007bff); /* Utiliser votre couleur primaire */
+    text-decoration: none;
+    font-size: 1.2rem;
 }

@@ -1,0 +1,143 @@
+/* Variables CSS pour faciliter la personnalisation */
+:root {
+    --primary-color: #4f46e5; /* Indigo */
+    --primary-hover-color: #4338ca;
+    --text-color: #374151; /* Gray-700 */
+    --border-color: #d1d5db; /* Gray-300 */
+    --background-light: #f9fafb; /* Gray-50 */
+    --error-color: #dc2626; /* Red-600 */
+    --error-bg-color: #fee2e2; /* Red-100 */
+}
+
+.category-form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif; /* Assurez-vous d'importer cette police si vous l'utilisez */
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.back-link:hover {
+    color: var(--primary-hover-color);
+}
+.back-link::before {
+    content: '←'; /* Flèche unicode */
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+h3 {
+    font-size: 1.8em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.alert-error {
+    background-color: var(--error-bg-color);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1em;
+    color: var(--text-color);
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Important pour que le padding n'agrandisse pas l'input */
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); /* Indigo-300 avec opacité */
+    outline: none;
+}
+
+.form-group input[readonly] {
+    background-color: var(--background-light);
+    cursor: not-allowed;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #6b7280; /* Gray-500 */
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.8em;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 14px 25px;
+    margin-top: 30px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+button[type="submit"]:hover:not([disabled]) {
+    background-color: var(--primary-hover-color);
+    box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+}
+
+button[type="submit"]:disabled {
+    background-color: #a7a7a7; /* Gray désactivé */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.category-form-container > div:last-child { /* Pour le message "Sauvegarde en cours..." */
+    text-align: center;
+    margin-top: 15px;
+    color: #6b7280;
+    font-size: 0.9em;
+}

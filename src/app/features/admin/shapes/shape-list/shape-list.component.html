@@ -2,41 +2,60 @@
     <h2>Gestion des Formes Géométriques</h2>
 
     <div class="header-actions">
-        <button (click)="onCreateShape()">+ Ajouter une nouvelle forme</button>
+        <button (click)="onCreateShape()" class="btn-create-shape">
+            <span class="icon-plus">+</span> Ajouter une nouvelle forme
+        </button>
     </div>
 
-    <div *ngIf="isLoading">Chargement des formes...</div>
-    <div *ngIf="error" class="alert-error">{{ error }}</div>
-
-    <table *ngIf="!isLoading && shapes.length > 0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Slug</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let shape of shapes">
-                <td>{{ shape.id }}</td>
-                <td>{{ shape.name }}</td>
-                <td>{{ shape.slug }}</td>
-                <td>
-                    <span [class]="shape.is_active ? 'status-active' : 'status-inactive'">
-                        {{ shape.is_active ? 'Actif' : 'Inactif' }}
-                    </span>
-                </td>
-                <td>
-                    <button (click)="onEditShape(shape.id)">Modifier</button>
-                    <button (click)="onDeleteShape(shape.id)" class="btn-danger">Supprimer</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div *ngIf="!isLoading && shapes.length === 0 && !error">
-        Aucune forme trouvée.
-    </div>
+    @if (isLoading) {
+        <div class="loading-state">
+            <p>Chargement des formes en cours...</p>
+        </div>
+    } @else if (error) {
+        <div class="alert-error">{{ error }}</div>
+    } @else if (shapes.length === 0) {
+        <div class="empty-state">
+            Aucune forme trouvée.
+        </div>
+    } @else {
+        <table class="shapes-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Slug</th>
+                    <th>Statut</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (shape of shapes; track shape.id) {
+                    <tr>
+                        <td>{{ shape.id }}</td>
+                        <td>
+                            <a [routerLink]="['/admin/shapes/edit', shape.id]" class="shape-name-link">{{ shape.name }}</a>
+                        </td>
+                        <td><span class="shape-slug">{{ shape.slug }}</span></td>
+                        <td>
+                            <span [class]="shape.is_active ? 'status-tag status-active' : 'status-tag status-inactive'">
+                                {{ shape.is_active ? 'Actif' : 'Inactif' }}
+                            </span>
+                        </td>
+                        <td class="image-cell">
+                            @if (shape.image_url) {
+                                <img [src]="shape.image_url" [alt]="shape.name" class="shape-icon">
+                            } @else {
+                                <span class="no-image-placeholder">🖼️</span>
+                            }
+                        </td>
+                        <td class="action-cell">
+                            <button (click)="onEditShape(shape.id)" class="btn-action btn-edit">Modifier</button>
+                            <button (click)="onDeleteShape(shape.id)" class="btn-action btn-danger">Supprimer</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>

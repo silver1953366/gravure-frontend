@@ -1,83 +1,83 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, Params, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { ShapeService, Shape } from '../shape.service';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule], 
+    imports: [CommonModule, ReactiveFormsModule],
     selector: 'app-shape-form',
     templateUrl: './shape-form.component.html',
     styleUrls: ['./shape-form.component.css']
 })
 export class ShapeFormComponent implements OnInit {
     
-    shapeForm: FormGroup;
-    currentShapeId: number | null = null;
+    private fb = inject(FormBuilder);
+    private route = inject(ActivatedRoute);
+    // Rendre 'router' PUBLIC pour l'accès dans le template HTML
+    public router = inject(Router); 
+    private shapeService = inject(ShapeService);
+
+    shapeForm!: FormGroup;
+    shapeId: number | null = null;
     isEditMode = false;
     isLoading = false;
-    apiErrors: any = {};
+    error: string | null = null;
     
-    private routeSubscription!: Subscription;
-
-    constructor(
-        private fb: FormBuilder,
-        private shapeService: ShapeService,
-        private route: ActivatedRoute,
-        private router: Router
-    ) {
-        // Définition du formulaire
-        this.shapeForm = this.fb.group({
-            name: ['', [Validators.required, Validators.maxLength(100)]],
-            slug: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]], // Validation du slug
-            description: [''],
-            image_url: [''],
-            is_active: [true], // Par défaut, la forme est active
-        });
-    }
+    selectedFile: File | null = null; 
+    currentImageUrl: string | null = null; 
 
     ngOnInit(): void {
-        this.routeSubscription = this.route.params.subscribe((params: Params) => {
-            this.currentShapeId = params['id'] ? +params['id'] : null;
-            this.isEditMode = !!this.currentShapeId;
-            
-            if (this.isEditMode) {
-                this.loadShapeData();
-            }
-        });
-    }
-
-    ngOnDestroy(): void {
-        if (this.routeSubscription) {
-            this.routeSubscription.unsubscribe();
-        }
-    }
-
-    loadShapeData(): void {
-        this.isLoading = true;
-        this.shapeService.getShape(this.currentShapeId!).subscribe({
+        this.initializeForm();
+        this.route.paramMap.pipe(
+            switchMap(params => {
+                const id = params.get('id');
+                if (id) {
+                    this.shapeId = +id;
+                    this.isEditMode = true;
+                    this.isLoading = true;
+                    return this.shapeService.getShape(this.shapeId);
+                }
+                return of(null);
+            })
+        ).subscribe({
             next: (shape) => {
-                this.patchForm(shape);
+                if (shape) {
+                    this.shapeForm.patchValue(shape);
+                    // Rendre le slug non modifiable après la création
+                    this.shapeForm.get('slug')?.disable(); 
+                    this.currentImageUrl = shape.image_url || null;
+                }
                 this.isLoading = false;
             },
             error: (err) => {
-                console.error("Erreur de chargement des données de la forme:", err);
-                this.router.navigate(['/admin/shapes']); 
+                this.error = "Erreur lors du chargement de la forme.";
+                this.isLoading = false;
+                console.error(err);
             }
         });
     }
 
-    patchForm(shape: Shape): void {
-         this.shapeForm.patchValue({
-             name: shape.name,
-             slug: shape.slug,
-             description: shape.description,
-             image_url: shape.image_url,
-             is_active: shape.is_active,
-         });
+    initializeForm(): void {
+        this.shapeForm = this.fb.group({
+            name: ['', [Validators.required, Validators.maxLength(100)]],
+            // Le slug est requis uniquement à la création
+            slug: ['', this.isEditMode ? [] : [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]], 
+            description: [''],
+            is_active: [true]
+        });
+    }
+
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            this.selectedFile = input.files[0];
+        } else {
+            this.selectedFile = null;
+        }
     }
 
     onSubmit(): void {
@@ -87,42 +87,60 @@ export class ShapeFormComponent implements OnInit {
         }
 
         this.isLoading = true;
-        this.apiErrors = {};
-        const data = this.shapeForm.value;
+        this.error = null;
         
-        // Choisir entre création et mise à jour
-        const request = this.isEditMode && this.currentShapeId
-            ? this.shapeService.updateShape(this.currentShapeId, data)
-            : this.shapeService.createShape(data);
+        // Récupérer TOUTES les valeurs, y compris le 'slug' désactivé.
+        const formValue = this.shapeForm.getRawValue();
 
-        request.pipe(take(1)).subscribe({
-            next: () => {
-                this.isLoading = false;
-                this.router.navigate(['/admin/shapes']);
-            },
-            error: (err) => {
-                this.isLoading = false;
-                if (err.status === 422 && err.error.errors) {
-                    this.apiErrors = err.error.errors;
-                } else {
-                    this.apiErrors = { general: "Une erreur inattendue est survenue lors de la sauvegarde." };
-                }
-                console.error("Erreur API:", err);
+        const formData = new FormData();
+        
+        // 🚀 FIX: Ajouter toutes les données du formulaire, en s'assurant que les valeurs sont des chaînes (y compris les booléens et les champs vides)
+        Object.keys(formValue).forEach(key => {
+            const value = formValue[key];
+
+            if (typeof value === 'boolean') {
+                // Pour les booléens, utiliser '1' ou '0' pour les API REST robustes
+                formData.append(key, value ? '1' : '0'); 
+            } else if (value !== null && value !== undefined) {
+                // Pour les autres valeurs, utiliser la valeur elle-même
+                formData.append(key, value);
+            } else {
+                // Pour les champs nulls ou non définis (comme la description si laissée vide), envoyer une chaîne vide
+                formData.append(key, ''); 
             }
         });
-    }
-    
-    // Méthode utilitaire pour générer le slug automatiquement
-    onNameChange(): void {
-        if (!this.isEditMode) {
-            const name = this.shapeForm.get('name')?.value;
-            if (name) {
-                const slug = name.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Supprimer les caractères non alphanumériques, espaces et tirets
-                    .trim()
-                    .replace(/\s+/g, '-'); // Remplacer les espaces par des tirets
-                this.shapeForm.get('slug')?.setValue(slug);
-            }
+
+        // Ajouter le fichier sélectionné
+        if (this.selectedFile) {
+            // Assurez-vous que 'image' est le nom du champ attendu par votre backend
+            formData.append('image', this.selectedFile, this.selectedFile.name);
         }
+        
+        // Si c'est une mise à jour, ajouter la méthode PUT pour le backend
+        if (this.isEditMode) {
+            formData.append('_method', 'PUT'); 
+        }
+
+        const action = this.isEditMode
+            ? this.shapeService.updateShape(this.shapeId!, formData)
+            : this.shapeService.createShape(formData);
+
+        action.subscribe({
+            next: () => {
+                // Utilisez une modale ou un toast au lieu d'alert() dans une application réelle
+                alert(`Forme ${this.isEditMode ? 'mise à jour' : 'créée'} avec succès.`);
+                this.router.navigate(['/admin/shapes']); 
+            },
+            error: (err) => {
+                this.error = this.isEditMode 
+                    ? 'Erreur lors de la mise à jour de la forme.' 
+                    : 'Erreur lors de la création de la forme.';
+                this.isLoading = false;
+                console.error(err);
+                if (err.error && err.error.message) {
+                    this.error += ' Détails: ' + err.error.message;
+                }
+            }
+        });
     }
 }

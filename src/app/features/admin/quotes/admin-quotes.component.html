@@ -1,6 +1,6 @@
 <div class="admin-quotes-container">
     <h2>Gestion des Devis Clients (Quotes)</h2>
-    <p>Visualisation de tous les devis créés par l'ensemble des utilisateurs.</p>
+    <p class="subtitle">Visualisation de tous les devis créés par l'ensemble des utilisateurs.</p>
 
     <div *ngIf="error" class="alert-error">{{ error }}</div>
     <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
@@ -12,7 +12,7 @@
             <tr>
                 <th>ID</th>
                 <th>Client</th>
-                <th>Prix Total (FCFA)</th>
+                <th class="price-col">Prix Final (FCFA)</th>
                 <th>Statut</th>
                 <th>Créé le</th>
                 <th>Actions</th>
@@ -22,21 +22,36 @@
             <tr *ngFor="let quote of quotes">
                 <td>{{ quote.id }}</td>
                 <td>{{ quote.user?.name || 'Utilisateur inconnu' }} (ID: {{ quote.user_id }})</td>
-                <td class="price-col">{{ quote.total_price | number:'1.2-2' }}</td>
+                <td class="price-col">{{ quote.final_price_fcfa | number:'1.2-2' }}</td>
                 <td>
-                    <span [class]="'status-' + quote.status">{{ quote.status | uppercase }}</span>
+                    <span [class]="'status-tag status-' + quote.status">{{ quote.status | uppercase }}</span>
                 </td>
                 <td>{{ quote.created_at | date:'short' }}</td>
-                <td>
+                <td class="action-col">
                     <button 
-                        *ngIf="quote.status === 'submitted'" 
-                        (click)="onConvertQuote(quote)" 
+                        *ngIf="quote.status === 'sent'" 
+                        (click)="onCalculateQuote(quote)" 
                         [disabled]="isProcessing"
-                        class="btn-convert">
-                        Convertir en Commande
+                        class="btn-action btn-calculate">
+                        Calculer Prix
                     </button>
-                    <button class="btn-view">Détails</button> 
-                    <button (click)="onDeleteQuote(quote.id)" class="btn-danger">Supprimer</button>
+
+                    <button 
+                        *ngIf="quote.status === 'sent' || quote.status === 'calculated'" 
+                        (click)="onRejectQuote(quote.id)" 
+                        [disabled]="isProcessing"
+                        class="btn-action btn-reject">
+                        Rejeter
+                    </button>
+                    
+                    <button class="btn-action btn-view">Détails</button> 
+                    
+                    <button 
+                        (click)="onDeleteQuote(quote.id)" 
+                        [disabled]="isDeleteDisabled(quote) || isProcessing"
+                        class="btn-action btn-danger">
+                        Supprimer
+                    </button>
                 </td>
             </tr>
         </tbody>

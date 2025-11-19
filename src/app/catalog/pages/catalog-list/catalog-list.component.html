@@ -1,93 +1,106 @@
-<div class="page-container">
-    
-    <div class="hero-carousel-wrapper">
+<div class="hero-carousel-wrapper">
+    <div class="hero-carousel" [style.transform]="'translateX(-' + currentSlideIndex() * 100 + '%)'">
         <div 
-            class="hero-carousel" 
-            [style.transform]="'translateX(' + (-currentSlideIndex() * 100) + '%)'"
+            class="carousel-slide" 
+            *ngFor="let slide of carouselData; let i = index" 
+            [style.backgroundImage]="'url(' + slide.imageUrl + ')'"
+            (click)="goToSlide(i)"
         >
-            @for (slide of carouselSlides; track slide.title) {
-                <div 
-                    class="carousel-slide" 
-                    [style.background-image]="'url(' + slide.imageUrl + ')'"
-                >
-                    <div class="carousel-content">
-                        <span class="carousel-subtitle">{{ slide.subtitle }}</span>
-                        <h2 class="carousel-title">{{ slide.title }}</h2>
-                        <a [routerLink]="[slide.link]" class="carousel-cta-button">
-                            Voir {{ slide.categoryName }}
-                        </a>
-                    </div>
-                </div>
-            }
-        </div>
-    
-        <div class="carousel-indicators">
-            @for (slide of carouselSlides; track $index) {
-                <span 
-                    class="indicator-dot" 
-                    [class.is-active]="currentSlideIndex() === $index" 
-                    (click)="goToSlide($index)"
-                ></span>
-            }
-        </div>
-    </div>
-    <h1 class="page-title">Notre Catalogue de Matériaux</h1>
-    
-    <div class="category-selector-bar">
-        <div class="category-list-horizontal">
-            <span 
-                class="category-tag-button"
-                [class.is-active]="!selectedCategory()"
-                (click)="selectCategory(null)"
-            >
-                Tous les matériaux
-            </span>
-            @for (category of categories(); track category.id) {
-                <span 
-                    class="category-tag-button" 
-                    [class.is-active]="selectedCategory()?.id === category.id"
-                    (click)="selectCategory(category)"
-                >
-                    {{ category.name }}
-                </span>
-            }
+            <div class="carousel-content">
+                <span class="carousel-subtitle">{{ slide.subtitle }}</span>
+                <h2 class="carousel-title">{{ slide.title }}</h2>
+                <a [routerLink]="slide.link" class="carousel-cta-button">
+                    Découvrir la gamme {{ slide.categoryName }}
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="material-content-zone">
-        @if (isLoading()) {
-            <p class="loading-message-main">Chargement du catalogue...</p>
-        } @else if (filteredMaterials().length === 0) {
-            <div class="no-results-box">
-                <p class="no-results-text">Aucun matériel trouvé pour cette catégorie.</p>
-            </div>
-        } @else {
+    <div class="carousel-indicators">
+        <span 
+            *ngFor="let slide of carouselData; let i = index"
+            class="indicator-dot"
+            [class.is-active]="i === currentSlideIndex()"
+            (click)="goToSlide(i)"
+        ></span>
+    </div>
+</div>
+
+<h1 class="page-title">
+    Catalogue des Matériaux
+</h1>
+
+<div class="category-selector-bar">
+    <div *ngIf="categories().length > 0; else loadingCategories" class="category-list-horizontal">
+        <button
+            class="category-tag-button"
+            [class.is-active]="selectedCategory() === null"
+            (click)="selectCategory(null)"
+        >
+            Tous les Matériaux
+        </button>
+        <button
+            *ngFor="let category of categories()"
+            class="category-tag-button"
+            [class.is-active]="selectedCategory()?.id === category.id"
+            (click)="selectCategory(category)"
+        >
+            {{ category.name }}
+        </button>
+    </div>
+    <ng-template #loadingCategories>
+        <div class="loading-message-small">Chargement des catégories...</div>
+    </ng-template>
+</div>
+
+<div class="material-content-zone">
+    <div *ngIf="isLoading() && allMaterials().length === 0; else materialContent">
+        <div class="loading-message-main">Chargement du catalogue...</div>
+    </div>
+
+    <ng-template #materialContent>
+        <div *ngIf="filteredMaterials().length > 0; else noResults">
             <div class="product-grid-view">
-                @for (material of filteredMaterials(); track material.id) {
-                    <div class="product-card">
-                        <div class="product-image-container">
-                             <span class="product-tag">{{ material.category?.name }}</span>
-                            <img 
-                                [src]="material.image_url" 
-                                alt="Image de {{ material.name }}" 
-                                class="product-image"
-                            />
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">{{ material.name }}</h3>
-                            <p class="product-description">{{ material.description }}</p>
-                            <div class="card-actions-row">
-                                <a routerLink="/details/{{ material.id }}" class="action-button secondary-button">
-                                    Voir plus
-                                </a>
-                                <a routerLink="/configurator/{{ material.id }}" class="action-button primary-button">
-                                    Créer
-                                </a>
-                            </div>
+                <div *ngFor="let material of filteredMaterials()" class="product-card">
+                    
+                    <div class="product-image-container">
+                        <img 
+                            *ngIf="material.image_url; else placeholderImage"
+                            [src]="material.image_url" 
+                            [alt]="'Image de ' + material.name" 
+                            class="product-image"
+                        />
+                        <ng-template #placeholderImage>
+                            <div class="card-image-placeholder">Image Non Disponible</div>
+                        </ng-template>
+                        <span class="product-tag">{{ material.category?.name || 'Divers' }}</span>
+                    </div>
+
+                    <div class="product-info">
+                        <h3 class="product-name">{{ material.name }}</h3>
+                        <p class="product-description">
+                            {{ material.description || 'Matériau polyvalent, idéal pour la gravure et la découpe laser.' }}
+                        </p>
+                        
+                        <div class="card-actions-row">
+                            <a [routerLink]="['/product', material.id]" class="action-button secondary-button">
+                                Voir Details
+                            </a>
+                            <a [routerLink]="['/configurator', material.id]" class="action-button primary-button">
+    Personnaliser
+</a>
                         </div>
                     </div>
-                }
+                </div>
             </div>
-        }
-    </div>
+        </div>
+
+        <ng-template #noResults>
+            <div class="no-results-box">
+                <p class="no-results-text">
+                    Aucun matériau trouvé pour cette catégorie.
+                </p>
+            </div>
+        </ng-template>
+    </ng-template>
 </div>

@@ -1,97 +1,163 @@
+/* --- VARIABLES --- */
+:root {
+    --navbar-bg: #1e88e5; /* Bleu Principal Matériel Design */
+    --navbar-text: white;
+    --accent-blue: #4fc3f7; /* Bleu clair pour le survol/focus */
+    --danger-red: #d32f2f; /* Rouge professionnel pour la déconnexion */
+    --shadow-strong: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ----------------------------------- */
+/* --- 1. STRUCTURE PRINCIPALE (Navbar) --- */
+/* ----------------------------------- */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 15px 30px; /* Plus d'espace sur les côtés */
+    background-color: var(--navbar-bg); /* 🛑 BLEU */
+    color: var(--navbar-text); /* 🛑 Texte BLANC */
+    box-shadow: var(--shadow-strong);
     z-index: 10;
+    width: 100%;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.welcome-message {
+    font-weight: 500;
+    font-size: 1.1em;
 }
 
 .navbar-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 25px; /* Plus d'espace entre les éléments de droite */
 }
 
-/* Styles Déconnexion */
+/* ----------------------------------- */
+/* --- 2. BOUTON DÉCONNEXION (Logout) --- */
+/* ----------------------------------- */
 .btn-logout {
-    background-color: #e74c3c;
+    background-color: var(--danger-red);
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.2s;
     display: flex;
     align-items: center;
 }
-.btn-logout:hover { background-color: #c0392b; }
+.btn-logout:hover { 
+    background-color: #c0392b; 
+    box-shadow: 0 8px 4px rgba(0, 0, 0, 0.2);
+}
 
-.icon-logout { margin-right: 5px; font-style: normal; }
+/* 🛑 Nouvelle icône Material Icons */
+.icon-logout { 
+    margin-right: 8px; 
+    font-size: 1.3em; /* Taille ajustée pour l'alignement */
+}
 
-/* Styles Notifications */
+/* ----------------------------------- */
+/* --- 3. NOTIFICATIONS --- */
+/* ----------------------------------- */
 .notification-area {
     position: relative;
     cursor: pointer;
-    padding: 5px;
+    padding: 10px; /* Augmenter le hit area */
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+.notification-area:hover {
+    background-color: #ffffff30; /* Effet de survol sur fond bleu */
 }
 
+/* 🛑 Nouvelle icône Material Icons (couleur blanche) */
 .icon-bell {
-    font-size: 1.5em;
-    color: #34495e;
+    font-size: 1.6em;
+    color: var(--navbar-text); /* Blanc */
+    display: block; /* S'assurer que le padding de la notification-area fonctionne */
 }
 
 .badge {
     position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: #e67e22;
-    color: white;
+    top: 5px;
+    right: 5px;
+    background-color: #ffc107; /* Jaune/Orange pour le contraste */
+    color: #1e88e5; /* Texte bleu sur le badge */
     border-radius: 50%;
     padding: 3px 6px;
-    font-size: 0.7em;
-    font-weight: bold;
+    font-size: 0.75em;
+    font-weight: 900;
     line-height: 1;
+    border: 2px solid var(--navbar-bg); /* Bordure bleue pour l'ancrage visuel */
 }
 
+/* ----------------------------------- */
+/* --- 4. DROPDOWN DE NOTIFICATIONS (Style conservé mais ajusté) --- */
+/* ----------------------------------- */
 .notification-dropdown {
     position: absolute;
-    top: 45px;
+    top: 55px; /* Décalé pour l'icône plus grande */
     right: 0;
-    width: 300px;
+    width: 320px;
     background-color: white;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     z-index: 20;
-    padding: 10px;
+    padding: 15px;
+    color: var(--text-primary); /* Texte interne sombre */
+}
+
+.notification-dropdown h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
 }
 
 .notification-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px dashed #eee;
+    align-items: flex-start; /* Alignement en haut pour le texte long */
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.notif-content strong {
+    color: #000;
 }
 
 .btn-read {
-    background-color: #3498db;
+    background-color: var(--navbar-bg); /* Utilisation du bleu de la navbar */
     color: white;
     border: none;
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.75em;
+    font-size: 0.8em;
     flex-shrink: 0;
+    margin-left: 10px;
+    transition: background-color 0.2s;
 }
+.btn-read:hover {
+    background-color: #1565c0; /* Bleu plus foncé */
+}
+
 .view-all {
     display: block;
     text-align: center;
-    margin-top: 10px;
-    color: #3498db;
+    margin-top: 15px;
+    color: var(--navbar-bg);
     text-decoration: none;
+    font-weight: 600;
     font-size: 0.9em;
 }

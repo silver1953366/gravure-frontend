@@ -1,33 +1,64 @@
-import { Component, signal, output, inject } from '@angular/core'; 
+import { Component, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router'; 
+import { RouterLink, Router } from '@angular/router'; // Import Router
 import { AuthService } from '../../../../core/services/auth.service';
+
+// Interface pour simuler les éléments de navigation (navItems)
+interface NavItem {
+  label: string;
+  link: string;
+}
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink], 
+  imports: [CommonModule, RouterLink],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css' 
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
+  private router = inject(Router); // Inject Router directement pour la navigation
 
-  // Ces noms sont corrects
-  isAuthenticated = this.authService.isAuthenticated;
+  onLoginClicked = output<void>(); 
+
+  // Propriétés du Service (Signals)
+  isAuthenticated = this.authService.isAuthenticated; 
   currentUser = this.authService.currentUser;
-
-  // PROPRIÉTÉ CALCULÉE POUR L'IMAGE DE PROFIL RETIRÉE
-
-  // OUTPUT pour l'ouverture du modal
-  onLoginClicked = output<void>();
-
-  navItems = [
-    { label: 'Commander', link: '/order' },
-    { label: 'Matériaux', link: '/catalog' },
-    { label: 'Aide', link: '/help' },
+  
+  // SIGNALS POUR GÉRER LES MENUS DÉROULANTS (Résout les erreurs NG9)
+  isLanguageMenuOpen = signal(false);
+  isTypeMenuOpen = signal(false);
+  isCategoryMenuOpen = signal(false);
+  
+  // ÉLÉMENTS DE NAVIGATION (Résout l'erreur 'navItems')
+  navItems: NavItem[] = [
+    { label: 'Accueil', link: '/' },
+    { label: 'À Propos', link: '/about' },
+    { label: 'Catalogue', link: '/catalog/products' },
+    { label: 'Contact', link: '/contact' },
+    // Ajoutez d'autres items selon votre besoin
   ];
 
+  // MÉTHODES POUR GÉRER L'OUVERTURE/FERMETURE DES MENUS (Résout les erreurs NG9)
+  toggleLanguageMenu(): void {
+    this.isLanguageMenuOpen.update(value => !value);
+    this.isTypeMenuOpen.set(false);
+    this.isCategoryMenuOpen.set(false);
+  }
+
+  toggleTypeMenu(): void {
+    this.isTypeMenuOpen.update(value => !value);
+    this.isLanguageMenuOpen.set(false);
+    this.isCategoryMenuOpen.set(false);
+  }
+
+  toggleCategoryMenu(): void {
+    this.isCategoryMenuOpen.update(value => !value);
+    this.isLanguageMenuOpen.set(false);
+    this.isTypeMenuOpen.set(false);
+  }
+  
   triggerLoginModal(): void {
     this.onLoginClicked.emit();
   }
@@ -35,10 +66,13 @@ export class HeaderComponent {
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
-        console.log('Déconnexion réussie');
+        // CORRECTION TS2341: Utiliser le router injecté dans ce composant
+        this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error('Erreur lors de la déconnexion', err);
+        console.error("Échec de la déconnexion", err);
+        // Utiliser le router injecté ici
+        this.router.navigate(['/']);
       }
     });
   }

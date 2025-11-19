@@ -1,14 +1,16 @@
 <div class="user-form-container">
     <a routerLink="/admin/users" class="back-link">← Retour à la liste des utilisateurs</a>
     
-    <h3>{{ isEditMode ? 'Modifier l\'utilisateur' : 'Créer un nouvel utilisateur' }}</h3>
+    <h3>{{ isEditMode ? (isOwnProfile ? 'Mon Profil' : 'Modifier le Rôle') : 'Créer un nouvel utilisateur' }}</h3>
 
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
         
         <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
         
         <div class="form-group">
-            <label for="name">Nom</label>
+            <label for="name">Nom
+                <span *ngIf="isEditMode && !isOwnProfile" class="info-note">(Non modifiable)</span>
+            </label>
             <input id="name" type="text" formControlName="name">
             <div *ngIf="userForm.controls['name'].touched && userForm.controls['name'].invalid" class="error-message">
                 Le nom est requis.
@@ -17,24 +19,32 @@
         </div>
 
         <div class="form-group">
-            <label for="email">Email</label>
-            <input id="email" type="email" formControlName="email">
-            <div *ngIf="userForm.controls['email'].touched && userForm.controls['email'].invalid" class="error-message">
+            <label for="email">Email 
+                <span *ngIf="isEditMode && !isOwnProfile" class="info-note">(Non modifiable)</span>
+            </label>
+            <input id="email" type="email" formControlName="email"> 
+            <div *ngIf="userForm.controls['email'].touched && userForm.controls['email'].invalid && !isEditMode" class="error-message">
                 Email invalide ou requis.
             </div>
             <div *ngIf="apiErrors.email" class="error-message">{{ apiErrors.email }}</div>
         </div>
 
-        <div class="form-group">
-            <label for="password">Mot de passe {{ isEditMode ? '(laisser vide pour ne pas changer)' : '*' }}</label>
+        <div class="form-group" *ngIf="!isEditMode || isOwnProfile">
+            <label for="password">Mot de passe {{ !isEditMode ? '*' : '(Laissez vide pour ne pas changer)' }}</label>
             <input id="password" type="password" formControlName="password">
-            <div *ngIf="userForm.controls['password'].touched && userForm.controls['password'].hasError('minlength')" class="error-message">
+            
+            <div *ngIf="userForm.controls['password']?.hasError('minlength')" class="error-message">
                 Le mot de passe doit contenir au moins 8 caractères.
             </div>
-            <div *ngIf="userForm.controls['password'].hasError('required') && !isEditMode" class="error-message">
+            
+            <div *ngIf="!isEditMode && userForm.controls['password']?.hasError('required') && userForm.controls['password']?.touched" class="error-message">
                 Le mot de passe est requis.
             </div>
-            <div *ngIf="apiErrors.password" class="error-message">{{ apiErrors.password }}</div>
+            <div *ngIf="apiErrors.password" class="error-message">{{ apiErrors.password }}</div> 
+        </div>
+
+        <div class="form-group" *ngIf="isEditMode && !isOwnProfile">
+            <p class="info-note">Seul le rôle peut être modifié. L'utilisateur doit changer son nom et son mot de passe lui-même.</p>
         </div>
 
         <div class="form-group">
@@ -46,7 +56,7 @@
         </div>
 
         <button type="submit" [disabled]="userForm.invalid || isLoading">
-            {{ isEditMode ? 'Sauvegarder les modifications' : 'Créer l\'utilisateur' }}
+            Sauvegarder les modifications
         </button>
         <div *ngIf="isLoading">Sauvegarde en cours...</div>
     </form>

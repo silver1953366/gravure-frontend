@@ -1,24 +1,38 @@
-<nav class="client-sidebar-nav">
-    <div class="user-info">
-        <h3>Mon Espace Client</h3>
-        <h4>Bonjour, {{ userName }}!</h4>
-        <p class="member-since">Membre depuis le {{ memberSince | date:'shortDate' }}</p>
+<div class="client-sidebar-content" [class.sidebar-mini-active]="isMini">
+    
+    <div class="sidebar-toggle-button-wrapper" [class.mini]="isMini">
+        <button 
+            (click)="toggleSidebar.emit()" 
+            class="sidebar-toggle-btn"
+            aria-label="Toggle sidebar"
+        >
+            <i class="fa-solid" [class.fa-chevron-left]="!isMini" [class.fa-chevron-right]="isMini"></i>
+        </button>
     </div>
     
-    <ul class="nav-list">
-        @for (item of navItems; track item.label) {
-            <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact: true}">
-                <a [routerLink]="item.path">
-                    <i class="fas fa-{{ item.icon }}"></i> 
-                    <span>{{ item.label }}</span>
-                </a>
+    <header class="account-header">
+        <div class="account-icon-wrapper">
+            <i class="fa-solid fa-circle-user"></i> 
+        </div>
+        <div class="account-details" *ngIf="!isMini">
+            <p class="account-name">Client A (Principal)</p>
+            <p class="account-welcome">Bienvenue chez Client A</p>
+        </div>
+    </header>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li 
+                *ngFor="let item of navItems" 
+                [routerLink]="item.route" 
+                routerLinkActive="active" 
+                class="nav-item"
+            >
+                <i class="fa-solid fa-fw" [class]="item.icon"></i>
+                <span class="nav-label" *ngIf="!isMini">{{ item.label }}</span>
+                <span *ngIf="isMini" [attr.title]="item.label" class="mini-tooltip">{{ item.label }}</span>
             </li>
-        }
-    </ul>
-    
-    <div class="sidebar-footer">
-        <a routerLink="/logout" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a>
-    </div>
-</nav>
+        </ul>
+    </nav>
+
+</div>

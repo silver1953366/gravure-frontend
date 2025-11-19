@@ -1,0 +1,55 @@
+/* Styles pour la table */
+.category-management-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.category-management-container th, 
+.category-management-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.category-management-container th {
+    background-color: #f2f2f2;
+}
+
+/* Styles pour le bouton danger */
+.category-management-container .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 4px;
+}
+.category-management-container .btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Styles pour le statut Actif/Inactif */
+.category-management-container .status-active {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.category-management-container .status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.category-management-container .alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}

@@ -1,56 +1,79 @@
 <div class="shape-form-container">
-    <a routerLink="/admin/shapes" class="back-link">← Retour à la liste des formes</a>
-    
-    <h3>{{ isEditMode ? 'Modifier la forme' : 'Ajouter une nouvelle forme' }}</h3>
+    <h2>{{ isEditMode ? 'Modifier la Forme' : 'Créer une Nouvelle Forme' }}</h2>
 
-    <form [formGroup]="shapeForm" (ngSubmit)="onSubmit()">
-        
-        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
-        
-        <div class="form-group">
-            <label for="name">Nom de la Forme</label>
-            <input id="name" type="text" formControlName="name" (input)="onNameChange()">
-            <div *ngIf="shapeForm.controls['name'].touched && shapeForm.controls['name'].invalid" class="error-message">
-                Le nom est requis.
+    @if (isLoading) {
+        <p class="loading-state">Chargement du formulaire...</p>
+    } @else {
+        <form [formGroup]="shapeForm" (ngSubmit)="onSubmit()" class="shape-form">
+            
+            @if (error) {
+                <div class="alert-error">{{ error }}</div>
+            }
+
+            <!-- Champ Nom -->
+            <div class="form-group">
+                <label for="name">Nom de la Forme *</label>
+                <input id="name" type="text" formControlName="name" placeholder="Ex: Rectangle">
+                @if (shapeForm.get('name')?.invalid && shapeForm.get('name')?.touched) {
+                    <div class="validation-error">Le nom est requis et limité à 100 caractères.</div>
+                }
             </div>
-            <div *ngIf="apiErrors.name" class="error-message">{{ apiErrors.name }}</div>
-        </div>
 
-        <div class="form-group">
-            <label for="slug">Slug (URL)</label>
-            <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode">
-            <small *ngIf="!isEditMode">Généré automatiquement à partir du nom.</small>
-            <div *ngIf="shapeForm.controls['slug'].touched && shapeForm.controls['slug'].invalid" class="error-message">
-                Le slug est requis et doit être au format 'minuscule-tirets'.
+            <!-- Champ Slug (Lecture seule en mode édition) -->
+            <div class="form-group">
+                <label for="slug">Slug (URL) *</label>
+                <!-- Le champ est désactivé si on est en mode édition (lecture seule pour l'utilisateur). -->
+                <input id="slug" type="text" formControlName="slug" 
+                       [attr.readonly]="isEditMode ? true : null"
+                       [class.readonly-field]="isEditMode"
+                       placeholder="Ex: rectangle-standard">
+                @if (isEditMode) {
+                    <small class="hint-text">Le slug ne peut pas être modifié après la création.</small>
+                } @else if (shapeForm.get('slug')?.invalid && shapeForm.get('slug')?.touched) {
+                    <div class="validation-error">Slug requis, en minuscules, sans espace (utiliser tirets).</div>
+                }
             </div>
-            <div *ngIf="apiErrors.slug" class="error-message">{{ apiErrors.slug }}</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" formControlName="description"></textarea>
-            <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
-        </div>
 
-        <div class="form-group">
-            <label for="image_url">URL de l'image/icône</label>
-            <input id="image_url" type="url" formControlName="image_url">
-            <div *ngIf="apiErrors.image_url" class="error-message">{{ apiErrors.image_url }}</div>
-        </div>
+            <!-- Champ Description -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" formControlName="description" rows="4" placeholder="Description courte de la forme..."></textarea>
+            </div>
 
-        <div class="form-group">
-            <label for="is_active">Statut</label>
-            <select id="is_active" formControlName="is_active">
-                <option [ngValue]="true">Actif</option>
-                <option [ngValue]="false">Inactif</option>
-            </select>
-            <div *ngIf="apiErrors.is_active" class="error-message">{{ apiErrors.is_active }}</div>
-        </div>
+            <!-- Champ Image/Icône (Téléversement de Fichier) -->
+            <div class="form-group file-upload-group">
+                <label for="image" class="file-label">
+                    Icône / Image de la Forme
+                    <span class="file-icon">📁</span>
+                </label>
+                
+                <input id="image" type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input">
+                
+                @if (isEditMode && currentImageUrl) {
+                    <div class="current-image-preview">
+                        <p>Image actuelle :</p>
+                        <img [src]="currentImageUrl" alt="Image actuelle de la forme" class="shape-icon-preview">
+                    </div>
+                }
+                @if (selectedFile) {
+                    <p class="file-info">Fichier sélectionné : <strong>{{ selectedFile.name }}</strong></p>
+                }
+            </div>
 
+            <!-- Champ Statut -->
+            <div class="form-group checkbox-group">
+                <input id="is_active" type="checkbox" formControlName="is_active">
+                <label for="is_active">Forme active et visible dans le catalogue ?</label>
+            </div>
 
-        <button type="submit" [disabled]="shapeForm.invalid || isLoading">
-            {{ isEditMode ? 'Sauvegarder la forme' : 'Créer la forme' }}
-        </button>
-        <div *ngIf="isLoading">Sauvegarde en cours...</div>
-    </form>
+            <div class="form-actions">
+                <button type="submit" [disabled]="!shapeForm.valid || isLoading" class="btn-submit btn-primary">
+                    {{ isLoading ? 'Envoi...' : (isEditMode ? 'Sauvegarder les modifications' : 'Créer la Forme') }}
+                </button>
+                <button type="button" (click)="router.navigate(['/admin/shapes'])" class="btn-secondary">
+                    Annuler
+                </button>
+            </div>
+        </form>
+    }
 </div>

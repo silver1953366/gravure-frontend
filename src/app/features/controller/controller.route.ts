@@ -1,5 +1,3 @@
-// src/app/features/controller/controller.route.ts
-
 import { Routes } from '@angular/router';
 
 // 1. Layout du Contrôleur (Parent)
@@ -16,7 +14,6 @@ import { ControllerOrderDetailComponent } from './orders/order-detail/controller
 
 // 4. Production & Stock
 import { ControllerInventoryListComponent } from './inventory/inventory-list/controller-inventory-list/controller-inventory-list.component';
-// import { ControllerInventoryDetailComponent } from './inventory/inventory-detail/controller-inventory-detail.component'; // (Si créé)
 import { ControllerCatalogueComponent } from './catalogue/controller-catalogue.component'; 
 
 // 5. Autres (Clients & Notifications)
@@ -27,33 +24,33 @@ import { ControllerNotificationListComponent } from './notifications/controller-
 const InventoryDetailComponent = ControllerInventoryListComponent; 
 
 export const CONTROLLER_ROUTES: Routes = [
-    {
-        path: '',
-        // Layout parent qui inclut la Sidebar et la Navbar
-        component: ControllerLayoutComponent, 
-        children: [
-            // --- DASHBOARD (Route par défaut) ---
-            { path: 'dashboard', component: ControllerDashboardComponent, title: 'Controller | Tableau de Bord' },
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-            
-            // --- GESTION DES COMMANDES (PRODUCTION) ---
-            { path: 'orders', component: ControllerOrderListComponent, title: 'Controller | Commandes' },
-            { path: 'orders/:id', component: ControllerOrderDetailComponent, title: 'Controller | Détail Commande' },
+    {
+        path: '',
+        // Layout parent qui inclut la Sidebar et la Navbar
+        component: ControllerLayoutComponent, 
+        children: [
+            // --- DASHBOARD (Route par défaut) ---
+            { path: 'dashboard', component: ControllerDashboardComponent, title: 'Controller | Tableau de Bord' },
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            
+            // --- GESTION DES COMMANDES (PRODUCTION) ---
+            { path: 'orders', component: ControllerOrderListComponent, title: 'Controller | Commandes' },
+            { path: 'orders/:id', component: ControllerOrderDetailComponent, title: 'Controller | Détail Commande' },
 
-            // --- DEVIS (CONSULTATION) ---
-            { path: 'quotes', component: ControllerQuoteListComponent, title: 'Controller | Devis' },
+            // --- DEVIS (CONSULTATION) ---
+            { path: 'quotes', component: ControllerQuoteListComponent, title: 'Controller | Devis' },
 
-            // --- INVENTAIRE & CATALOGUE ---
-            { path: 'inventory', component: ControllerInventoryListComponent, title: 'Controller | Inventaire' },
-            { path: 'inventory/:id', component: InventoryDetailComponent, title: 'Controller | Détail Inventaire' }, // Route simplifiée
-            { path: 'catalogue', component: ControllerCatalogueComponent, title: 'Controller | Catalogue' },
-            
-            // --- CLIENTS & NOTIFICATIONS ---
-            { path: 'clients', component: ControllerClientsComponent, title: 'Controller | Clients' },
-            { path: 'notifications', component: ControllerNotificationListComponent, title: 'Controller | Notifications' },
-            
-            // --- PROFIL ---
-            { path: 'profile', component: ControllerUserProfileComponent, title: 'Controller | Mon Profil' },
-        ]
-    }
+            // --- INVENTAIRE & CATALOGUE ---
+            { path: 'inventory', component: ControllerInventoryListComponent, title: 'Controller | Inventaire' },
+            { path: 'inventory/:id', component: InventoryDetailComponent, title: 'Controller | Détail Inventaire' }, // Route simplifiée
+            { path: 'catalogue', component: ControllerCatalogueComponent, title: 'Controller | Catalogue' },
+            
+            // --- CLIENTS & NOTIFICATIONS ---
+            { path: 'clients', component: ControllerClientsComponent, title: 'Controller | Clients' },
+            { path: 'notifications', component: ControllerNotificationListComponent, title: 'Controller | Notifications' },
+            
+            // --- PROFIL ---
+            { path: 'profile', component: ControllerUserProfileComponent, title: 'Controller | Mon Profil' },
+        ]
+    }
 ];

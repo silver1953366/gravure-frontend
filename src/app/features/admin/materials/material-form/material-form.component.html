@@ -2,85 +2,129 @@
     <a routerLink="/admin/materials" class="back-link">← Retour à la liste des matériaux</a>
     
     <h3>{{ isEditMode ? 'Modifier le matériau' : 'Ajouter un nouveau matériau' }}</h3>
-
-    <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
-        
-        <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
-        
-        <div class="form-group">
-            <label for="name">Nom du Matériau (Ex: Aluminium 5052)</label>
-            <input id="name" type="text" formControlName="name" (input)="onNameChange()">
-            <div *ngIf="materialForm.controls['name'].touched && materialForm.controls['name'].invalid" class="error-message">
-                Le nom est requis.
-            </div>
-            <div *ngIf="apiErrors.name" class="error-message">{{ apiErrors.name }}</div>
-        </div>
-
-        <div class="form-group">
-            <label for="slug">Slug (URL)</label>
-            <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode">
-            <small *ngIf="!isEditMode">Généré automatiquement à partir du nom.</small>
-            <div *ngIf="materialForm.controls['slug'].touched && materialForm.controls['slug'].invalid" class="error-message">
-                Le slug est requis et doit être au format 'minuscule-tirets'.
-            </div>
-            <div *ngIf="apiErrors.slug" class="error-message">{{ apiErrors.slug }}</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="file">Image du Matériau</label>
-            <input 
-                id="file" 
-                type="file" 
-                accept="image/*" 
-                (change)="onFileSelected($event)">
+    
+    @if (isLoading && isEditMode) {
+        <div class="loading-data">Chargement des données du matériau...</div>
+    } @else {
+        <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
             
-            <small *ngIf="isEditMode">Laissez vide pour conserver l'image existante.</small>
+            @if (apiErrors.general) {
+                <div class="alert-error">{{ apiErrors.general }}</div>
+            }
             
-            <div *ngIf="imageUrlPreview" class="image-preview">
-                <img 
-                    [src]="imageUrlPreview" 
-                    alt="Aperçu du matériau" 
-                    style="max-width: 150px; margin-top: 10px; border: 1px solid #ccc;">
+            <!-- NOM DU MATÉRIAU -->
+            <div class="form-group">
+                <label for="name">Nom du Matériau (Ex: Aluminium 5052) <span class="required">*</span></label>
+                <input id="name" type="text" formControlName="name" (input)="onNameChange()" placeholder="Entrez le nom complet">
+                
+                @if (materialForm.controls['name'].touched && materialForm.controls['name'].invalid) {
+                    <div class="error-message">Le nom est requis (Max 100 caractères).</div>
+                }
+                @if (apiErrors.name) {
+                    <div class="error-message">{{ apiErrors.name }}</div>
+                }
+            </div>
+
+            <!-- SLUG (URL) -->
+            <div class="form-group">
+                <label for="slug">Slug (Identifiant URL)</label>
+                <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode" placeholder="slug-auto-genere">
+                
+                <!-- CORRECTION: Utilisation du bloc @if pour envelopper <small> -->
+                @if (!isEditMode) {
+                    <small>Généré automatiquement à partir du nom. Format: minuscule-tirets.</small>
+                }
+                
+                @if (materialForm.controls['slug'].touched && materialForm.controls['slug'].invalid) {
+                    <div class="error-message">Le slug est requis et doit être au format 'minuscule-tirets'.</div>
+                }
+                @if (apiErrors.slug) {
+                    <div class="error-message">{{ apiErrors.slug }}</div>
+                }
             </div>
             
-            <div *ngIf="apiErrors.image" class="error-message">{{ apiErrors.image }}</div>
-        </div>
-
-        <div class="form-group">
-            <label for="price_per_sq_meter">Prix de base (€/m²)</label>
-            <input id="price_per_sq_meter" type="number" formControlName="price_per_sq_meter" step="0.01">
-            <div *ngIf="materialForm.controls['price_per_sq_meter'].invalid" class="error-message">
-                Le prix au m² est requis et doit être positif.
+            <!-- IMAGE DU MATÉRIAU -->
+            <div class="form-group">
+                <label for="file">Image du Matériau</label>
+                <input 
+                    id="file" 
+                    type="file" 
+                    accept="image/*" 
+                    (change)="onFileSelected($event)">
+                
+                <!-- CORRECTION: Utilisation du bloc @if pour envelopper <small> -->
+                @if (isEditMode) {
+                    <small>Laissez vide pour conserver l'image existante.</small>
+                }
+                
+                @if (imageUrlPreview) {
+                    <div class="image-preview">
+                        <img 
+                            [src]="imageUrlPreview" 
+                            alt="Aperçu du matériau">
+                    </div>
+                }
+                
+                @if (apiErrors.image) {
+                    <div class="error-message">{{ apiErrors.image }}</div>
+                }
             </div>
-            <div *ngIf="apiErrors.price_per_sq_meter" class="error-message">{{ apiErrors.price_per_sq_meter }}</div>
-        </div>
 
-        <div class="form-group">
-            <label for="thickness_options">Options d'Épaisseur (Ex: 1mm, 2mm, 3mm, 5mm)</label>
-            <input id="thickness_options" type="text" formControlName="thickness_options">
-            <small>Séparez les valeurs par une virgule et un espace pour la facilité.</small>
-            <div *ngIf="apiErrors.thickness_options" class="error-message">{{ apiErrors.thickness_options }}</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" formControlName="description"></textarea>
-            <div *ngIf="apiErrors.description" class="error-message">{{ apiErrors.description }}</div>
-        </div>
+            <!-- PRIX DE BASE -->
+            <div class="form-group">
+                <label for="price_per_sq_meter">Prix de base (franc/m²) <span class="required">*</span></label>
+                <input id="price_per_sq_meter" type="number" formControlName="price_per_sq_meter" step="0.01" min="0.01" placeholder="Ex: 45.50">
+                
+                @if (materialForm.controls['price_per_sq_meter'].invalid) {
+                    <div class="error-message">Le prix au m² est requis et doit être positif.</div>
+                }
+                @if (apiErrors.price_per_sq_meter) {
+                    <div class="error-message">{{ apiErrors.price_per_sq_meter }}</div>
+                }
+            </div>
 
-        <div class="form-group">
-            <label for="is_active">Statut (Disponible dans le configurateur)</label>
-            <select id="is_active" formControlName="is_active">
-                <option [ngValue]="true">Actif</option>
-                <option [ngValue]="false">Inactif</option>
-            </select>
-            <div *ngIf="apiErrors.is_active" class="error-message">{{ apiErrors.is_active }}</div>
-        </div>
+            <!-- OPTIONS D'ÉPAISSEUR -->
+            <div class="form-group">
+                <label for="thickness_options">Options d'Épaisseur</label>
+                <input id="thickness_options" type="text" formControlName="thickness_options" placeholder="Ex: 1mm, 2mm, 3mm">
+                <small>Séparez les valeurs par une virgule pour les options d'épaisseur disponibles.</small>
+                
+                @if (apiErrors.thickness_options) {
+                    <div class="error-message">{{ apiErrors.thickness_options }}</div>
+                }
+            </div>
+            
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" formControlName="description" rows="4" placeholder="Description détaillée du matériau, ses propriétés, etc."></textarea>
+                
+                @if (apiErrors.description) {
+                    <div class="error-message">{{ apiErrors.description }}</div>
+                }
+            </div>
 
+            <!-- STATUT -->
+            <div class="form-group">
+                <label for="is_active">Statut (Disponible dans le configurateur) <span class="required">*</span></label>
+                <select id="is_active" formControlName="is_active">
+                    <option [ngValue]="true">Actif</option>
+                    <option [ngValue]="false">Inactif</option>
+                </select>
+                
+                @if (apiErrors.is_active) {
+                    <div class="error-message">{{ apiErrors.is_active }}</div>
+                }
+            </div>
 
-        <button type="submit" [disabled]="materialForm.invalid || isLoading">
-            {{ isEditMode ? 'Sauvegarder le matériau' : 'Créer le matériau' }}
-        </button>
-        <div *ngIf="isLoading">Sauvegarde en cours...</div>
-    </form>
+            <!-- BOUTON DE SOUMISSION -->
+            <button type="submit" [disabled]="materialForm.invalid || isLoading" class="btn-submit">
+                @if (isLoading) {
+                    Sauvegarde en cours...
+                } @else {
+                    {{ isEditMode ? 'Sauvegarder les modifications' : 'Créer le matériau' }}
+                }
+            </button>
+        </form>
+    }
 </div>

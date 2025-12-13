@@ -27,7 +27,9 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
+    // ------------------------------------
     // --- Méthodes Devis (Quotes) ---
+    // ------------------------------------
 
     getAllQuotes(): Observable<Quote[]> {
         return this.http.get<Quote[]>(QUOTE_API_URL);
@@ -53,23 +55,32 @@ export class TransactionService {
         return this.http.post<Order>(`${QUOTE_API_URL}/${quoteId}/convert`, {});
     }
 
+    // ------------------------------------
     // --- Méthodes Commandes (Orders) ---
+    // ------------------------------------
 
     getAllOrders(): Observable<Order[]> {
         return this.http.get<Order[]>(ORDER_API_URL);
     }
     
     /**
-     * [CORRECTION TS2339] Récupère le détail d'une commande.
+     * Récupère le détail d'une commande par ID.
      */
     getOrderById(id: number): Observable<Order> {
         return this.http.get<Order>(`${ORDER_API_URL}/${id}`);
     }
     
     /**
-     * [CORRECTION TS2339] Met à jour le statut d'une commande.
+     * Met à jour le statut d'une commande.
      */
     updateOrderStatus(id: number, status: string): Observable<Order> {
         return this.http.post<Order>(`${ORDER_API_URL}/${id}/status`, { status });
+    }
+    
+    /**
+     * Supprime une commande par ID.
+     */
+    deleteOrder(id: number): Observable<void> {
+        return this.http.delete<void>(`${ORDER_API_URL}/${id}`);
     }
 }

@@ -3,10 +3,10 @@ import { CommonModule, NgClass, NgStyle } from '@angular/common';
 import { Material } from './../../../core/models/material.model';
 
 @Component({
-  selector: 'app-material-selector',
-  standalone: true,
-  imports: [CommonModule, NgClass, NgStyle],
-  template: `
+ selector: 'app-material-selector',
+ standalone: true,
+ imports: [CommonModule, NgClass, NgStyle],
+ template: `
     @if (!materials().length && !isLoading()) {
         <p class="text-center text-gray-500 py-4">Aucun matériau disponible.</p>
     }
@@ -15,14 +15,14 @@ import { Material } from './../../../core/models/material.model';
     }
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        @for (material of materials(); track material.id) {
-          <div 
-            (click)="selectMaterial(material)"
-            [class.ring-2]="material.id === selectedMaterial()?.id"
-            [class.ring-indigo-500]="material.id === selectedMaterial()?.id"
-            [ngStyle]="{'border-color': material.color ? material.color : '#e5e7eb'}"
-            class="relative border-2 rounded-xl shadow-md overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg bg-white"
-          >
+    @for (material of materials(); track material.id) {
+     <div 
+      (click)="selectMaterial(material)"
+      [class.ring-2]="material.id === selectedMaterial()?.id"
+      [class.ring-indigo-500]="material.id === selectedMaterial()?.id"
+     [ngStyle]="{'border-color': material.color ? material.color : '#e5e7eb'}"
+     class="relative border-2 rounded-xl shadow-md overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg bg-white"
+    >
                 <!-- Bandeau de couleur/image -->
                 <div 
                     [ngStyle]="{'background-color': material.color ? material.color : '#4f46e5'}"
@@ -55,20 +55,20 @@ import { Material } from './../../../core/models/material.model';
                         </svg>
                     </div>
                 }
-          </div>
-        }
-    </div>
-  `,
+     </div>
+    }
+  </div>
+ `,
 })
 export class MaterialSelectorComponent {
-  materials = input<Material[]>([]); 
-  selectedMaterial = input<Material | null>(null); 
-  isLoading = input<boolean>(false); 
+ materials = input<Material[]>([]); 
+ selectedMaterial = input<Material | null>(null); 
+ isLoading = input<boolean>(false); 
 
-  materialSelected = output<Material | null>(); 
+ materialSelected = output<Material | null>(); 
 
-  selectMaterial(material: Material): void {
-    const newSelection = this.selectedMaterial()?.id === material.id ? null : material;
-    this.materialSelected.emit(newSelection); 
-  }
+ selectMaterial(material: Material): void {
+  const newSelection = this.selectedMaterial()?.id === material.id ? null : material;
+  this.materialSelected.emit(newSelection); 
+ }
 }

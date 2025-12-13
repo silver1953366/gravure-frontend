@@ -135,7 +135,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
 					case 'inox':
 					case 'carbone':
 					case 'métal':
-						tempImageUrl = '../../../../assets/material/aluminium.jpg'; 
+						tempImageUrl = '../../../../assets/material/acrylique.jpg'; 
 						break;
 					case 'aluminium':
 						tempImageUrl = '../../../../assets/material/aluminium.jpg';

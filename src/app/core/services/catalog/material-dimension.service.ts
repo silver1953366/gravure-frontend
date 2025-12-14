@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment'; // Ajustez le c
 })
 export class MaterialDimensionService {
   // L'URL pointe maintenant vers la nouvelle route PUBLIQUE définie dans api.php
-  private apiUrl = '${environment.apiUrl}/catalog/dimensions'; // <-- CHEMIN CORRIGÉ
+  private apiUrl = `${environment.apiUrl}/catalog/dimensions`; // <-- CHEMIN CORRIGÉ
 
   private http = inject(HttpClient);
 

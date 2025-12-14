@@ -13,7 +13,7 @@ import { environment } from '../../../environments/environment'; // Ajustez le c
 })
 export class CatalogService {
  // ⚠️ Assurez-vous que cette URL est correcte (localhost:8000 pour Laravel local)
- private apiUrl = '${environment.apiUrl}/catalog'; 
+private apiUrl = `${environment.apiUrl}/catalog`; // Lit la valeur réelle de l'URL
 
  private http = inject(HttpClient);
 

@@ -16,8 +16,8 @@ export type QuoteStatus = Models.QuoteStatus;
 
 
 // Constantes d'URL de l'API (à adapter à votre configuration)
-const QUOTE_API_URL = '${environment.apiUrl}/admin/quotes'; 
-const ORDER_API_URL = '${environment.apiUrl}/admin/orders'; 
+const QUOTE_API_URL = `${environment.apiUrl}/admin/quotes`; 
+const ORDER_API_URL = `${environment.apiUrl}/admin/orders`; 
 
 /**
  * Service central pour la gestion des transactions (Devis et Commandes).

@@ -12,7 +12,7 @@ export class FavoritesService {
   
   private http = inject(HttpClient);
   // Assurez-vous que l'URL de base de l'API est correcte
-  private apiUrl = '${environment.apiUrl}/favorites'; 
+  private apiUrl = `${environment.apiUrl}/favorites`; 
 
   /**
    * Récupère la liste des favoris de l'utilisateur.

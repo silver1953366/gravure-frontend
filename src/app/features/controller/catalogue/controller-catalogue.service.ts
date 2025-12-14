@@ -1,4 +1,4 @@
-// src/app/features/controller/catalogue/controller-catalogue.service.ts
+
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';

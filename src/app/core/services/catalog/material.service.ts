@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment'; // Ajustez le c
 })
 export class MaterialService {
   // ⚠️ ASSUMPTION : Utilise la route publique du catalogue pour la lecture
-  private apiUrl = '${environment.apiUrl}/catalog/materials'; 
+  private apiUrl = `${environment.apiUrl}/catalog/materials`; 
 
   private http = inject(HttpClient);
 

@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, of } from 'rxjs'; 
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment'; // Ajustez le chemin si nécessaire
 import { User, LoginPayload, RegisterPayload, AuthResponse } from '../models/auth.model';
 
 @Injectable({
@@ -11,7 +12,8 @@ export class AuthService {
  private http = inject(HttpClient);
  private router = inject(Router);
 
- private readonly API_URL = 'http://localhost:8000/api'; 
+// REMPLACER : private readonly API_URL = 'http://localhost:8000/api 14/12/2025'; 
+private readonly API_URL = environment.apiUrl; // Utilisation de la variable d'environnement
  
  currentUser = signal<User | null>(null);
  isAuthenticated = signal(false); 

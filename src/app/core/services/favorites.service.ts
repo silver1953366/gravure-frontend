@@ -1,9 +1,9 @@
-// src/app/features/client/favorites/favorites.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { FavoriteItem } from '../models/favorite.model'; // Import de la nouvelle interface
+import { environment } from '../../environments/environment'; // Ajustez le chemin si nécessaire
+
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class FavoritesService {
   
   private http = inject(HttpClient);
   // Assurez-vous que l'URL de base de l'API est correcte
-  private apiUrl = '/api/favorites'; 
+  private apiUrl = '${environment.apiUrl}/favorites'; 
 
   /**
    * Récupère la liste des favoris de l'utilisateur.

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment'; // Ajustez le chemin si nécessaire
+
 
 // Exportation explicite des interfaces depuis le service pour être importées dans les composants.
 // Ceci corrige l'erreur TS2459 (Module '...' declares 'Order'/'Quote' locally, but it is not exported.)
@@ -14,8 +16,8 @@ export type QuoteStatus = Models.QuoteStatus;
 
 
 // Constantes d'URL de l'API (à adapter à votre configuration)
-const QUOTE_API_URL = '/api/admin/quotes'; 
-const ORDER_API_URL = '/api/admin/orders'; 
+const QUOTE_API_URL = '${environment.apiUrl}/admin/quotes'; 
+const ORDER_API_URL = '${environment.apiUrl}/admin/orders'; 
 
 /**
  * Service central pour la gestion des transactions (Devis et Commandes).

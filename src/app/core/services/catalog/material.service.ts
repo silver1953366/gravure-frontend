@@ -2,13 +2,15 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Material } from '../../models/material.model';
+import { environment } from '../../../environments/environment'; // Ajustez le chemin si nécessaire
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class MaterialService {
   // ⚠️ ASSUMPTION : Utilise la route publique du catalogue pour la lecture
-  private apiUrl = 'http://localhost:8000/api/catalog/materials'; 
+  private apiUrl = '${environment.apiUrl}/catalog/materials'; 
 
   private http = inject(HttpClient);
 

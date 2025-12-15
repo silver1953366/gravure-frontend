@@ -1,3 +1,5 @@
+// src/app/core/models/auth.models.ts
+
 // Basé sur les champs de votre modèle User Laravel
 export interface User {
     id: number;
@@ -5,7 +7,7 @@ export interface User {
     email: string;
     role: 'admin' | 'controller' | 'client';
     created_at: string;
-    // Ajoutez d'autres champs si nécessaire
+    updated_at?: string;
 }
 
 // Payload pour la connexion
@@ -14,7 +16,7 @@ export interface LoginPayload {
     password: string;
 }
 
-// Payload pour l'inscription (votre AuthController ne demande pas de rôle)
+// Payload pour l'inscription
 export interface RegisterPayload {
     name: string;
     email: string;
@@ -26,5 +28,8 @@ export interface RegisterPayload {
 export interface AuthResponse {
     user: User;
     access_token: string;
-    message?: string; // Présent uniquement pour la réponse de 'register'
+    message?: string; // Présent pour la réponse de 'register'
+    
+    // NOUVEAU: Le token de session est renvoyé par le backend pour la fusion du panier anonyme
+    session_token?: string; 
 }

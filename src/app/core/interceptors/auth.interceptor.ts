@@ -1,25 +1,38 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+// src/app/core/interceptor/auth.interceptor.ts
+
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { CartService } from '../services/cart.service'; // AJOUT
 
+
+export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
  
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  // Utilisation de la méthode maintenant existante (getAuthToken)
-  const authToken = authService.getAuthToken();
+    const authService = inject(AuthService);
+    const cartService = inject(CartService); 
 
-  // Si un jeton existe et si ce n'est PAS une requête de connexion/inscription (qui n'en ont pas besoin)
-  if (authToken) {
-    // Clone la requête et ajoute l'en-tête Authorization
+    const authToken = authService.getAuthToken(); 
+    const sessionToken = cartService.getSessionToken(); 
+
+    let headers: { [key: string]: string } = {};
+    
+    // 1. Ajout du Jeton d'Authentification (Bearer)
+   if (authToken) {
+     headers['Authorization'] = `Bearer ${authToken}`;
+   }
+    
+    // 2. Ajout du Jeton de Session (Anonyme/Fusion)
+    // Nous l'ajoutons s'il est présent.
+    if (sessionToken) {
+         // Ce header permet à Laravel d'identifier le panier anonyme
+         headers['X-Session-Token'] = sessionToken; 
+    }
+
+    // Clone la requête et ajoute tous les en-têtes
     const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${authToken}`
-      }
-    });
-    // Poursuit la requête modifiée
-    return next(authReq);
-  }
-
-  // Si pas de jeton, poursuit la requête originale
-  return next(req);
+       setHeaders: headers
+       });
+    
+  return next(authReq);
 };

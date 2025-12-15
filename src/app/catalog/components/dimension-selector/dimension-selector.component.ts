@@ -7,11 +7,11 @@ import { MaterialDimension } from '../../../core/models/material-dimension.model
   standalone: true,
   imports: [CommonModule, NgClass, DecimalPipe],
   template: `
-    @if (!dimensions().length) {
-        <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg text-center font-medium">
-            ⚠️ Aucune dimension disponible pour cette combinaison.
-        </div>
-    }
+    @if (!dimensions().length) {
+        <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg text-center font-medium">
+            ⚠️ Aucune dimension disponible pour cette combinaison.
+        </div>
+    }
 
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
         @for (dimension of dimensions(); track dimension.id) {
@@ -26,8 +26,8 @@ import { MaterialDimension } from '../../../core/models/material-dimension.model
               {{ dimension.dimension_label }}
             </h4>
             <p class="text-sm text-gray-500 mt-1">
-                {{ dimension.unit_price_fcfa | number:'1.2-2' }} FCFA
-            </p>
+                {{ dimension.unit_price_fcfa | number:'1.2-2' }} FCFA
+            </p>
           </div>
         }
     </div>

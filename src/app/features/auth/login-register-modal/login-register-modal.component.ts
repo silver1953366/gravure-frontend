@@ -22,9 +22,9 @@ export class LoginRegisterModalComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // 🛑 INPUT : Reçoit l'état du parent
+  //  INPUT : Reçoit l'état du parent
   isOpen = input<boolean>(false);
-  // 🛑 OUTPUT : Émet l'événement de fermeture au parent
+  //  OUTPUT : Émet l'événement de fermeture au parent
   close = output<void>(); 
 
   mode = signal<'login' | 'register'>('login');

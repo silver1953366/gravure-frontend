@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, signal, computed, LOCALE_ID, OnInit
 import { DatePipe, NgClass, NgFor, NgIf, CurrencyPipe } from '@angular/common'; 
 import { RouterLink } from '@angular/router';
 // Importez vos services et modèles ici (exemples)
-import { FavoritesService, FavoriteItem } from '../favorites/favorites.service';
+import { FavoritesService, FavoriteItem } from '../../../core/services/favorites.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Importez les vrais composants si ce sont des composants Angular Standalone

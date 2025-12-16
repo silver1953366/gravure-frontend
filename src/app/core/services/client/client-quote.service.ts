@@ -2,12 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http'; // <-- Import de HttpParams ajouté
 import { Observable } from 'rxjs';
 import { Quote, QuotePayload, QuoteEstimate } from '../../../core/models/client/quotes/quote.model'; 
+import { environment } from '../../../environments/environment'; 
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientQuoteService {
-  private apiUrl = 'http://localhost:8000/api/quotes'; 
+  private apiUrl = `${environment.apiUrl}/quotes`; 
 
   private http = inject(HttpClient);
 

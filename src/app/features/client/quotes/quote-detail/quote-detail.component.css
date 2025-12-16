@@ -1,3 +1,5 @@
+/* src/app/features/client/quotes/quote-detail/quote-detail.component.css */
+
 :host {
     display: block;
     padding: 2rem;
@@ -5,12 +7,13 @@
     min-height: 100vh;
 }
 
-/* --- Typographie et Mise en page --- */
-.quote-detail-container {
+/* --- Conteneur général --- */
+.container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
+/* --- Lien de retour --- */
 .back-link {
     display: inline-flex;
     align-items: center;
@@ -25,6 +28,8 @@
     color: #3730a3; /* Indigo-800 */
 }
 
+/* Note: l'icône de flèche n'est pas utilisée dans le template final, 
+   mais je la garde pour la complétude si vous l'ajoutez plus tard. */
 .icon-arrow {
     width: 1rem;
     height: 1rem;
@@ -32,62 +37,36 @@
     transform: rotate(180deg);
 }
 
-.detail-header {
+/* --- Carte principale --- */
+.card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+}
+.detail-page-card > .p-8 {
+    padding: 2rem; /* Espace intérieur de la carte */
+}
+
+/* --- En-tête de la carte (Titre et Statut) --- */
+.card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.title {
+.card-header-title {
     font-size: 2.25rem;
     font-weight: 800;
     color: #1e293b; /* Slate-800 */
 }
 
-.subtitle {
-    color: #64748b; /* Slate-500 */
-    margin-top: 0.25rem;
-    font-size: 1rem;
-}
-
-.header-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.action-button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    line-height: 1;
-    border: none;
-}
-
-.primary-cta-button {
-    background-color: #ef4444; /* Red-500 */
-    color: white;
-}
-.primary-cta-button:hover {
-    background-color: #dc2626; /* Red-600 */
-}
-
-.secondary-cta-button {
-    background-color: #f1f5f9; /* Slate-100 */
-    color: #1e293b;
-}
-.secondary-cta-button:hover {
-    background-color: #e2e8f0; /* Slate-200 */
-}
-
-/* --- Status Chip --- */
-.status-chip {
+/* --- Pillule de Statut --- */
+.status-pill {
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     font-size: 0.75rem;
@@ -95,14 +74,14 @@
     letter-spacing: 0.05em;
     align-self: center;
 }
-.gray { background-color: #e5e7eb; color: #4b5563; }
-.blue { background-color: #bfdbfe; color: #1d4ed8; }
-.green { background-color: #d1fae5; color: #059669; }
-.purple { background-color: #ede9fe; color: #7c3aed; }
-.red { background-color: #fee2e2; color: #ef4444; }
-.orange { background-color: #ffedd5; color: #f97316; }
+.status-gray { background-color: #e5e7eb; color: #4b5563; }
+.status-blue { background-color: #bfdbfe; color: #1d4ed8; }
+.status-green { background-color: #d1fae5; color: #059669; }
+.status-purple { background-color: #ede9fe; color: #7c3aed; }
+.status-red { background-color: #fee2e2; color: #ef4444; }
+.status-orange { background-color: #ffedd5; color: #f97316; }
 
-/* --- Grille de Contenu --- */
+/* --- Grille de Contenu Principal --- */
 .detail-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -115,15 +94,7 @@
     }
 }
 
-.card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
-}
-
-.card h2 {
+.detail-block h2 {
     font-size: 1.5rem;
     font-weight: 700;
     color: #1e293b;
@@ -141,78 +112,80 @@
     }
 }
 
-/* --- Configuration Card --- */
-.info-group {
+/* --- Listes de données (dl.data-list) --- */
+.data-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.data-list > div {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: 1px dotted #f1f5f9;
 }
-.info-group:last-child {
+.data-list > div:last-child {
     border-bottom: none;
 }
-
-.info-label {
+.data-list dt {
     font-weight: 600;
     color: #475569; /* Slate-600 */
 }
-.info-value {
+.data-list dd {
     color: #1e293b;
-}
-
-.info-group.wide {
-    flex-direction: column;
-    padding-top: 1rem;
-    border-top: 1px dashed #e2e8f0;
-}
-.info-description {
-    margin-top: 0.5rem;
-    font-style: italic;
-    color: #64748b;
-    white-space: pre-wrap;
-}
-
-/* --- Price Card --- */
-.price-card {
-    display: flex;
-    flex-direction: column;
-}
-
-.price-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-}
-
-.price-line.base-price,
-.price-line.subtotal-price,
-.price-line.discount-price {
-    font-size: 0.95rem;
-    color: #475569;
-}
-
-.price-separator {
-    height: 1px;
-    background-color: #cbd5e1; /* Slate-300 */
-    margin: 0.75rem 0;
-}
-
-.final-price {
-    margin-top: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.price-note {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    margin-top: auto;
-    padding-top: 1rem;
+    margin-left: 1rem;
     text-align: right;
 }
 
-/* --- Attachments Card --- */
+/* --- Prix et Quantité --- */
+.final-price {
+    font-weight: 700;
+    color: #10b981; /* Émeraude */
+}
+.discount-price {
+    color: #ef4444; /* Rouge */
+}
+.quantity {
+    font-weight: 700;
+}
+
+.ordered-message {
+    margin-top: 1rem;
+    color: #7c3aed;
+    font-style: italic;
+}
+.view-order-link {
+    display: block;
+    margin-top: 0.5rem;
+    color: #7c3aed;
+    text-decoration: underline;
+}
+
+/* --- Bouton de conversion --- */
+.convert-button {
+    background-color: #059669; /* Vert pour l'action positive */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    width: 100%;
+    border: none;
+    transition: background-color 0.2s;
+}
+.convert-button:hover {
+    background-color: #047857;
+}
+
+/* --- Instructions --- */
+.instructions-text {
+    margin-top: 0.5rem;
+    color: #475569;
+    white-space: pre-wrap; /* Maintient les sauts de ligne */
+}
+
+/* --- Pièces Jointes --- */
 .attachment-list {
     list-style: none;
     padding: 0;
@@ -282,25 +255,14 @@
 
 /* --- États de chargement/erreur --- */
 .loading-state,
-.not-found-state {
+.error-message {
     text-align: center;
     padding: 4rem 2rem;
     background-color: white;
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
-
-.spinner {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid rgba(79, 70, 229, 0.1);
-    border-radius: 50%;
-    border-top-color: #4f46e5;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1rem;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+.error-message {
+    color: #ef4444;
+    font-weight: 600;
 }

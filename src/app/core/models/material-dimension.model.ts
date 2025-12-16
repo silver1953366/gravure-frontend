@@ -1,17 +1,19 @@
-import { Material } from './material.model';
+// src/app/core/models/material-dimension.model.ts
+
+// Les imports sont directs car les fichiers sont dans le même répertoire 'core/models/'
+import { Material } from './material.model'; 
 import { Shape } from './shape.model';
 
 /**
  * Interface représentant une entrée de prix spécifique dans le catalogue.
- * Les dimensions physiques (width, height, thickness) sont gérées par dimension_label.
  */
 export interface MaterialDimension {
-    id: number;
-    material_id: number;
-    shape_id: number;
+    id: number; 
+    material_id: number; 
+    shape_id: number; 
     category_id: number; 
     
-    dimension_label: string; // Ex: '100x50mm Ép.2'
+    dimension_label: string; 
     unit_price_fcfa: number; 
     is_active: boolean;
     

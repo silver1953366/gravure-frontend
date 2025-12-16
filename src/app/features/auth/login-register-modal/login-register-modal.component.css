@@ -25,7 +25,7 @@
     bottom: 0;
     left: 0;
     
-    /* 🛑 Z-INDEX CORRIGÉ : TRÈS HAUT pour être au-dessus de tout */
+    /*  Z-INDEX CORRIGÉ : TRÈS HAUT pour être au-dessus de tout */
     z-index: 99999; 
     
     background-color: rgba(17, 24, 39, 0.9);

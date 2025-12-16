@@ -1,28 +1,28 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment'; // 🛑 CORRIGÉ : Importation de l'environnement
+import { environment } from '../../../environments/environment'; 
 
 export interface InventoryItem {
-    id: number;
-    // Propriétés provenant de MaterialDimension ou Material (pour l'affichage)
-    reference: string; 
-    description: string;
-    location: string; // (Assumé, peut-être lié à l'emplacement physique)
-    material_id?: number; 
-    
-    // Propriétés provenant de la table Inventory
-    stock_quantity: number; // 🛑 CORRIGÉ : Nom plus explicite pour le stock total
-    reserved_quantity: number; // Quantité réservée (stock_reserve dans votre ancienne interface)
-    minimum_threshold: number; // Seuil minimum (stock_minimum dans votre ancienne interface)
-    price_per_unit: number; 
+    id: number;
+    // Propriétés provenant de MaterialDimension ou Material (pour l'affichage)
+    reference: string; 
+    description: string;
+    location: string; // (Assumé, peut-être lié à l'emplacement physique)
+    material_id?: number; 
+    
+    // Propriétés provenant de la table Inventory
+    stock_quantity: number; //  CORRIGÉ : Nom plus explicite pour le stock total
+    reserved_quantity: number; // Quantité réservée (stock_reserve dans votre ancienne interface)
+    minimum_threshold: number; // Seuil minimum (stock_minimum dans votre ancienne interface)
+    price_per_unit: number; 
     
     // Propriété calculée (comme dans le modèle Laravel)
     available_quantity: number; 
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root'
 })
 export class InventoryService {
     // URL Publique (pour la lecture par les rôles 'controller' ou 'logistics')

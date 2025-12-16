@@ -1,4 +1,13 @@
+// src/app/core/models/client/quotes/quote.model.ts
+
 import { Attachment } from './attachment.model'; 
+// --- IMPORTS DES INTERFACES COMPLÈTES DEPUIS LEURS CHEMINS ---
+// Les chemins corrects basés sur l'emplacement de 'quote.model.ts'
+import { Material } from '../../material.model'; 
+import { Shape } from '../../shape.model'; 
+import { MaterialDimension } from '../../material-dimension.model'; // <= IMPORTANT: Chemin ajusté
+// -------------------------------------------------------------
+
 
 // --- Définitions d'Interfaces ---
 
@@ -39,12 +48,10 @@ export interface Order {
     items: OrderItem[];
 }
 
-export interface MaterialDimension {
-    dimension_label: string; 
-    // ...
-}
-export interface Material { /* ... */ }
-export interface Shape { /* ... */ }
+// NOTE IMPORTANTE: La définition locale de MaterialDimension a été retirée
+// pour éviter le conflit (TS2440), car elle est déjà importée ci-dessus.
+// export interface MaterialDimension { dimension_label: string; // ... } 
+
 
 export interface Quote {
     id: number;
@@ -74,10 +81,9 @@ export interface Quote {
 
     material?: Material; 
     shape?: Shape; 
-    materialDimension?: MaterialDimension; 
+    materialDimension?: MaterialDimension; // Utilise l'interface importée
     attachments?: Attachment[]; 
     
-    // CORRECTION APPLIQUÉE ICI
     user?: UserInfo; 
     items: QuoteItem[];
 }
@@ -87,5 +93,8 @@ export interface QuotePayload {
 }
 
 export interface QuoteEstimate {
-    // Définition de la réponse d'estimation de prix
+    // Définition de la réponse d'estimation de prix (Résout les erreurs HTML du formulaire)
+    base_price: number; 
+    discount_amount: number;
+    final_price: number; 
 }

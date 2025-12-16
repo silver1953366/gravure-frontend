@@ -2,12 +2,15 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Attachment, UploadResponse } from '../../../core/models/client/quotes/attachment.model';
+import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientAttachmentService {
-  private apiUrl = 'http://localhost:8000/api/attachments'; 
+  // CORRECTION: Utilisation de l'environnement pour l'URL de base
+  private apiUrl = `${environment.apiUrl}/attachments`; 
 
   private http = inject(HttpClient);
 

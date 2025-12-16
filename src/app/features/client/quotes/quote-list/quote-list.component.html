@@ -1,37 +1,46 @@
-<div class="container mx-auto p-4 sm:p-6 lg:p-8">
+<div class="list-container">
     
-    <header class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Mes Devis</h1>
-        <a routerLink="/client/quote/new" class="btn-primary">
+    <header class="list-header">
+        <h1 class="page-title">Mes Devis</h1>
+        <a routerLink="/client/quote/new" class="btn btn-primary">
             + Nouveau Devis
         </a>
     </header>
 
+    @if (errorOccurred()) {
+        <div class="alert alert-error">
+            <p class="alert-title">Erreur de connexion</p>
+            <p>Impossible de charger vos devis. Veuillez réessayer plus tard.</p>
+            <button (click)="fetchQuotes(currentSort())" class="btn btn-secondary retry-button">Réessayer</button>
+        </div>
+    }
+
     @if (isLoading()) {
-        <div class="text-center py-10">
-            <p class="text-lg text-gray-500">Chargement de vos devis...</p>
+        <div class="loading-state">
+            <p>Chargement de vos devis...</p>
         </div>
     } @else if (quotes().length === 0) {
         <div class="empty-state">
-            <p class="text-xl text-gray-600 mb-4">Vous n'avez pas encore de devis.</p>
-            <a routerLink="/client/quote/new" class="text-indigo-600 hover:text-indigo-800 font-medium">
-                Commencez par créer un nouveau devis !
+            <p class="empty-text">Vous n'avez pas encore de devis.</p>
+            <a routerLink="/client/quote/new" class="btn btn-secondary">
+                Créez votre premier devis !
             </a>
         </div>
     } @else {
         
-        <div class="flex justify-end mb-4">
-            <select (change)="onSortChange($event)" class="form-select">
-                <option value="recent">Tri: Les plus récents</option>
-                <option value="oldest">Tri: Les plus anciens</option>
+        <div class="sort-controls">
+            <label for="sort-select">Trier par:</label>
+            <select id="sort-select" (change)="onSortChange($event)" class="form-select">
+                <option value="recent" [selected]="currentSort() === 'recent'">Les plus récents</option>
+                <option value="oldest" [selected]="currentSort() === 'oldest'">Les plus anciens</option>
             </select>
         </div>
 
-        <div class="space-y-4">
+        <div class="quotes-list-wrapper">
             @for (quote of quotes(); track quote.id) {
-                <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition duration-300">
-                    <div class="flex justify-between items-start mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">
+                <div class="quote-card">
+                    <div class="card-header">
+                        <h2 class="quote-reference">
                             Devis #{{ quote.reference }}
                         </h2>
                         
@@ -40,42 +49,38 @@
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 border-t pt-4">
+                    <div class="card-details-grid">
                         
-                        <div>
-                            <span class="font-semibold">Statut:</span> 
-                            <span class="status-text status-{{ getStatusColor(quote.status) }}">{{ quote.status | uppercase }}</span>
-                        </div>
-                        <div>
-                            <span class="font-semibold">Créé le:</span> 
+                        <div class="detail-item">
+                            <span class="detail-label">Créé le:</span> 
                             {{ quote.created_at | date: 'mediumDate' }}
                         </div>
                         
-                        <div>
-                            <span class="font-semibold">Matériau:</span> 
+                        <div class="detail-item">
+                            <span class="detail-label">Matériau:</span> 
                             {{ quote.material?.name || 'N/A' }}
                         </div>
                         <div>
-                            <span class="font-semibold">Forme:</span> 
+                            <span class="detail-label">Forme:</span> 
                             {{ quote.shape?.name || 'N/A' }}
                         </div>
                         
-                        <div>
-                            <span class="font-semibold">Quantité:</span> 
+                        <div class="detail-item">
+                            <span class="detail-label">Quantité:</span> 
                             {{ quote.quantity }}
                         </div>
-                        <div>
-                            <span class="font-semibold">Dimension:</span> 
+                        <div class="detail-item">
+                            <span class="detail-label">Dimension:</span> 
                             {{ quote.materialDimension?.dimension_label || 'N/A' }}
                         </div>
 
-                        <div class="col-span-2 md:col-span-1 font-bold text-lg text-indigo-700">
+                        <div class="quote-total">
                             {{ quote.final_price_fcfa | number:'1.0-0' }} FCFA
                         </div>
                     </div>
 
-                    <div class="mt-4 border-t pt-4 flex justify-end">
-                        <a [routerLink]="['/client/quotes', quote.id]" class="btn-secondary">
+                    <div class="card-actions">
+                        <a [routerLink]="['/client/quotes', quote.id]" class="btn btn-secondary">
                             Voir les détails
                         </a>
                     </div>

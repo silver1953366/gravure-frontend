@@ -24,8 +24,8 @@ import { ControllerNotificationListComponent } from './notifications/controller-
 const InventoryDetailComponent = ControllerInventoryListComponent; 
 
 export const CONTROLLER_ROUTES: Routes = [
-    {
-        path: '',
+ {
+ path: '',
         // Layout parent qui inclut la Sidebar et la Navbar
         component: ControllerLayoutComponent, 
         children: [

@@ -1,0 +1,214 @@
+/* Import des variables globales */
+/* Note: Les variables globales définies dans :root dans styles.css sont accessibles ici */
+
+/* --- Conteneur général --- */
+.list-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- En-tête et Bouton --- */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray-text); /* #1f2937 */
+}
+
+/* --- Boutons globaux réutilisés --- */
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary-blue); /* #004481 */
+    color: white;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: var(--primary-blue-dark); /* #003366 */
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+}
+.btn-secondary:hover {
+    background-color: var(--gray-light-bg); /* #f3f4f6 */
+}
+
+/* --- Contrôle de Tri --- */
+.sort-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.sort-controls label {
+    margin-right: 10px;
+    font-weight: 500;
+    color: var(--gray-sub);
+}
+.form-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* --- Carte de Devis --- */
+.quotes-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.quote-card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s, transform 0.3s;
+}
+.quote-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.quote-reference {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-text);
+}
+
+/* --- Détails de la Carte --- */
+.card-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+    font-size: 14px;
+    color: var(--gray-sub);
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--gray-text);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.quote-total {
+    grid-column: 1 / -1; /* Prend toute la largeur sur mobile */
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent-yellow); /* #f8991d */
+    text-align: right;
+    margin-top: 10px;
+}
+
+/* --- Actions de la Carte --- */
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f3f4f6;
+}
+
+
+/* --- Pastilles de Statut (Status Pill) --- */
+.status-pill {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Couleurs spécifiques basées sur getStatusColor(status) */
+.status-gray { background-color: #e5e7eb; color: #4b5563; }
+.status-blue { background-color: #bfdbfe; color: #1d4ed8; }
+.status-green { background-color: #d1fae5; color: #059669; }
+.status-purple { background-color: #e9d5ff; color: #7c3aed; }
+.status-red { background-color: #fee2e2; color: #ef4444; }
+.status-orange { background-color: #fed7aa; color: #f97316; }
+
+
+/* --- États Spéciaux (Chargement, Vide, Erreur) --- */
+.loading-state, .empty-state {
+    text-align: center;
+    padding: 50px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+    color: var(--gray-sub);
+}
+.empty-text {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    border-left: 5px solid #ef4444;
+    color: #991b1b;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.alert-title {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.retry-button {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 6px 15px;
+    font-size: 14px;
+}
+
+/* --- Responsive pour les grilles --- */
+@media (max-width: 600px) {
+    .card-details-grid {
+        grid-template-columns: 1fr;
+    }
+    .quote-total {
+        text-align: left;
+    }
+    .list-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .btn-primary {
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+    }
+}

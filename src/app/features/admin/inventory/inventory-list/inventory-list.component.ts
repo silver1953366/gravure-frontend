@@ -4,33 +4,33 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
 // Service hypothétique pour obtenir le rôle de l'utilisateur
-// 🛑 Note: Dans un environnement réel, ce service serait injecté.
+
 interface UserAuth {
-    isAdmin: boolean;
-    isController: boolean;
+    isAdmin: boolean;
+    isController: boolean;
 }
 const FAKE_AUTH_SERVICE = {
-    getUserRoles(): UserAuth {
-        // isAdmin: true pour tests CRUD Admin, false pour tests simple Controller/Consultation
-        return { isAdmin: true, isController: true }; 
-    }
+    getUserRoles(): UserAuth {
+    // isAdmin: true pour tests CRUD Admin, false pour tests simple Controller/Consultation
+    return { isAdmin: true, isController: true }; 
+   }
 };
 
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, RouterModule], 
-    selector: 'app-inventory-list',
-    templateUrl: './inventory-list.component.html',
-    styleUrls: ['./inventory-list.component.css']
+   standalone: true,
+   imports: [CommonModule, RouterModule], 
+   selector: 'app-inventory-list',
+   templateUrl: './inventory-list.component.html',
+   styleUrls: ['./inventory-list.component.css']
 })
 export class InventoryListComponent implements OnInit {
-    inventory: InventoryItem[] = [];
-    isLoading = true;
-    error: any = null;
-    
-    // Permission pour masquer/afficher les actions CRUD
-    canAdministerInventory: boolean = false; 
+   inventory: InventoryItem[] = [];
+   isLoading = true;
+   error: any = null;
+ 
+ // Permission pour masquer/afficher les actions CRUD
+    canAdministerInventory: boolean = false; 
 
     constructor(
       private inventoryService: InventoryService,

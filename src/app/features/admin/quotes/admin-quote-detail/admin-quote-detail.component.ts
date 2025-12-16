@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TransactionService, Quote } from '../../../../core/services/transaction.service';
-
+import { TransactionService,  } from '../../../../core/services/transaction.service'; // Importe l'interface Quote corrigée
+import{Quote} from '../../../../core/models/client/quotes/quote.model';
 @Component({
     selector: 'app-admin-quote-detail',
     standalone: true,
@@ -20,11 +20,12 @@ export class AdminQuoteDetailComponent implements OnInit {
     successMessage: string | null = null;
     isProcessing = false;
     
+    // Pour la gestion du calcul manuel du prix
     newFinalPrice: number | null = null; 
 
     constructor(
         private route: ActivatedRoute,
-        public router: Router, // 'public' pour l'accès dans le template HTML
+        public router: Router,
         private transactionService: TransactionService
     ) {}
 
@@ -47,13 +48,11 @@ export class AdminQuoteDetailComponent implements OnInit {
     loadQuoteDetail(id: number): void {
         this.isLoading = true;
         this.error = null;
-        // NOTE: Il faut ajouter la méthode getQuoteById(id: number): Observable<Quote>
-        // dans votre TransactionService pour que ceci fonctionne.
-        // Je vais assumer qu'elle existe.
         this.transactionService.getQuoteById(id).subscribe({
             next: (data: Quote) => { 
                 this.quote = data;
                 this.isLoading = false;
+                // Initialise le champ de prix avec le prix actuel (si calculé)
                 this.newFinalPrice = data.final_price_fcfa > 0 ? data.final_price_fcfa : null;
             },
             error: (err: any) => { 
@@ -115,6 +114,7 @@ export class AdminQuoteDetailComponent implements OnInit {
             }
         });
     }
+
 
     /**
      * Supprime le devis depuis la page de détail.

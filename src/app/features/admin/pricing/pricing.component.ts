@@ -1,48 +1,56 @@
-// src/app/features/admin/pricing/pricing.component.ts
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { PricingService } from './pricing.service';
 import { MaterialDimension, Material, Shape, Category } from '../../../core/models/category.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   selector: 'app-pricing',
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.css']
 })
 export class PricingComponent implements OnInit {
   
-  // Données de la table
+  // --- Injections ---
+  private fb = inject(FormBuilder);
+  private pricingService = inject(PricingService);
+
+  // --- Données du catalogue ---
   dimensions: MaterialDimension[] = [];
   materials: Material[] = [];
   shapes: Shape[] = [];
   categories: Category[] = [];
 
-  // État
+  // --- État UI ---
   isLoading = true;
   isSaving = false;
   error: string | null = null;
   successMessage: string | null = null;
 
-  // Formulaire CRUD
+  // --- Recherche et Filtres ---
+  searchTerm: string = '';
+  // Optionnel: vous pouvez ajouter des propriétés pour des sélecteurs de filtres précis
+  // filterMaterialId: string = '';
+
+  // --- Pagination ---
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+
+  // --- Formulaire CRUD ---
   dimensionForm: FormGroup;
   isEditMode = false;
   currentDimensionId: number | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private pricingService: PricingService
-  ) {
+  constructor() {
     this.dimensionForm = this.fb.group({
       material_id: ['', Validators.required],
       shape_id: ['', Validators.required],
       category_id: ['', Validators.required],
-      dimension_label: ['', Validators.required],
-      unit_price_fcfa: [0.01, [Validators.required, Validators.min(0.01)]],
+      dimension_label: ['', [Validators.required, Validators.maxLength(100)]],
+      unit_price_fcfa: [0, [Validators.required, Validators.min(1)]],
       is_active: [true],
     });
   }
@@ -52,7 +60,7 @@ export class PricingComponent implements OnInit {
   }
 
   /**
-   * Charge simultanément les listes déroulantes (dépendances) et les données du catalogue.
+   * Charge simultanément les dépendances et les tarifs
    */
   loadDependenciesAndData(): void {
     this.isLoading = true;
@@ -65,35 +73,91 @@ export class PricingComponent implements OnInit {
       categories: this.pricingService.getCategories(),
     }).subscribe({
       next: (results) => {
-        this.dimensions = results.dimensions;
+        // Tri par ID décroissant pour voir les nouveautés en premier
+        this.dimensions = results.dimensions.sort((a, b) => (b.id || 0) - (a.id || 0));
         this.materials = results.materials;
         this.shapes = results.shapes;
         this.categories = results.categories;
         this.isLoading = false;
-        
-        // Initialiser les valeurs du formulaire si elles sont vides
-        if (this.materials.length) this.dimensionForm.get('material_id')?.setValue(this.materials[0].id);
-        if (this.shapes.length) this.dimensionForm.get('shape_id')?.setValue(this.shapes[0].id);
-        if (this.categories.length) this.dimensionForm.get('category_id')?.setValue(this.categories[0].id);
       },
-      error: (err: any) => {
-        console.error("Erreur lors du chargement des données:", err);
-        this.error = 'Impossible de charger les dépendances ou le catalogue. Vérifiez les routes API.';
+      error: (err) => {
+        console.error("Erreur API:", err);
+        this.error = 'Erreur lors du chargement des données. Vérifiez votre connexion.';
         this.isLoading = false;
       }
     });
   }
 
+  // --- Logique de Filtrage et Recherche ---
+
   /**
-   * Prépare le formulaire pour l'édition.
+   * Retourne la liste filtrée selon le terme de recherche global
+   * Cherche dans le label, le nom du matériau, de la forme et de la catégorie
    */
+  get filteredDimensions(): MaterialDimension[] {
+    const term = this.searchTerm.toLowerCase().trim();
+    if (!term) return this.dimensions;
+
+    return this.dimensions.filter(dim => {
+      const matchLabel = dim.dimension_label?.toLowerCase().includes(term);
+      const matchMaterial = dim.material?.name.toLowerCase().includes(term);
+      const matchShape = dim.shape?.name.toLowerCase().includes(term);
+      const matchCategory = dim.category?.name.toLowerCase().includes(term);
+      
+      return matchLabel || matchMaterial || matchShape || matchCategory;
+    });
+  }
+
+  /**
+   * Liste finale à afficher après filtrage ET pagination
+   */
+  get paginatedDimensions(): MaterialDimension[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredDimensions.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredDimensions.length / this.itemsPerPage);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1; // Reset la page quand on cherche
+  }
+
+  // --- Actions Formulaire ---
+
+  onSubmit(): void {
+    if (this.dimensionForm.invalid) {
+      this.dimensionForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSaving = true;
+    this.error = null;
+    const formValue = this.dimensionForm.getRawValue();
+
+    const request = (this.isEditMode && this.currentDimensionId)
+      ? this.pricingService.updateMaterialDimension(this.currentDimensionId, formValue)
+      : this.pricingService.createMaterialDimension(formValue);
+
+    request.subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.successMessage = this.isEditMode ? "Mise à jour réussie !" : "Ajout réussi !";
+        this.resetForm();
+        this.loadDependenciesAndData();
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (err) => this.handleError(err, this.isEditMode ? 'mise à jour' : 'création')
+    });
+  }
+
   editDimension(dimension: MaterialDimension): void {
     this.isEditMode = true;
     this.currentDimensionId = dimension.id || null;
     this.successMessage = null;
     this.error = null;
     
-    // Remplir le formulaire avec les données de la dimension
     this.dimensionForm.patchValue({
       material_id: dimension.material_id,
       shape_id: dimension.shape_id,
@@ -103,118 +167,42 @@ export class PricingComponent implements OnInit {
       is_active: dimension.is_active,
     });
 
-    // Optionnel: Empêcher la modification des clés (material/shape/category) en mode édition
     this.dimensionForm.get('material_id')?.disable();
     this.dimensionForm.get('shape_id')?.disable();
-    // La category_id peut être modifiée si l'implémentation le permet
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /**
-   * Réinitialise le formulaire pour la création.
-   */
   resetForm(): void {
     this.isEditMode = false;
     this.currentDimensionId = null;
-    this.successMessage = null;
-    this.error = null;
     this.dimensionForm.reset({
-      material_id: this.materials.length ? this.materials[0].id : '',
-      shape_id: this.shapes.length ? this.shapes[0].id : '',
-      category_id: this.categories.length ? this.categories[0].id : '',
-      unit_price_fcfa: 0.01,
+      unit_price_fcfa: 0,
       is_active: true
     });
     this.dimensionForm.get('material_id')?.enable();
     this.dimensionForm.get('shape_id')?.enable();
   }
 
-  /**
-   * Gère la soumission du formulaire (création ou mise à jour).
-   */
-  onSubmit(): void {
-    this.isSaving = true;
-    this.successMessage = null;
-    this.error = null;
-
-    if (this.dimensionForm.invalid) {
-      this.dimensionForm.markAllAsTouched();
-      this.error = "Veuillez corriger les erreurs de validation.";
-      this.isSaving = false;
-      return;
-    }
-
-    // Récupérer les valeurs, inclure les champs désactivés si en mode édition
-    const formValue = this.dimensionForm.getRawValue();
-
-    if (this.isEditMode && this.currentDimensionId) {
-      // Mise à jour (PATCH)
-      this.pricingService.updateMaterialDimension(this.currentDimensionId, formValue).subscribe({
-        next: () => {
-          this.isSaving = false;
-          this.successMessage = "Entrée de catalogue mise à jour avec succès!";
-          this.loadDependenciesAndData(); // Recharger les données
-          this.resetForm();
-        },
-        error: (err: any) => this.handleError(err, 'mise à jour')
-      });
-    } else {
-      // Création (POST)
-      this.pricingService.createMaterialDimension(formValue).subscribe({
-        next: () => {
-          this.isSaving = false;
-          this.successMessage = "Nouvelle entrée de catalogue créée avec succès!";
-          this.loadDependenciesAndData();
-          this.resetForm();
-        },
-        error: (err: any) => this.handleError(err, 'création')
-      });
-    }
-  }
-  
-  /**
-   * Gère la suppression d'une entrée.
-   */
   deleteDimension(id: number | undefined): void {
-    if (!id || !confirm("Êtes-vous sûr de vouloir supprimer cette entrée du catalogue ? Elle doit être retirée de l'inventaire et des devis existants.")) {
-      return;
-    }
+    if (!id || !confirm("Supprimer cette entrée ? Cela peut affecter vos devis existants.")) return;
 
     this.pricingService.deleteMaterialDimension(id).subscribe({
       next: () => {
-        this.successMessage = "Entrée du catalogue supprimée avec succès.";
+        this.successMessage = "Supprimé avec succès.";
         this.loadDependenciesAndData();
       },
-      error: (err: any) => {
-        console.error("Erreur de suppression:", err);
-        // Gère les conflits (409) si l'entrée est utilisée dans l'inventaire/devis (selon le backend PHP)
-        if (err.status === 409) {
-          this.error = err.error.message || 'Conflit: Impossible de supprimer cette entrée (utilisée dans l\'inventaire/devis).';
-        } else {
-          this.error = 'Erreur lors de la suppression de l\'entrée.';
-        }
+      error: (err) => {
+        this.error = err.status === 409 ? "Conflit : ce tarif est utilisé ailleurs." : "Erreur de suppression.";
       }
     });
   }
 
-  /**
-   * Gestion centralisée des erreurs API.
-   */
-  private handleError(err: any, operation: string): void {
+  private handleError(err: any, op: string): void {
     this.isSaving = false;
-    console.error(`Erreur de ${operation}:`, err);
-
-    if (err.status === 422 && err.error && err.error.errors) {
-      // Erreur de validation Laravel
-      const apiErrors = err.error.errors;
-      let errorMsg = `Erreur de validation lors de la ${operation}:<br>`;
-      for (const key in apiErrors) {
-        if (apiErrors.hasOwnProperty(key)) {
-          errorMsg += `- ${apiErrors[key].join(' ')}<br>`;
-        }
-      }
-      this.error = errorMsg;
+    if (err.status === 422 && err.error?.errors) {
+      this.error = "Données invalides : cette combinaison existe peut-être déjà.";
     } else {
-      this.error = `Une erreur est survenue lors de la ${operation} : ${err.message || err.statusText}`;
+      this.error = `Erreur lors de la ${op}.`;
     }
   }
 }

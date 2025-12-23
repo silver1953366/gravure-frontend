@@ -1,82 +1,100 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule, DatePipe, DecimalPipe } from '@angular/common'; 
+import { CommonModule, DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { OrderService } from '../../../../core/services/client/order.service';
-import { Order } from '../../../../core/models/order.model';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-// CORRECTION: Assurez-vous que ce chemin est correct dans votre structure de dossier
+
+// Importation de vos modèles
+import { Order } from '../../../../core/models/order.model';
+import { OrderService } from '../../../../core/services/client/order.service';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  templateUrl: '../order-details/order-details.component.html',
-  styleUrl: '../order-details/order-details.component.css',
-  // DatePipe et DecimalPipe sont nécessaires pour les pipes dans le template
-  imports: [CommonModule, DatePipe, DecimalPipe, RouterLink] 
+  imports: [
+    CommonModule, // Indispensable pour *ngIf, *ngFor et les pipes de base
+    RouterLink,
+    DatePipe,
+    DecimalPipe,
+    UpperCasePipe
+  ],
+  templateUrl: './order-details.component.html',
+  styleUrl: './order-details.component.css'
 })
 export class OrderDetailComponent implements OnInit {
   
   private route = inject(ActivatedRoute);
   private orderService = inject(OrderService);
 
-  order = signal<Order | null>(null);
-  isLoading = signal(true);
-  error = signal<string | null>(null);
+  // Signaux pour la gestion d'état (Angular 17+)
+  public order = signal<Order | null>(null);
+  public isLoading = signal(true);
+  public error = signal<string | null>(null);
 
-  private attachmentBaseUrl = 'http://localhost:8000/api/attachments'; // Base URL pour le téléchargement
+  // URL de base pour vos fichiers (à adapter selon votre environnement)
+  private attachmentBaseUrl = 'http://localhost:8000/api/attachments'; 
 
   ngOnInit(): void {
+    // On récupère l'ID depuis l'URL et on charge les données
     this.route.params.pipe(
       switchMap(params => {
-        const orderId = +params['id'];
-        if (orderId) {
-          return this.orderService.getOrder(orderId);
+        const id = +params['id'];
+        if (id) {
+          return this.orderService.getOrder(id);
         }
-        this.error.set("ID de commande non valide.");
         return of(null);
       })
     ).subscribe({
-      next: (order) => {
-        if (order) {
-          this.order.set(order);
+      next: (orderData) => {
+        if (orderData) {
+          this.order.set(orderData);
+        } else {
+          this.error.set("La commande est introuvable.");
         }
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error("Erreur de chargement des détails de la commande", err);
-        this.error.set("Détails de la commande introuvables ou accès refusé.");
+        console.error("Erreur commande:", err);
+        this.error.set("Impossible de charger les détails de la commande.");
         this.isLoading.set(false);
       }
     });
   }
 
-  // Fonction utilitaire pour le style (pour CSS standard)
-  getStatusClass(status: Order['status']): string {
-    switch (status) {
-      case 'paid':
-      case 'completed':
-        return 'status-pill bg-status-paid';
-      case 'pending_payment':
-        return 'status-pill bg-status-pending_payment';
-      case 'processing':
-      case 'shipped':
-        return 'status-pill bg-status-processing';
-      case 'canceled':
-        return 'status-pill bg-status-canceled';
-      default:
-        return 'status-pill bg-status-gray';
-    }
+  /**
+   * Retourne une classe CSS basée sur le statut de la commande
+   */
+  getStatusClass(status: Order['status'] | undefined): string {
+    if (!status) return 'status-default';
+    
+    const baseClass = 'status-pill ';
+    const statusMap: Record<string, string> = {
+      'paid': 'bg-status-paid',
+      'completed': 'bg-status-paid',
+      'pending_payment': 'bg-status-pending',
+      'processing': 'bg-status-processing',
+      'shipped': 'bg-status-processing',
+      'canceled': 'bg-status-canceled'
+    };
+
+    return baseClass + (statusMap[status] || 'bg-gray-500');
   }
 
   /**
-   * Génère l'URL de téléchargement pour un fichier joint.
+   * Génère l'URL de téléchargement pour les pièces jointes
    */
   getAttachmentDownloadUrl(attachmentId: number): string {
     return `${this.attachmentBaseUrl}/${attachmentId}/download`; 
   }
 
+  /**
+   * Action de paiement
+   */
   handlePayment(): void {
-    alert("Redirection vers la passerelle de paiement pour l'ordre " + this.order()?.reference);
+    const currentOrder = this.order();
+    if (currentOrder) {
+      console.log("Initialisation du paiement pour la référence:", currentOrder.reference);
+      // Ajoutez ici votre logique vers Stripe, Monetbil, etc.
+    }
   }
 }

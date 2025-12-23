@@ -1,7 +1,7 @@
-import { Component, Input, signal, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-// 🛑 FormsModule EST SUPPRIMÉ
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service'; 
 
 interface NavItem {
   icon: string;
@@ -12,26 +12,30 @@ interface NavItem {
 @Component({
   selector: 'app-client-sidebar',
   standalone: true,
-  // 🛑 Correction : FormsModule est retiré
-  imports: [CommonModule, RouterLink], 
+  imports: [CommonModule, RouterLink, RouterLinkActive], 
   templateUrl: './client-sidebar.component.html',
   styleUrls: ['./client-sidebar.component.css']
 })
 export class ClientSidebarComponent {
-  
-  @Input() isMini: boolean = false;
-  // Émet l'événement de bascule vers le composant parent (Dashboard)
-  @Output() toggleSidebar = new EventEmitter<void>(); 
-  
-  // 🛑 searchTerm EST SUPPRIMÉ
-  
-  navItems: NavItem[] = [
-    { icon: 'fa-table-columns', label: 'Tableau de bord', route: '/client/dashboard' },
-    { icon: 'fa-file-invoice', label: 'Mes Devis', route: '/client/quotes' },
-    { icon: 'fa-truck', label: 'Mes Commandes', route: '/client/orders' },
-    { icon: 'fa-heart', label: 'Mes Favoris', route: '/client/favorites' },
-    { icon: 'fa-user-group', label: 'Mon Équipe', route: '/client/team' },
-  ];
+  private authService = inject(AuthService);
 
-  // 🛑 onSearchChange EST SUPPRIMÉ
+  @Input() isMini: boolean = false;
+  @Output() toggleSidebar = new EventEmitter<void>(); 
+
+  currentUser = this.authService.currentUser; 
+  
+  userInitials = computed(() => {
+    const user = this.currentUser();
+    if (!user) return '??';
+    return user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  });
+
+  navItems: NavItem[] = [
+    { icon: 'fa-chart-pie', label: 'Tableau de bord', route: '/client/dashboard' },
+    { icon: 'fa-file-invoice-dollar', label: 'Mes Devis', route: '/client/quotes' },
+    { icon: 'fa-boxes-stacked', label: 'Mes Commandes', route: '/client/orders' },
+    { icon: 'fa-heart', label: 'Mes Favoris', route: '/client/favorites' },
+    { icon: 'fa-users-gear', label: 'Mon Équipe', route: '/client/team' },
+    { icon: 'fa-book-open', label: 'Catalogue', route: '/catalog' },
+  ];
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CategoryService, Category } from '../category.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { take } from 'rxjs/operators';
 
 @Component({
     standalone: true,
@@ -13,7 +14,7 @@ import { Router, RouterModule } from '@angular/router';
 export class CategoryListComponent implements OnInit {
     categories: Category[] = [];
     isLoading = true;
-    error: any = null;
+    error: string | null = null;
 
     constructor(
       private categoryService: CategoryService,
@@ -27,30 +28,29 @@ export class CategoryListComponent implements OnInit {
     fetchCategories(): void {
         this.isLoading = true;
         this.error = null;
-        this.categoryService.getCategories().subscribe({
+        this.categoryService.getCategories().pipe(take(1)).subscribe({
             next: (data) => {
-                this.categories = data;
+                // Tri par défaut : les plus récentes en premier (par ID)
+                this.categories = data.sort((a, b) => b.id - a.id);
                 this.isLoading = false;
             },
             error: (err) => {
-                console.error("Erreur de chargement des catégories", err);
-                this.error = 'Impossible de charger la liste des catégories. Accès Admin requis.';
+                this.error = 'Impossible de charger les catégories. Vérifiez votre connexion admin.';
                 this.isLoading = false;
             }
         });
     }
 
-    onDeleteCategory(categoryId: number): void {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
-            this.categoryService.deleteCategory(categoryId).subscribe({
+    onDeleteCategory(category: Category): void {
+        const confirmMsg = `Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ? 
+        Cela pourrait affecter les produits associés.`;
+        
+        if (confirm(confirmMsg)) {
+            this.categoryService.deleteCategory(category.id).pipe(take(1)).subscribe({
                 next: () => {
-                    this.categories = this.categories.filter(c => c.id !== categoryId);
-                    console.log(`Catégorie ${categoryId} supprimée.`);
+                    this.categories = this.categories.filter(c => c.id !== category.id);
                 },
-                error: (err) => {
-                    console.error("Erreur de suppression", err);
-                    alert("Erreur lors de la suppression de la catégorie.");
-                }
+                error: () => alert("Erreur : Impossible de supprimer une catégorie liée à des produits.")
             });
         }
     }

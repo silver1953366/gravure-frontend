@@ -1,88 +1,111 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment'; // Ajustez le chemin si nécessaire
+import { Order } from '../models/order.model';
 
 
-// Exportation explicite des interfaces depuis le service pour être importées dans les composants.
-// Ceci corrige l'erreur TS2459 (Module '...' declares 'Order'/'Quote' locally, but it is not exported.)
-import * as Models from '../models/client/quotes/quote.model';
+// Importation des interfaces (Assurez-vous que Order est exporté dans quote.model.ts)
+// Si l'erreur 2459 persiste, définissez l'interface Order ici avec le mot-clé 'export'
+import { Quote,  } from '../models/client/quotes/quote.model';
 
-export type Quote = Models.Quote;
-export type Order = Models.Order;
-export type QuoteItem = Models.QuoteItem;
-export type OrderItem = Models.OrderItem;
-export type QuoteStatus = Models.QuoteStatus;
-
-
-// Constantes d'URL de l'API (à adapter à votre configuration)
-const QUOTE_API_URL = `${environment.apiUrl}/admin/quotes`; 
-const ORDER_API_URL = `${environment.apiUrl}/admin/orders`; 
-
-/**
- * Service central pour la gestion des transactions (Devis et Commandes).
- */
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class TransactionService {
 
-    constructor(private http: HttpClient) {}
+  // --- CONFIGURATION DE L'ENTREPRISE ---
+  private readonly user = 'contact';
+  private readonly domain = 'emes-gravure.com';
+  // String.fromCharCode(64) = "@" pour éviter les problèmes d'analyse statique
+  readonly COMPANY_EMAIL = `${this.user}${String.fromCharCode(64)}${this.domain}`;
 
-    // ------------------------------------
-    // --- Méthodes Devis (Quotes) ---
-    // ------------------------------------
+  // --- CONFIGURATION DES URLS (API LARAVEL) ---
+  private readonly API_URL = 'http://localhost:8000/api';
+  private readonly ADMIN_QUOTES = `${this.API_URL}/admin/quotes`;
+  private readonly ADMIN_ORDERS = `${this.API_URL}/admin/admin-orders`;
+  private readonly CLIENT_QUOTES = `${this.API_URL}/quotes`;
 
-    getAllQuotes(): Observable<Quote[]> {
-        return this.http.get<Quote[]>(QUOTE_API_URL);
-    }
-    
-    getQuoteById(id: number): Observable<Quote> {
-        return this.http.get<Quote>(`${QUOTE_API_URL}/${id}`);
-    }
+  constructor(private http: HttpClient) {}
 
-    deleteQuote(id: number): Observable<void> {
-        return this.http.delete<void>(`${QUOTE_API_URL}/${id}`);
-    }
+  // ========================================================================
+  // 1. GESTION DES DEVIS (QUOTES) - PARTIE ADMIN
+  // ========================================================================
 
-    calculateQuote(id: number, priceData: { final_price: number }): Observable<Quote> {
-        return this.http.post<Quote>(`${QUOTE_API_URL}/${id}/calculate`, priceData);
-    }
+  /**
+   * Récupère la liste de tous les devis
+   */
+  getAllQuotes(): Observable<Quote[]> {
+    return this.http.get<Quote[]>(this.ADMIN_QUOTES);
+  }
 
-    rejectQuote(id: number): Observable<void> {
-        return this.http.post<void>(`${QUOTE_API_URL}/${id}/reject`, {});
-    }
+  /**
+   * Récupère un devis par son ID
+   */
+  getQuoteById(id: number): Observable<Quote> {
+    return this.http.get<Quote>(`${this.CLIENT_QUOTES}/${id}`);
+  }
 
-    convertQuoteToOrder(quoteId: number): Observable<Order> {
-        return this.http.post<Order>(`${QUOTE_API_URL}/${quoteId}/convert`, {});
-    }
+  /**
+   * Mise à jour globale d'un devis (prix final ou rejet)
+   */
+  updateQuote(id: number, payload: Partial<Quote>): Observable<Quote> {
+    return this.http.put<Quote>(`${this.ADMIN_QUOTES}/${id}`, payload);
+  }
 
-    // ------------------------------------
-    // --- Méthodes Commandes (Orders) ---
-    // ------------------------------------
+  /**
+   * Suppression définitive d'un devis
+   */
+  deleteQuote(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.ADMIN_QUOTES}/${id}`);
+  }
 
-    getAllOrders(): Observable<Order[]> {
-        return this.http.get<Order[]>(ORDER_API_URL);
-    }
-    
-    /**
-     * Récupère le détail d'une commande par ID.
-     */
-    getOrderById(id: number): Observable<Order> {
-        return this.http.get<Order>(`${ORDER_API_URL}/${id}`);
-    }
-    
-    /**
-     * Met à jour le statut d'une commande.
-     */
-    updateOrderStatus(id: number, status: string): Observable<Order> {
-        return this.http.post<Order>(`${ORDER_API_URL}/${id}/status`, { status });
-    }
-    
-    /**
-     * Supprime une commande par ID.
-     */
-    deleteOrder(id: number): Observable<void> {
-        return this.http.delete<void>(`${ORDER_API_URL}/${id}`);
-    }
+  // ========================================================================
+  // 2. GESTION DES COMMANDES (ORDERS) - PARTIE ADMIN
+  // ========================================================================
+
+  /**
+   * Liste toutes les commandes pour l'admin
+   */
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.ADMIN_ORDERS);
+  }
+
+  /**
+   * Détail d'une commande spécifique (utilisé pour la facture finale)
+   */
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.ADMIN_ORDERS}/${id}`);
+  }
+
+  /**
+   * Mise à jour du statut d'une commande (Erreur 2339 résolue ici)
+   */
+  updateOrderStatus(id: number, status: string): Observable<Order> {
+    return this.http.put<Order>(`${this.ADMIN_ORDERS}/${id}`, { status });
+  }
+
+  /**
+   * Mise à jour globale d'une commande (si besoin de modifier plus que le statut)
+   */
+  updateOrder(id: number, payload: any): Observable<Order> {
+    return this.http.put<Order>(`${this.ADMIN_ORDERS}/${id}`, payload);
+  }
+
+  /**
+   * Suppression d'une commande
+   */
+  deleteOrder(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.ADMIN_ORDERS}/${id}`);
+  }
+
+  // ========================================================================
+  // 3. ACTIONS CLIENTS (CONVERSIONS)
+  // ========================================================================
+
+  /**
+   * Convertit un devis validé en commande réelle
+   */
+  convertQuoteToOrder(quoteId: number): Observable<Order> {
+    return this.http.post<Order>(`${this.API_URL}/orders/convert/${quoteId}`, {});
+  }
 }

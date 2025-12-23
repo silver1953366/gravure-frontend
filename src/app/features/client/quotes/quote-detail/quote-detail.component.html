@@ -5,6 +5,7 @@
 
     @if (isLoading()) {
         <div class="loading-state">
+            <div class="spinner"></div>
             Chargement des détails du devis...
         </div>
     } @else if (!quote()) {
@@ -17,10 +18,10 @@
                 
                 <header class="card-header">
                     <h1 class="card-header-title">
-                        Devis #{{ quote()!.reference }}
+                        Devis #{{ quote()?.reference }}
                     </h1>
                     <span class="status-pill status-{{ getStatusColor(quote()!.status) }}">
-                        {{ quote()!.status | uppercase }}
+                        {{ quote()?.status | uppercase }}
                     </span>
                 </header>
 
@@ -31,34 +32,36 @@
                         <dl class="data-list">
                             <div>
                                 <dt>Date de création:</dt>
-                                <dd>{{ quote()!.created_at | date: 'fullDate' }}</dd>
+                                <dd>{{ quote()?.created_at | date: 'fullDate' }}</dd>
                             </div>
                             <div>
                                 <dt>Montant total final:</dt>
-                                <dd class="final-price">{{ quote()!.final_price_fcfa | number:'1.0-0' }} FCFA</dd>
+                                <dd class="final-price">{{ (quote()?.final_price_fcfa ?? 0) | number:'1.0-0' }} FCFA</dd>
                             </div>
                             <div>
                                 <dt>Prix de base:</dt>
-                                <dd>{{ quote()!.base_price_fcfa | number:'1.0-0' }} FCFA</dd>
+                                <dd>{{ (quote()?.base_price_fcfa ?? 0) | number:'1.0-0' }} FCFA</dd>
                             </div>
-                            @if (quote()!.discount_amount_fcfa > 0) {
+                            @if (quote()?.discount_amount_fcfa && quote()!.discount_amount_fcfa > 0) {
                                 <div>
                                     <dt>Réduction appliquée:</dt>
-                                    <dd class="discount-price">- {{ quote()!.discount_amount_fcfa | number:'1.0-0' }} FCFA</dd>
+                                    <dd class="discount-price">- {{ quote()?.discount_amount_fcfa | number:'1.0-0' }} FCFA</dd>
                                 </div>
                             }
                         </dl>
                         
-                        @if (quote()!.status === 'calculated') {
+                        @if (quote()?.status === 'calculated') {
                             <button (click)="convertQuote()"
                                     class="convert-button">
-                                Confirmer & Convertir en Commande
+                                <i class="fa-solid fa-check-double"></i> Confirmer & Convertir en Commande
                             </button>
-                        } @else if (quote()!.status === 'ordered') {
-                            <p class="ordered-message">Ce devis a été converti en commande.</p>
-                            <a [routerLink]="['/client/orders', quote()!.order_id]" class="view-order-link">
-                                Voir la commande associée
-                            </a>
+                        } @else if (quote()?.status === 'ordered') {
+                            <div class="ordered-info-box">
+                                <p class="ordered-message">Ce devis a été converti en commande.</p>
+                                <a [routerLink]="['/client/orders', quote()?.order_id]" class="view-order-link">
+                                    Voir la commande #{{ quote()?.order_id }}
+                                </a>
+                            </div>
                         }
                     </article>
 
@@ -67,23 +70,23 @@
                         <dl class="data-list">
                             <div>
                                 <dt>Matériau:</dt>
-                                <dd>{{ quote()!.material?.name || 'Non spécifié' }}</dd>
+                                <dd>{{ quote()?.material?.name || 'Non spécifié' }}</dd>
                             </div>
                             <div>
                                 <dt>Forme:</dt>
-                                <dd>{{ quote()!.shape?.name || 'Non spécifiée' }}</dd>
+                                <dd>{{ quote()?.shape?.name || 'Non spécifiée' }}</dd>
                             </div>
                             <div>
                                 <dt>Dimension:</dt>
-                                <dd>{{ quote()!.materialDimension?.dimension_label || 'Non spécifiée' }}</dd>
+                                <dd>{{ quote()?.materialDimension?.dimension_label || 'Non spécifiée' }}</dd>
                             </div>
                             <div>
                                 <dt>Quantité demandée:</dt>
-                                <dd class="quantity">{{ quote()!.quantity }}</dd>
+                                <dd class="quantity">{{ quote()?.quantity }} unités</dd>
                             </div>
                             <div>
                                 <dt>Référence du client:</dt>
-                                <dd>{{ quote()!.client_ref || 'N/A' }}</dd>
+                                <dd>{{ quote()?.client_details?.name || 'N/A' }}</dd>
                             </div>
                         </dl>
                     </article>
@@ -91,32 +94,44 @@
                     <article class="detail-block instructions-block">
                         <h2>Instructions de Fabrication</h2>
                         <p class="instructions-text">
-                            {{ quote()!.details_snapshot.description || 'Le client n\'a pas fourni d\'instructions spécifiques.' }}
+                            {{ 
+                                quote()?.details_snapshot?.['description'] || 
+                                quote()?.details_snapshot?.['customization']?.['description'] || 
+                                'Le client n\'a pas fourni d\'instructions spécifiques.' 
+                            }}
                         </p>
                     </article>
 
                 </div>
 
-                <article class="card attachments-card full-width">
+                <article class="attachments-section full-width">
                     <h2>Pièces Jointes</h2>
                     
-                    @if (quote()!.attachments?.length) {
+                    @if (quote()?.attachments?.length) {
                         <ul class="attachment-list">
                             @for (att of quote()!.attachments; track att.id) {
                                 <li class="attachment-item">
-                                    <span class="file-name">{{ att.original_name }}</span>
-                                    <div class="file-info-actions">
-                                        <span class="file-size">{{ att.size | number:'1.0-0':'fr' }} octets</span>
-                                        <a [href]="getAttachmentDownloadUrl(att.id)" target="_blank" class="download-link" title="Télécharger">
-                                            Télécharger
-                                            <svg class="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-4-4l4 4 4-4"/></svg>
-                                        </a>
+                                    <div class="file-icon">
+                                        <i class="fa-solid fa-file-pdf"></i>
                                     </div>
+                                    <div class="file-content">
+                                        <span class="file-name">{{ att.original_name }}</span>
+                                        <span class="file-size">{{ (att.size / 1024) | number:'1.0-2' }} KB</span>
+                                    </div>
+                                    <a [href]="getAttachmentDownloadUrl(att.id)" 
+                                       target="_blank" 
+                                       class="download-action" 
+                                       title="Télécharger">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
                                 </li>
                             }
                         </ul>
                     } @else {
-                        <p class="no-attachments">Aucun fichier joint à ce devis.</p>
+                        <div class="empty-attachments">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <p>Aucun fichier joint à ce devis.</p>
+                        </div>
                     }
                 </article>
 

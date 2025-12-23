@@ -4,7 +4,7 @@ export interface Attachment {
     attachable_type: string;
     // ID du modèle lié (ex: quote_id)
     attachable_id: number; 
-    file_path: string;
+    stored_path: string;
     // Nom original du fichier pour l'affichage
     original_name: string; 
     size: number; 

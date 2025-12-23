@@ -8,7 +8,7 @@ export const ADMIN_ROUTES: Routes = [
     {
         path: '',
         // Composant de layout principal (avec Sidebar/Header commun)
-        loadComponent: () => import('./../admin/shared/admin-layout.component').then(m => m.AdminLayoutComponent),
+        loadComponent: () => import('./shared/layout/admin-layout.component').then(m => m.AdminLayoutComponent),
         children: [
             // Route par défaut (Redirection vers le tableau de bord)
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -122,7 +122,7 @@ export const ADMIN_ROUTES: Routes = [
             // --- 10. MODULES SYSTÈME & RAPPORTS ---
             { 
                 path: 'activity-log', 
-                loadComponent: () => import('./activity-log/activity-log/activity-log.component').then(m => m.ActivityLogComponent) 
+                loadComponent: () => import('./activity-log/activity-log.component').then(m => m.ActivityLogComponent) 
             },
             { 
                 path: 'reports', 

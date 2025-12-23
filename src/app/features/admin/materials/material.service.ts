@@ -1,53 +1,63 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+// Import de l'environnement (4 niveaux pour remonter à src/app/...)
 import { environment } from '../../../environments/environment';
 
-// Modèle de Matériau (basé sur votre interface mockée)
-export interface Material {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    image_url: string;
-    price_per_sq_meter: number;
-    thickness_options: string;
-    is_active: boolean;
-    category_id: number; 
-}
+// Import du modèle (3 niveaux pour remonter à src/app/core/...)
+import { Material } from '../../../core/models/material.model';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MaterialService {
-    
-    private http = inject(HttpClient);
-    // ⭐ Utilisation de l'API Admin pour le CRUD des matériaux
-    private readonly apiUrl = `${environment.apiUrl}/admin/materials`; 
+  private http = inject(HttpClient);
+  
+  /**
+   * URL vers votre API Laravel. 
+   * Assurez-vous que environment.apiUrl est défini sur 'http://localhost:8000/api'
+   */
+  private readonly apiUrl = `${environment.apiUrl}/admin/materials`;
 
-    /** GET: Récupère la liste de tous les matériaux */
-    getMaterials(): Observable<Material[]> {
-        return this.http.get<Material[]>(this.apiUrl);
-    }
+  /** * GET: Récupère la liste de tous les matériaux 
+   * Route: GET /api/admin/materials
+   */
+  getMaterials(): Observable<Material[]> {
+    return this.http.get<Material[]>(this.apiUrl);
+  }
 
-    /** GET: Récupère un matériau par ID */
-    getMaterial(id: number): Observable<Material> {
-        return this.http.get<Material>(`${this.apiUrl}/${id}`);
-    }
+  /** * GET: Récupère un matériau spécifique par son ID 
+   * Route: GET /api/admin/materials/{id}
+   */
+  getMaterial(id: number): Observable<Material> {
+    return this.http.get<Material>(`${this.apiUrl}/${id}`);
+  }
 
-    /** POST: Crée un nouveau matériau (accepte FormData pour fichiers) */
-    createMaterial(formData: FormData): Observable<Material> {
-        return this.http.post<Material>(this.apiUrl, formData);
-    }
+  /** * POST: Crée un nouveau matériau avec support Multipart (Image)
+   * Route: POST /api/admin/materials
+   */
+  createMaterial(formData: FormData): Observable<Material> {
+    return this.http.post<Material>(this.apiUrl, formData);
+  }
 
-    /** POST: Met à jour un matériau existant (utilise POST/PUT avec FormData) */
-    updateMaterial(id: number, formData: FormData): Observable<Material> {
-        // Le backend doit gérer le _method=PUT dans le FormData
-        return this.http.post<Material>(`${this.apiUrl}/${id}`, formData);
-    }
+  /** * POST: Met à jour un matériau existant 
+   * Route: POST /api/admin/materials/{id}
+   * Note: On utilise POST avec _method=PUT car PHP/Laravel ne traite pas 
+   * nativement le 'multipart/form-data' via une requête PUT classique.
+   */
+  updateMaterial(id: number, formData: FormData): Observable<Material> {
+    // Force la méthode PUT pour Laravel
+    if (!formData.has('_method')) {
+      formData.append('_method', 'PUT');
+    }
+    return this.http.post<Material>(`${this.apiUrl}/${id}`, formData);
+  }
 
-    /** DELETE: Supprime un matériau */
-    deleteMaterial(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    }
+  /** * DELETE: Supprime un matériau 
+   * Route: DELETE /api/admin/materials/{id}
+   */
+  deleteMaterial(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

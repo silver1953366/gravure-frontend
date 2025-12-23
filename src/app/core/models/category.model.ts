@@ -1,5 +1,3 @@
-// src/app/shared/models/catalog.models.ts (ou à créer)
-
 export interface Material {
     id: number;
     name: string;

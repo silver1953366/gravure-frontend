@@ -12,7 +12,6 @@
                 <div class="alert-error">{{ apiErrors.general }}</div>
             }
             
-            <!-- NOM DU MATÉRIAU -->
             <div class="form-group">
                 <label for="name">Nom du Matériau (Ex: Aluminium 5052) <span class="required">*</span></label>
                 <input id="name" type="text" formControlName="name" (input)="onNameChange()" placeholder="Entrez le nom complet">
@@ -25,14 +24,12 @@
                 }
             </div>
 
-            <!-- SLUG (URL) -->
             <div class="form-group">
                 <label for="slug">Slug (Identifiant URL)</label>
                 <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode" placeholder="slug-auto-genere">
                 
-                <!-- CORRECTION: Utilisation du bloc @if pour envelopper <small> -->
                 @if (!isEditMode) {
-                    <small>Généré automatiquement à partir du nom. Format: minuscule-tirets.</small>
+                    <small class="info-text">Généré automatiquement à partir du nom. Format: minuscule-tirets.</small>
                 }
                 
                 @if (materialForm.controls['slug'].touched && materialForm.controls['slug'].invalid) {
@@ -42,8 +39,20 @@
                     <div class="error-message">{{ apiErrors.slug }}</div>
                 }
             </div>
+
+            <div class="form-group">
+                <label for="category_id">Catégorie du catalogue</label>
+                <select id="category_id" formControlName="category_id">
+                    <option [ngValue]="null">-- Sélectionner une catégorie (Optionnel) --</option>
+                    @for (cat of categories; track cat.id) {
+                        <option [value]="cat.id">{{ cat.name }}</option>
+                    }
+                </select>
+                @if (apiErrors.category_id) {
+                    <div class="error-message">{{ apiErrors.category_id }}</div>
+                }
+            </div>
             
-            <!-- IMAGE DU MATÉRIAU -->
             <div class="form-group">
                 <label for="file">Image du Matériau</label>
                 <input 
@@ -52,16 +61,13 @@
                     accept="image/*" 
                     (change)="onFileSelected($event)">
                 
-                <!-- CORRECTION: Utilisation du bloc @if pour envelopper <small> -->
                 @if (isEditMode) {
-                    <small>Laissez vide pour conserver l'image existante.</small>
+                    <small class="info-text">Laissez vide pour conserver l'image existante.</small>
                 }
                 
                 @if (imageUrlPreview) {
                     <div class="image-preview">
-                        <img 
-                            [src]="imageUrlPreview" 
-                            alt="Aperçu du matériau">
+                        <img [src]="imageUrlPreview" alt="Aperçu du matériau">
                     </div>
                 }
                 
@@ -70,46 +76,43 @@
                 }
             </div>
 
-            <!-- PRIX DE BASE -->
             <div class="form-group">
-                <label for="price_per_sq_meter">Prix de base (franc/m²) <span class="required">*</span></label>
-                <input id="price_per_sq_meter" type="number" formControlName="price_per_sq_meter" step="0.01" min="0.01" placeholder="Ex: 45.50">
+                <label for="price_per_sq_meter">Prix de base (FCFA/m²)</label>
+                <input id="price_per_sq_meter" type="number" formControlName="price_per_sq_meter" step="1" min="0" placeholder="Ex: 45000">
+                <small class="info-text">Laissez vide si le prix est géré uniquement par les dimensions spécifiques.</small>
                 
-                @if (materialForm.controls['price_per_sq_meter'].invalid) {
-                    <div class="error-message">Le prix au m² est requis et doit être positif.</div>
+                @if (materialForm.controls['price_per_sq_meter'].touched && materialForm.controls['price_per_sq_meter'].invalid) {
+                    <div class="error-message">Le prix doit être un nombre positif.</div>
                 }
                 @if (apiErrors.price_per_sq_meter) {
                     <div class="error-message">{{ apiErrors.price_per_sq_meter }}</div>
                 }
             </div>
 
-            <!-- OPTIONS D'ÉPAISSEUR -->
             <div class="form-group">
                 <label for="thickness_options">Options d'Épaisseur</label>
                 <input id="thickness_options" type="text" formControlName="thickness_options" placeholder="Ex: 1mm, 2mm, 3mm">
-                <small>Séparez les valeurs par une virgule pour les options d'épaisseur disponibles.</small>
+                <small class="info-text">Séparez les valeurs par une virgule.</small>
                 
                 @if (apiErrors.thickness_options) {
                     <div class="error-message">{{ apiErrors.thickness_options }}</div>
                 }
             </div>
             
-            <!-- DESCRIPTION -->
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea id="description" formControlName="description" rows="4" placeholder="Description détaillée du matériau, ses propriétés, etc."></textarea>
+                <textarea id="description" formControlName="description" rows="4" placeholder="Propriétés du matériau..."></textarea>
                 
                 @if (apiErrors.description) {
                     <div class="error-message">{{ apiErrors.description }}</div>
                 }
             </div>
 
-            <!-- STATUT -->
             <div class="form-group">
-                <label for="is_active">Statut (Disponible dans le configurateur) <span class="required">*</span></label>
+                <label for="is_active">Statut <span class="required">*</span></label>
                 <select id="is_active" formControlName="is_active">
-                    <option [ngValue]="true">Actif</option>
-                    <option [ngValue]="false">Inactif</option>
+                    <option [ngValue]="true">Actif (Visible)</option>
+                    <option [ngValue]="false">Inactif (Masqué)</option>
                 </select>
                 
                 @if (apiErrors.is_active) {
@@ -117,14 +120,15 @@
                 }
             </div>
 
-            <!-- BOUTON DE SOUMISSION -->
-            <button type="submit" [disabled]="materialForm.invalid || isLoading" class="btn-submit">
-                @if (isLoading) {
-                    Sauvegarde en cours...
-                } @else {
-                    {{ isEditMode ? 'Sauvegarder les modifications' : 'Créer le matériau' }}
-                }
-            </button>
+            <div class="form-actions">
+                <button type="submit" [disabled]="materialForm.invalid || isLoading" class="btn-submit">
+                    @if (isLoading) {
+                        <span class="spinner"></span> Sauvegarde...
+                    } @else {
+                        {{ isEditMode ? 'Mettre à jour le matériau' : 'Enregistrer le matériau' }}
+                    }
+                </button>
+            </div>
         </form>
     }
 </div>

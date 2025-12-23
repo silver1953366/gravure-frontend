@@ -1,105 +1,192 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // <-- CORRECTION: Import de FormsModule
-import { TransactionService, Order } from '../../../core/services/transaction.service';
-import { Router } from '@angular/router';
+import { CommonModule, DatePipe, DecimalPipe, UpperCasePipe, SlicePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TransactionService } from '../../../core/services/transaction.service';
+import { Order } from '../../../core/models/order.model';
 
 @Component({
-    selector: 'app-admin-orders',
-    standalone: true,
-    // CORRECTION: Ajout de FormsModule
-    imports: [CommonModule, DatePipe, DecimalPipe, UpperCasePipe, FormsModule], 
-    templateUrl: './admin-orders.component.html',
-    styleUrls: ['./admin-orders.component.css']
+  selector: 'app-admin-orders',
+  standalone: true,
+  imports: [
+    CommonModule, 
+    DatePipe, 
+    DecimalPipe, 
+    UpperCasePipe, 
+    SlicePipe,
+    FormsModule, 
+    RouterModule
+  ],
+  templateUrl: './admin-orders.component.html',
+  styleUrls: ['./admin-orders.component.css']
 })
 export class AdminOrdersComponent implements OnInit {
 
-    orders: Order[] = [];
-    isLoading = true;
-    error: string | null = null;
-    successMessage: string | null = null;
-    isProcessing = false;
+  // --- Données ---
+  orders: Order[] = [];
+  
+  // --- Filtres et Tri ---
+  searchTerm: string = '';
+  sortOrder: 'asc' | 'desc' = 'desc'; // Tri décroissant (plus récent d'abord)
+  
+  // --- Pagination ---
+  currentPage: number = 1;
+  itemsPerPage: number = 8;
+
+  // --- États UI ---
+  isLoading: boolean = true;
+  isProcessing: boolean = false;
+  error: string | null = null;
+  successMessage: string | null = null;
+
+  // --- Configuration des statuts pour l'affichage ---
+  availableStatuses = [
+    { value: 'pending_payment', label: 'ATTENTE PAIEMENT' },
+    { value: 'processing', label: 'EN PRÉPARATION' },
+    { value: 'ready_for_pickup', label: 'PRÊT À ENLEVER' },
+    { value: 'completed', label: 'TERMINÉE' },
+    { value: 'cancelled', label: 'ANNULÉE' }
+  ];
+
+  statusLabels: Record<string, string> = {
+    'pending_payment': 'Attente Paiement',
+    'processing': 'En Préparation',
+    'ready_for_pickup': 'Prêt à Enlever',
+    'completed': 'Terminée',
+    'cancelled': 'Annulée'
+  };
+
+  constructor(
+    private transactionService: TransactionService, 
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.loadOrders();
+  }
+
+  /**
+   * Récupère toutes les commandes depuis le service
+   */
+  loadOrders(): void {
+    this.isLoading = true;
+    this.error = null;
     
-    // CORRECTION: Renommage en availableStatuses
-    availableStatuses = ['pending_payment', 'processing', 'ready_for_pickup', 'completed', 'cancelled']; 
+    this.transactionService.getAllOrders().subscribe({
+      next: (data: Order[]) => {
+        this.orders = data;
+        this.isLoading = false;
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Erreur de chargement des commandes:', err);
+        this.error = 'Impossible de charger la liste des commandes. Veuillez réessayer.';
+        this.isLoading = false;
+      }
+    });
+  }
 
-    statusLabels: { [key: string]: string } = {
-        'pending_payment': 'En attente de Paiement',
-        'processing': 'En Préparation',
-        'ready_for_pickup': 'Prêt à Enlever',
-        'completed': 'Terminée',
-        'cancelled': 'Annulée'
-    };
+  // ==========================================
+  // LOGIQUE DE FILTRAGE ET TRI (Calculée)
+  // ==========================================
 
-    constructor(private transactionService: TransactionService, private router: Router) {}
+  /**
+   * Retourne la liste filtrée par référence, nom client ou ID
+   */
+  get filteredOrders(): Order[] {
+    // 1. Filtrage
+    let result = this.orders.filter(order => {
+      const search = this.searchTerm.toLowerCase();
+      const referenceMatch = order.reference?.toLowerCase().includes(search);
+      const nameMatch = order.user?.name?.toLowerCase().includes(search);
+      const idMatch = order.id.toString().includes(search);
+      return referenceMatch || nameMatch || idMatch;
+    });
 
-    ngOnInit(): void {
-        this.loadOrders();
-    }
+    // 2. Tri par date (created_at)
+    result.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return this.sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
 
-    loadOrders(): void {
-        this.isLoading = true;
-        this.error = null;
-        this.transactionService.getAllOrders().subscribe({
-            next: (data) => {
-                this.orders = data;
-                this.isLoading = false;
-            },
-            error: (err: HttpErrorResponse) => {
-                this.error = 'Erreur lors du chargement des commandes.';
-                this.isLoading = false;
-                console.error('API Error:', err);
-            }
-        });
-    }
+    return result;
+  }
+
+  /**
+   * Retourne uniquement les éléments de la page actuelle
+   */
+  get paginatedOrders(): Order[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredOrders.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  /**
+   * Calcul du nombre total de pages
+   */
+  get totalPages(): number {
+    const count = this.filteredOrders.length;
+    return count > 0 ? Math.ceil(count / this.itemsPerPage) : 1;
+  }
+
+  /**
+   * Inverse l'ordre de tri
+   */
+  toggleSort(): void {
+    this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc';
+    this.currentPage = 1; 
+  }
+
+  // ==========================================
+  // ACTIONS ADMINISTRATIVES
+  // ==========================================
+
+  /**
+   * Navigation vers la page de détail d'une commande
+   */
+  goToDetails(id: number): void {
+    this.router.navigate(['/admin/orders', id]);
+  }
+
+  /**
+   * Gère le changement de statut via le menu déroulant
+   */
+  onStatusChange(order: Order, newStatus: string): void {
+    if (order.status === newStatus) return;
+
+    const label = this.statusLabels[newStatus] || newStatus;
+    const confirmMessage = `Changer le statut de la commande #${order.reference || order.id} à "${label.toUpperCase()}" ?`;
     
-    goToDetails(id: number): void {
-        this.router.navigate(['/admin/orders', id]);
+    if (!confirm(confirmMessage)) {
+      this.loadOrders(); // Reset l'UI en rechargeant
+      return;
     }
 
-    /**
-     * Renvoie un label lisible pour un statut donné.
-     * <-- CORRECTION: Ajout de getStatusLabel
-     */
-    getStatusLabel(status: string): string {
-        return this.statusLabels[status] || status;
-    }
+    this.isProcessing = true;
+    this.error = null;
 
-    /**
-     * Met à jour le statut d'une commande directement depuis la liste.
-     * <-- CORRECTION: Renommage en onStatusChange
-     */
-    onStatusChange(order: Order, newStatus: string): void {
-        // Le code reste le même, mais le nom de la fonction est corrigé.
-        if (order.status === newStatus) return;
-
-        if (!confirm(`Changer le statut de la Commande #${order.id} à ${this.getStatusLabel(newStatus).toUpperCase()} ?`)) {
-            // Recharger pour rétablir la valeur visuelle si l'utilisateur annule
-            this.loadOrders(); 
-            return;
+    this.transactionService.updateOrderStatus(order.id, newStatus).subscribe({
+      next: (updatedOrder: Order) => {
+        // Mise à jour locale
+        const index = this.orders.findIndex(o => o.id === updatedOrder.id);
+        if (index !== -1) {
+          this.orders[index] = updatedOrder;
         }
+        
+        this.showFeedback(`Commande mise à jour : ${label}.`);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Erreur mise à jour statut:', err);
+        this.error = `Erreur lors de la modification de la commande.`;
+        this.isProcessing = false;
+        this.loadOrders();
+      }
+    });
+  }
 
-        this.isProcessing = true;
-        this.error = null;
-        this.successMessage = null;
-
-        this.transactionService.updateOrderStatus(order.id, newStatus).subscribe({
-            next: (updatedOrder) => {
-                const index = this.orders.findIndex(o => o.id === updatedOrder.id);
-                if (index !== -1) {
-                    this.orders[index] = updatedOrder;
-                }
-                this.successMessage = `Statut de la Commande #${order.id} mis à jour à ${newStatus.toUpperCase()}.`;
-                this.isProcessing = false;
-            },
-            error: (err: HttpErrorResponse) => {
-                this.error = `Erreur lors de la mise à jour du statut de la commande #${order.id}.`;
-                this.isProcessing = false;
-                // Forcer le rechargement pour afficher le statut réel après l'échec
-                this.loadOrders(); 
-                console.error('API Error:', err);
-            }
-        });
-    }
+  private showFeedback(message: string): void {
+    this.successMessage = message;
+    this.isProcessing = false;
+    setTimeout(() => this.successMessage = null, 4000);
+  }
 }

@@ -1,92 +1,91 @@
-<div class="list-container">
+<div class="dashboard-container">
+  
+  <header class="page-header">
+    <div class="header-main">
+      <h1>Mes Devis</h1>
+      <p class="subtitle">Historique et suivi de vos demandes</p>
+    </div>
+    <a routerLink="/client/quotes/create" class="btn-primary">
+      <i class="fa-solid fa-plus"></i> Nouveau Projet
+    </a>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input 
+        #searchInput
+        type="text" 
+        placeholder="Rechercher par matériau (ex: Acier, Bois...)" 
+        (input)="searchQuery.set(searchInput.value)">
+    </div>
     
-    <header class="list-header">
-        <h1 class="page-title">Mes Devis</h1>
-        <a routerLink="/client/quote/new" class="btn btn-primary">
-            + Nouveau Devis
-        </a>
-    </header>
+    <div class="filter-group">
+      <select (change)="onSortChange($event)" class="sort-select">
+        <option value="recent">Plus récents</option>
+        <option value="oldest">Plus anciens</option>
+      </select>
+    </div>
+  </div>
 
-    @if (errorOccurred()) {
-        <div class="alert alert-error">
-            <p class="alert-title">Erreur de connexion</p>
-            <p>Impossible de charger vos devis. Veuillez réessayer plus tard.</p>
-            <button (click)="fetchQuotes(currentSort())" class="btn btn-secondary retry-button">Réessayer</button>
-        </div>
-    }
+  @if (isLoading()) {
+    <div class="loader-container">
+      <div class="spinner"></div>
+      <p>Chargement de vos projets...</p>
+    </div>
+  } @else if (errorOccurred()) {
+    <div class="state-card error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <p>Impossible de charger les données.</p>
+      <button (click)="fetchQuotes(currentSort())" class="btn-retry">Réessayer</button>
+    </div>
+  } @else {
+    @if (filteredQuotes(); as list) {
+      <div class="quotes-stack">
+        @for (quote of list; track quote.id) {
+          <div class="quote-item">
+            <div class="status-line" [ngClass]="getStatusClass(quote.status)"></div>
+            
+            <div class="quote-content">
+              <div class="info-main">
+                <span class="ref">#{{ quote.reference }}</span>
+                <span class="date">{{ quote.created_at | date: 'dd/MM/yyyy' : '' : 'fr' }}</span>
+              </div>
 
-    @if (isLoading()) {
-        <div class="loading-state">
-            <p>Chargement de vos devis...</p>
-        </div>
-    } @else if (quotes().length === 0) {
-        <div class="empty-state">
-            <p class="empty-text">Vous n'avez pas encore de devis.</p>
-            <a routerLink="/client/quote/new" class="btn btn-secondary">
-                Créez votre premier devis !
-            </a>
-        </div>
-    } @else {
-        
-        <div class="sort-controls">
-            <label for="sort-select">Trier par:</label>
-            <select id="sort-select" (change)="onSortChange($event)" class="form-select">
-                <option value="recent" [selected]="currentSort() === 'recent'">Les plus récents</option>
-                <option value="oldest" [selected]="currentSort() === 'oldest'">Les plus anciens</option>
-            </select>
-        </div>
-
-        <div class="quotes-list-wrapper">
-            @for (quote of quotes(); track quote.id) {
-                <div class="quote-card">
-                    <div class="card-header">
-                        <h2 class="quote-reference">
-                            Devis #{{ quote.reference }}
-                        </h2>
-                        
-                        <span class="status-pill status-{{ getStatusColor(quote.status) }}">
-                            {{ quote.status | uppercase }}
-                        </span>
-                    </div>
-
-                    <div class="card-details-grid">
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Créé le:</span> 
-                            {{ quote.created_at | date: 'mediumDate' }}
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Matériau:</span> 
-                            {{ quote.material?.name || 'N/A' }}
-                        </div>
-                        <div>
-                            <span class="detail-label">Forme:</span> 
-                            {{ quote.shape?.name || 'N/A' }}
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Quantité:</span> 
-                            {{ quote.quantity }}
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Dimension:</span> 
-                            {{ quote.materialDimension?.dimension_label || 'N/A' }}
-                        </div>
-
-                        <div class="quote-total">
-                            {{ quote.final_price_fcfa | number:'1.0-0' }} FCFA
-                        </div>
-                    </div>
-
-                    <div class="card-actions">
-                        <a [routerLink]="['/client/quotes', quote.id]" class="btn btn-secondary">
-                            Voir les détails
-                        </a>
-                    </div>
+              <div class="specs-row">
+                <div class="spec">
+                  <small>Matériau</small>
+                  <strong>{{ quote.material?.name || 'N/A' }}</strong>
                 </div>
-            }
-        </div>
-    }
+                <div class="spec">
+                  <small>Quantité</small>
+                  <strong>{{ quote.quantity }} pce(s)</strong>
+                </div>
+              </div>
+            </div>
 
+            <div class="quote-actions">
+              <div class="price-box">
+                <span class="amount">{{ quote.final_price_fcfa | number:'1.0-0' }}</span>
+                <span class="currency">FCFA</span>
+              </div>
+              <div class="badge-wrapper">
+                <span class="status-badge" [ngClass]="getStatusClass(quote.status)">
+                  {{ STATUS_LABELS[quote.status] }}
+                </span>
+              </div>
+              <a [routerLink]="['/client/quotes', quote.id]" class="btn-icon">
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+        } @empty {
+          <div class="state-card empty">
+            <i class="fa-solid fa-box-open"></i>
+            <p>Aucun devis trouvé pour ce matériau.</p>
+          </div>
+        }
+      </div>
+    }
+  }
 </div>

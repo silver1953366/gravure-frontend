@@ -1,219 +1,219 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, switchMap, catchError, of, filter, tap, forkJoin } from 'rxjs';
+import { debounceTime, switchMap, catchError, of, filter, tap, forkJoin, timeout } from 'rxjs';
 import { Router } from '@angular/router';
 
-// Imports des modèles
+// Modèles
 import { Material } from '../../../../core/models/material.model';
 import { Shape } from '../../../../core/models/shape.model';
-import { QuoteEstimate } from '../../../../core/models/client/quotes/quote.model';
+import { QuoteEstimate, QuotePayload } from '../../../../core/models/client/quotes/quote.model';
 import { MaterialDimension } from '../../../../core/models/material-dimension.model';
-import { Attachment } from '../../../../core/models/client/quotes/attachment.model'; // NOUVEL IMPORT
+import { Attachment } from '../../../../core/models/client/quotes/attachment.model';
 
-// Imports des services
+// Services
 import { QuoteFormService } from '../../../../core/services/client/quote-form.service';
 import { ClientQuoteService } from '../../../../core/services/client/client-quote.service';
-// Import du composant enfant
+import { AuthService } from '../../../../core/services/auth.service';
+
+// Composants
 import { AttachmentUploaderComponent } from '../components/attachment/attachment-uploader/attachment-uploader.component'; 
 
 @Component({
-    selector: 'app-quote-form',
-    standalone: true,
-    // Ajout du composant d'upload
-    imports: [CommonModule, ReactiveFormsModule, AttachmentUploaderComponent], 
-    templateUrl: './quote-form.component.html',
-    styleUrls: ['./quote-form.component.css']
+  selector: 'app-quote-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, AttachmentUploaderComponent], 
+  templateUrl: './quote-form.component.html',
+  styleUrls: ['./quote-form.component.css']
 })
 export class QuoteFormComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private location = inject(Location);
+  private destroyRef = inject(DestroyRef);
+  private quoteFormService = inject(QuoteFormService);
+  private clientQuoteService = inject(ClientQuoteService);
+  private authService = inject(AuthService);
 
-    // --- Services Injectés ---
-    private fb = inject(FormBuilder);
-    private router = inject(Router);
-    private destroyRef = inject(DestroyRef);
-    private quoteFormService = inject(QuoteFormService);
-    private clientQuoteService = inject(ClientQuoteService);
+  // Formulaire réactif
+  quoteForm!: FormGroup;
 
-    // --- Formulaire Réactif ---
-    quoteForm!: FormGroup;
+  // --- Signals de données (Catalogues) ---
+  materials = signal<Material[]>([]);
+  shapes = signal<Shape[]>([]);
+  dimensions = signal<MaterialDimension[]>([]);
+  filteredDimensions = signal<MaterialDimension[]>([]);
 
-    // --- Signals pour la Gestion de l'État et des Données ---
-    materials = signal<Material[]>([]);
-    shapes = signal<Shape[]>([]);
-    dimensions = signal<MaterialDimension[]>([]);
-    filteredDimensions = signal<MaterialDimension[]>([]);
+  // --- Signals d'état et résultats ---
+  isDataLoading = signal(true);
+  isEstimating = signal(false);
+  isSubmitting = signal(false);
+  
+  estimate = signal<QuoteEstimate | null>(null);
+  estimateError = signal<string | null>(null);
+  attachments = signal<Attachment[]>([]);
+  
+  // Identifiant temporaire pour lier les uploads avant création du devis
+  quoteIdForAttachments = signal<number>(Math.floor(Date.now() / 1000)); 
 
-    isDataLoading = signal(true);
-    isEstimating = signal(false);
-    isSubmitting = signal(false);
-    
-    estimate = signal<QuoteEstimate | null>(null);
-    estimateError = signal<string | null>(null);
+  ngOnInit(): void {
+    this.initForm();
+    this.loadInitialData(); 
+  }
 
-    // Gestion des pièces jointes
-    attachments = signal<Attachment[]>([]);
-    // ID temporaire/DRAFT de devis utilisé par l'uploader. (Ex: ID de session DRAFT)
-    // Pour le cas de figure 'Nouveau Devis', cet ID doit être initialisé
-    // par le backend au chargement du formulaire (sauvegarde DRAFT implicite).
-    quoteIdForAttachments = signal<number>(123); // ID fictif pour l'exemple
+  private initForm(): void {
+    this.quoteForm = this.fb.group({
+      material_id: [null, [Validators.required]],
+      shape_id: [null, [Validators.required]],
+      material_dimension_id: [null, [Validators.required]],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      description: [''] 
+    });
+  }
 
-    ngOnInit(): void {
-        this.initForm();
-        this.loadInitialData(); 
-    }
+  /**
+   * Charge les données du catalogue et vérifie si un panier doit être converti
+   */
+  private loadInitialData(): void {
+    this.isDataLoading.set(true);
+    
+    forkJoin({
+      selections: this.quoteFormService.getFormSelections(),
+      cart: this.quoteFormService.getCartContent().pipe(
+        timeout(3000), 
+        catchError(() => of([]))
+      )
+    }).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (data) => {
+        this.materials.set(data.selections.materials);
+        this.shapes.set(data.selections.shapes);
+        this.dimensions.set(data.selections.dimensions);
 
-    /**
-     * Initialise le Formulaire Réactif
-     */
-    private initForm(): void {
-        this.quoteForm = this.fb.group({
-            material_id: [null, [Validators.required]],
-            shape_id: [null, [Validators.required]],
-            material_dimension_id: [null, [Validators.required]],
-            quantity: [1, [Validators.required, Validators.min(1)]],
-            description: ['']
-        });
-    }
+        // Si l'utilisateur venait du panier, on pré-remplit le formulaire
+        if (data.cart && data.cart.length > 0) {
+          const payload = this.quoteFormService.convertCartToQuotePayload(data.cart);
+          if (payload) this.quoteForm.patchValue(payload);
+        }
 
-    /**
-     * Charge les listes initiales (Matériaux, Formes, Dimensions) et les données du panier.
-     */
-    private loadInitialData(): void {
-        this.isDataLoading.set(true);
+        this.isDataLoading.set(false);
+        this.setupFormListeners(); 
+      },
+      error: (err) => {
+        console.error("Erreur d'initialisation:", err);
+        this.estimateError.set("Impossible de charger les options techniques. Vérifiez votre connexion.");
+        this.isDataLoading.set(false);
+      }
+    });
+  }
 
-        const formSelections$ = this.quoteFormService.getFormSelections();
-        const cartContent$ = this.quoteFormService.getCartContent().pipe(
-            catchError(() => of([])) 
-        );
+  /**
+   * Écoute les changements du formulaire pour filtrer les dimensions et estimer le prix
+   */
+  private setupFormListeners(): void {
+    const formChanges$ = this.quoteForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef));
 
-        forkJoin({
-            selections: formSelections$,
-            cart: cartContent$
-        }).pipe(
-            takeUntilDestroyed(this.destroyRef),
-            catchError(error => {
-                console.error("Erreur de chargement des données initiales", error);
-                this.isDataLoading.set(false);
-                this.estimateError.set("Impossible de charger les données du formulaire.");
-                return of(null);
-            })
-        ).subscribe(data => {
-            if (data) {
-                // 1. Stockage des listes de sélection
-                this.materials.set(data.selections.materials);
-                this.shapes.set(data.selections.shapes);
-                this.dimensions.set(data.selections.dimensions);
-                
-                // 2. Initialisation depuis le panier si des articles sont présents
-                if (data.cart && data.cart.length > 0) {
-                    const payload = this.quoteFormService.convertCartToQuotePayload(data.cart);
-                    if (payload) {
-                        this.quoteForm.patchValue(payload);
-                    }
-                }
-                
-                this.isDataLoading.set(false);
-                this.setupFormListeners(); 
-            }
-        });
-    }
+    // 1. Filtrage dynamique des dimensions selon le matériau et la forme
+    formChanges$.pipe(
+      tap(val => {
+        if (val.material_id && val.shape_id) {
+          this.filterDimensions(val.material_id, val.shape_id);
+        }
+      })
+    ).subscribe();
 
-    /**
-     * Configure l'estimation en temps réel et le filtrage des dimensions.
-     */
-    private setupFormListeners(): void {
-        const formChanges$ = this.quoteForm.valueChanges.pipe(
-            takeUntilDestroyed(this.destroyRef)
-        );
+    // 2. Estimation automatique du prix avec Debounce (Attente de 600ms sans saisie)
+    formChanges$.pipe(
+      debounceTime(600),
+      filter(() => {
+        const v = this.quoteForm.value;
+        return !!(v.material_id && v.shape_id && v.material_dimension_id);
+      }),
+      tap(() => {
+        this.isEstimating.set(true);
+        this.estimateError.set(null);
+      }),
+      switchMap(() => this.clientQuoteService.estimateQuote(this.quoteForm.value).pipe(
+        catchError(err => {
+          this.estimateError.set(err.error?.error || "Prix indisponible pour cette configuration.");
+          this.estimate.set(null);
+          return of(null);
+        })
+      ))
+    ).subscribe(res => {
+      this.isEstimating.set(false);
+      if (res) this.estimate.set(res);
+    });
+  }
 
-        // 1. Filtrage des Dimensions disponibles
-        formChanges$.pipe(
-            filter(changes => changes.material_id !== null && changes.shape_id !== null),
-            tap(changes => this.filterDimensions(changes.material_id, changes.shape_id))
-        ).subscribe();
+  private filterDimensions(mId: number, sId: number): void {
+    const filtered = this.dimensions().filter(d => d.material_id === mId && d.shape_id === sId);
+    this.filteredDimensions.set(filtered);
+    
+    // Reset de la sélection si elle n'est plus valide dans la nouvelle liste
+    const currentDim = this.quoteForm.get('material_dimension_id')?.value;
+    if (currentDim && !filtered.some(d => d.id === currentDim)) {
+      this.quoteForm.get('material_dimension_id')?.setValue(null);
+    }
+  }
 
-        // 2. Estimation de Prix en temps réel (débounced)
-        formChanges$.pipe(
-            debounceTime(500),
-            filter(() => this.quoteForm.valid),
-            tap(() => this.isEstimating.set(true)),
-            switchMap(() => this.clientQuoteService.estimateQuote(this.quoteForm.value).pipe(
-                catchError(error => {
-                    this.estimateError.set("Impossible d'estimer le prix. Veuillez vérifier les valeurs.");
-                    this.isEstimating.set(false);
-                    return of(null);
-                })
-            ))
-        ).subscribe((estimateResult) => {
-            this.isEstimating.set(false);
-            if (estimateResult) {
-                this.estimate.set(estimateResult);
-                this.estimateError.set(null);
-            }
-        });
-    }
+  // --- Gestion des fichiers joints ---
+  onAttachmentAdded(a: Attachment): void { 
+    this.attachments.update(as => [...as, a]); 
+  }
 
-    /**
-     * Filtre la liste des dimensions en fonction du Matériau et de la Forme sélectionnés.
-     */
-    private filterDimensions(materialId: number, shapeId: number): void {
-        const filtered = this.dimensions().filter(d => 
-            d.material_id === materialId && d.shape_id === shapeId
-        );
-        
-        this.filteredDimensions.set(filtered);
+  onAttachmentRemoved(id: number): void { 
+    this.attachments.update(as => as.filter(a => a.id !== id)); 
+  }
 
-        const currentDimensionId = this.quoteForm.get('material_dimension_id')?.value;
-        // Si la dimension actuelle n'est plus disponible, on la réinitialise
-        if (currentDimensionId && !filtered.some(d => d.id === currentDimensionId)) {
-            this.quoteForm.get('material_dimension_id')?.setValue(null);
-            this.estimate.set(null); 
-        }
-    }
+  goBack(): void { 
+    this.location.back(); 
+  }
 
-    /**
-     * Ajoute une pièce jointe reçue de l'uploader au Signal local.
-     */
-    onAttachmentAdded(attachment: Attachment): void {
-        this.attachments.update(atts => [...atts, attachment]);
-    }
+  /**
+   * Envoi final du devis au backend
+   */
+  onSubmit(): void {
+    if (this.quoteForm.invalid) {
+      this.quoteForm.markAllAsTouched();
+      return;
+    }
 
-    /**
-     * Retire une pièce jointe du Signal local.
-     */
-    onAttachmentRemoved(attachmentId: number): void {
-        this.attachments.update(atts => atts.filter(a => a.id !== attachmentId));
-    }
+    this.isSubmitting.set(true);
+    this.estimateError.set(null);
 
+    const user = this.authService.currentUser(); 
+    const formValue = this.quoteForm.getRawValue();
 
-    /**
-     * Gère la soumission finale du devis.
-     */
-    onSubmit(): void {
-        if (this.quoteForm.invalid) {
-            this.quoteForm.markAllAsTouched();
-            return;
-        }
+    // Structuration du payload final pour le backend Laravel
+    const finalPayload: QuotePayload = {
+      material_id: formValue.material_id,
+      shape_id: formValue.shape_id,
+      material_dimension_id: formValue.material_dimension_id,
+      quantity: formValue.quantity,
+      client_details: {
+        name: user?.name || 'Client',
+        email: user?.email || '',
+        phone: (user as any)?.phone || '' 
+      },
+      customization_details: {
+        description: formValue.description
+      },
+      files: this.attachments().map(a => a.id)
+    };
 
-        this.isSubmitting.set(true);
-        this.estimateError.set(null);
-
-        // Le devis est soumis. Le backend est responsable de lier les attachements (ID fictif) au nouvel ID de devis.
-        this.clientQuoteService.submitQuote(this.quoteForm.value).pipe(
-            catchError(error => {
-                console.error("Erreur de soumission", error);
-                this.estimateError.set("Erreur lors de l'enregistrement du devis. Veuillez réessayer.");
-                this.isSubmitting.set(false);
-                return of(null);
-            })
-        ).subscribe(response => {
-            this.isSubmitting.set(false);
-            if (response && response.quote) {
-                // Redirection vers la page de détail du devis nouvellement créé
-                this.router.navigate(['/client/quotes', response.quote.id]);
-            }
-        });
-    }
-
+    this.clientQuoteService.submitQuote(finalPayload).subscribe({
+      next: (res) => {
+        // Redirection vers la vue détail du devis nouvellement créé
+        this.router.navigate(['/client/quotes', res.quote.id]);
+      },
+      error: (err) => {
+        console.error("Erreur soumission finale:", err);
+        this.isSubmitting.set(false);
+        this.estimateError.set(err.error?.message || "Erreur lors de l'enregistrement de votre demande.");
+      }
+    });
+  }
 }

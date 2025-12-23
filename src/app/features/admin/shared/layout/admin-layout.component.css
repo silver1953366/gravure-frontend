@@ -1,0 +1,121 @@
+:host {
+    --sidebar-width: 260px;
+    --sidebar-mini-width: 80px;
+    --navbar-height: 70px;
+    --transition-speed: 0.3s;
+    --bezier-curve: cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    background-color: #f8fafc;
+}
+
+.admin-app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Structure Sidebar --- */
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    z-index: 1100;
+    background: #ffffff;
+    transition: width var(--transition-speed) var(--bezier-curve),
+                transform var(--transition-speed) var(--bezier-curve);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.sidebar-container.mini {
+    width: var(--sidebar-mini-width);
+}
+
+/* --- Wrapper de Contenu --- */
+.main-wrapper {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left var(--transition-speed) var(--bezier-curve), 
+                width var(--transition-speed) var(--bezier-curve);
+}
+
+.main-wrapper.mini-margin {
+    margin-left: var(--sidebar-mini-width);
+    width: calc(100% - var(--sidebar-mini-width));
+}
+
+/* --- Navbar Fixed Management --- */
+app-admin-navbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: var(--sidebar-width);
+    z-index: 1000;
+    transition: left var(--transition-speed) var(--bezier-curve);
+}
+
+.main-wrapper.mini-margin app-admin-navbar {
+    left: var(--sidebar-mini-width);
+}
+
+/* --- Zone de Contenu --- */
+.content-view {
+    padding: 2rem;
+    padding-top: calc(var(--navbar-height) + 2rem); 
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Conteneur optionnel pour limiter la largeur des formulaires admin sur très grands écrans */
+.page-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    flex-grow: 1;
+}
+
+/* --- Overlay Mobile --- */
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1050;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- Adaptabilité Mobile (< 1024px) --- */
+@media (max-width: 1023px) {
+    .sidebar-container { 
+        transform: translateX(-100%); 
+        width: var(--sidebar-width) !important;
+    }
+
+    .sidebar-container.mobile-show { 
+        transform: translateX(0); 
+    }
+
+    .main-wrapper { 
+        margin-left: 0 !important; 
+        width: 100% !important; 
+    }
+
+    app-admin-navbar { 
+        left: 0 !important; 
+    }
+
+    .content-view {
+        padding: 1rem;
+        padding-top: calc(var(--navbar-height) + 1.5rem);
+    }
+}

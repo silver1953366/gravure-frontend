@@ -1,0 +1,86 @@
+<div class="admin-sidebar-content" [class.sidebar-mini-active]="isMini()">
+  
+  <header class="account-header" routerLink="/admin/dashboard">
+    <div class="account-icon-wrapper">
+      {{ userInitials() }}
+    </div>
+    
+    @if (!isMini()) {
+      <div class="account-details">
+        <p class="account-name">{{ currentUser()?.name || 'Administrateur' }}</p>
+        <div class="role-status">
+          <span class="status-dot"></span>
+          <span class="role-label">Accès Principal</span>
+        </div>
+      </div>
+    }
+  </header>
+
+  <nav class="sidebar-nav">
+    <ul>
+      @for (menu of menus; track menu.label) {
+        
+        @if (!menu.children) {
+          <li>
+            <a [routerLink]="menu.link" 
+               routerLinkActive="active" 
+               [routerLinkActiveOptions]="{exact: true}"
+               class="nav-item"
+               [attr.data-tooltip]="isMini() ? menu.label : null">
+              <i class="fa-solid fa-fw" [class]="menu.icon"></i>
+              @if (!isMini()) {
+                <span class="nav-label">{{ menu.label }}</span>
+              }
+            </a>
+          </li>
+        } 
+        
+        @else {
+          <li class="nav-item-group" [class.is-open]="isMenuOpen(menu.label)">
+            <div class="nav-item submenu-header" 
+                 (click)="toggleSubMenu(menu.label)"
+                 [attr.data-tooltip]="isMini() ? menu.label : null">
+              <i class="fa-solid fa-fw" [class]="menu.icon"></i>
+              
+              @if (!isMini()) {
+                <span class="nav-label">{{ menu.label }}</span>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+              }
+            </div>
+            
+            @if (!isMini() && isMenuOpen(menu.label)) {
+              <ul class="submenu">
+                @for (child of menu.children; track child.link) {
+                  <li>
+                    <a [routerLink]="child.link" 
+                       routerLinkActive="active-sub"
+                       class="submenu-link">
+                       <span class="sub-dot"></span>
+                       {{ child.label }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      }
+    </ul>
+  </nav>
+
+  <footer class="sidebar-footer">
+    <a routerLink="/client/dashboard" 
+       class="back-link" 
+       [attr.data-tooltip]="isMini() ? 'Quitter l\'admin' : null">
+      <div class="exit-icon-box">
+        <i class="fa-solid" [class.fa-shuffle]="isMini()" [class.fa-arrow-right-from-bracket]="!isMini()"></i>
+      </div>
+      @if (!isMini()) {
+        <div class="footer-text">
+          <span class="nav-label">Vue Client</span>
+          <span class="sub-text">Quitter l'administration</span>
+        </div>
+      }
+    </a>
+  </footer>
+</div>

@@ -1,19 +1,19 @@
-import { Category } from './category.model'; 
+import { Category } from './category.model';
 
-/**
- * Interface représentant un matériau utilisé pour la configuration de produits.
- * Basée sur les champs de la table 'materials'.
- */
 export interface Material {
   id: number;
   name: string;
-  category_id: number;
-  color?: string; 
-  image_url?: string; 
+  slug: string;
   description?: string;
+  image_url?: string;
+  price_per_sq_meter?: number | null; // Optionnel
+  thickness_options?: string;
+  color?: string;
+  is_active: boolean;
+  category_id?: number | null; // Optionnel
   
-  // Relation optionnelle 
-  category?: Category; 
+  // Relation chargée par le backend (eager loading)
+  category?: Category;
   
   created_at?: string;
   updated_at?: string;

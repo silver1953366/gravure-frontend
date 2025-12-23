@@ -1,38 +1,32 @@
 <div class="client-sidebar-content" [class.sidebar-mini-active]="isMini">
     
-    <div class="sidebar-toggle-button-wrapper" [class.mini]="isMini">
-        <button 
-            (click)="toggleSidebar.emit()" 
-            class="sidebar-toggle-btn"
-            aria-label="Toggle sidebar"
-        >
-            <i class="fa-solid" [class.fa-chevron-left]="!isMini" [class.fa-chevron-right]="isMini"></i>
-        </button>
-    </div>
-    
-    <header class="account-header">
+    <header class="account-header" [routerLink]="['/client/profile']" style="cursor: pointer;">
         <div class="account-icon-wrapper">
-            <i class="fa-solid fa-circle-user"></i> 
+            {{ userInitials() }}
         </div>
         <div class="account-details" *ngIf="!isMini">
-            <p class="account-name">Client A (Principal)</p>
-            <p class="account-welcome">Bienvenue chez Client A</p>
+            <p class="account-name">{{ currentUser()?.name || 'Client' }}</p>
+            <p class="account-welcome">Entreprise / Compte Pro</p>
         </div>
     </header>
 
     <nav class="sidebar-nav">
         <ul>
-            <li 
-                *ngFor="let item of navItems" 
+            <li *ngFor="let item of navItems" 
                 [routerLink]="item.route" 
                 routerLinkActive="active" 
                 class="nav-item"
-            >
+                [attr.data-tooltip]="isMini ? item.label : null"> 
                 <i class="fa-solid fa-fw" [class]="item.icon"></i>
                 <span class="nav-label" *ngIf="!isMini">{{ item.label }}</span>
-                <span *ngIf="isMini" [attr.title]="item.label" class="mini-tooltip">{{ item.label }}</span>
             </li>
         </ul>
     </nav>
 
+    <div class="sidebar-footer">
+        <a routerLink="/catalog" class="back-link" [attr.data-tooltip]="isMini ? 'Retour au catalogue' : null">
+            <i class="fa-solid" [class]="isMini ? 'fa-arrow-right-from-bracket' : 'fa-arrow-left-long'"></i>
+            <span class="nav-label" *ngIf="!isMini">Retour au catalogue</span>
+        </a>
+    </div>
 </div>

@@ -1,115 +1,99 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // <-- Assurez-vous que FormsModule est importé
+import { CommonModule, DatePipe, CurrencyPipe, UpperCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TransactionService, Order } from '../../../../core/services/transaction.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
+// Import de VOTRE modèle complet
+import { Order } from '../../../../core/models/order.model';
+import { TransactionService } from '../../../../core/services/transaction.service';
+
 @Component({
-    selector: 'app-admin-order-detail',
-    standalone: true,
-    imports: [CommonModule, FormsModule, DatePipe, CurrencyPipe, RouterModule],
-    templateUrl: './admin-order-detail.component.html',
-    styleUrls: ['./admin-order-detail.component.css']
+  selector: 'app-admin-order-detail',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DatePipe, CurrencyPipe, UpperCasePipe, RouterModule],
+  templateUrl: './admin-order-detail.component.html',
+  styleUrls: ['./admin-order-detail.component.css']
 })
 export class AdminOrderDetailComponent implements OnInit {
+  order: Order | null = null;
+  isLoading = true;
+  error: string | null = null;
+  orderId: number | null = null;
+  successMessage: string | null = null;
+  isProcessing = false;
+  currentStatus: string | null = null; 
 
-    order: Order | null = null;
-    isLoading = true;
-    error: string | null = null;
-    orderId: number | null = null;
-    successMessage: string | null = null;
-    isProcessing = false;
-    
-    // Propriété utilisée par ngModel du template pour l'état actuel
-    currentStatus: string | null = null; // <-- CORRECTION: Ajout de currentStatus
-    
-    // Propriété utilisée par *ngFor
-    availableStatuses = ['pending_payment', 'processing', 'ready_for_pickup', 'completed', 'cancelled']; // <-- CORRECTION: Renommage pour correspondre au HTML
+  availableStatuses = ['pending_payment', 'paid', 'processing', 'shipped', 'completed', 'canceled'];
+  statusLabels: { [key: string]: string } = {
+    'pending_payment': 'En attente de paiement',
+    'paid': 'Payée',
+    'processing': 'En préparation',
+    'shipped': 'Expédiée',
+    'completed': 'Terminée',
+    'canceled': 'Annulée'
+  };
 
-    statusLabels: { [key: string]: string } = {
-        'pending_payment': 'En attente de Paiement',
-        'processing': 'En Préparation',
-        'ready_for_pickup': 'Prêt à Enlever',
-        'completed': 'Terminée',
-        'cancelled': 'Annulée'
-    };
+  constructor(
+    private route: ActivatedRoute,
+    public router: Router,
+    private transactionService: TransactionService
+  ) {}
 
-    constructor(
-        private route: ActivatedRoute,
-        public router: Router,
-        private transactionService: TransactionService
-    ) {}
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam) {
+        this.orderId = +idParam;
+        this.loadOrderDetail(this.orderId);
+      }
+    });
+  }
 
-    ngOnInit(): void {
-        this.route.paramMap.subscribe(params => {
-            const idParam = params.get('id');
-            if (idParam) {
-                this.orderId = +idParam;
-                this.loadOrderDetail(this.orderId);
-            } else {
-                this.error = "ID de la commande manquant.";
-                this.isLoading = false;
-            }
-        });
+  loadOrderDetail(id: number): void {
+    this.isLoading = true;
+    this.transactionService.getOrderById(id).subscribe({
+      // Utilisation de 'any' ici pour éviter le conflit de type avec le service
+      next: (data: any) => { 
+        this.order = data as Order; 
+        this.currentStatus = this.order.status;
+        this.isLoading = false;
+      },
+      error: () => { 
+        this.error = "Erreur de chargement.";
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onPrint(): void { window.print(); }
+
+  getStatusLabel(status: string): string {
+    return this.statusLabels[status] || status;
+  }
+
+  onStatusChange(newStatus: string): void {
+    if (!this.orderId || !this.order || this.order.status === newStatus) return;
+    if (!confirm(`Changer le statut ?`)) {
+      this.currentStatus = this.order.status;
+      return;
     }
 
-    /**
-     * Charge les détails de la commande.
-     */
-    loadOrderDetail(id: number): void {
-        this.isLoading = true;
-        this.error = null;
-        this.transactionService.getOrderById(id).subscribe({
-            next: (data: Order) => { 
-                this.order = data;
-                this.currentStatus = data.status; // <-- Initialiser currentStatus ici
-                this.isLoading = false;
-            },
-            error: (err: HttpErrorResponse) => { 
-                this.error = "Impossible de charger le détail de la commande. " + (err.message || 'Erreur inconnue');
-                this.isLoading = false;
-            }
-        });
-    }
-
-    /**
-     * Renvoie un label lisible pour un statut donné.
-     * <-- CORRECTION: Ajout de getStatusLabel
-     */
-    getStatusLabel(status: string): string {
-        return this.statusLabels[status] || status;
-    }
-
-    /**
-     * Gère le changement de statut via le sélecteur.
-     * <-- CORRECTION: Ajout/Renommage de onStatusChange
-     */
-    onStatusChange(newStatus: string): void {
-        // La nouvelle valeur est déjà dans this.currentStatus grâce à [(ngModel)]
-        if (!this.orderId || !this.order || this.order.status === newStatus) return;
-
-        if (!confirm(`Confirmez-vous le changement de statut de la Commande #${this.orderId} à ${this.getStatusLabel(newStatus).toUpperCase()} ?`)) {
-            // Si l'utilisateur annule, on revient à l'ancien statut
-            this.currentStatus = this.order.status; 
-            return;
-        }
-
-        this.isProcessing = true;
-        this.error = null;
-
-        this.transactionService.updateOrderStatus(this.orderId, newStatus).subscribe({
-            next: (updatedOrder) => {
-                this.order = updatedOrder; 
-                this.successMessage = `Statut mis à jour à ${this.getStatusLabel(newStatus).toUpperCase()}.`;
-                this.isProcessing = false;
-            },
-            error: (err: HttpErrorResponse) => {
-                this.error = `Erreur lors de la mise à jour du statut: ${err.message || 'Erreur inconnue'}`;
-                this.isProcessing = false;
-                // Si l'API échoue, rétablir l'ancien statut
-                this.currentStatus = this.order!.status; 
-            }
-        });
-    }
+    this.isProcessing = true;
+    this.transactionService.updateOrderStatus(this.orderId, newStatus).subscribe({
+      // Utilisation de 'any' ici pour éviter le conflit de type avec le service
+      next: (updatedOrder: any) => {
+        this.order = updatedOrder as Order; 
+        this.currentStatus = this.order.status;
+        this.successMessage = `Statut mis à jour.`;
+        this.isProcessing = false;
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: () => {
+        this.error = "Échec de la mise à jour.";
+        this.isProcessing = false;
+        if (this.order) this.currentStatus = this.order.status;
+      }
+    });
+  }
 }

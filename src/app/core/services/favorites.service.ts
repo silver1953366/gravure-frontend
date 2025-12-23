@@ -1,45 +1,48 @@
+// src/app/core/services/favorites.service.ts
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { FavoriteItem } from '../models/favorite.model'; // Import de la nouvelle interface
-import { environment } from '../../environments/environment'; // Ajustez le chemin si nécessaire
+// Supposons que le modèle est dans src/app/core/models/favorite.model
+import { FavoriteItem } from '../models/favorite.model'; 
+import { environment } from '../../environments/environment'; // Assurez-vous que le chemin est correct pour le niveau Core
 
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class FavoritesService {
-  
-  private http = inject(HttpClient);
-  // Assurez-vous que l'URL de base de l'API est correcte
-  private apiUrl = `${environment.apiUrl}/favorites`; 
+    
+    private http = inject(HttpClient);
+    // Assurez-vous que l'URL de base de l'API est correcte
+    private apiUrl = `${environment.apiUrl}/favorites`; 
 
-  /**
-   * Récupère la liste des favoris de l'utilisateur.
-   * La réponse de l'API correspond à FavoriteItem[] (y compris la relation 'quote').
-   */
-  getFavorites(): Observable<FavoriteItem[]> {
-    return this.http.get<FavoriteItem[]>(this.apiUrl).pipe(
-      // Optionnel: Ajouter une logique de transformation ou de tri ici
-      map(favorites => favorites.map(fav => ({
-        ...fav,
-        // Ajouter un champ 'image' par défaut si nécessaire pour le template
-        image: fav.quote.image_url || `https://placehold.co/160x120/4B5563/FFFFFF?text=${fav.quote.reference}`
-      })))
-    );
-  }
+    /**
+     * Récupère la liste des favoris de l'utilisateur.
+     * La réponse de l'API correspond à FavoriteItem[] (y compris la relation 'quote').
+     */
+    getFavorites(): Observable<FavoriteItem[]> {
+        return this.http.get<FavoriteItem[]>(this.apiUrl).pipe(
+            // Ajoute le champ 'image' pour faciliter l'affichage dans le template
+            map(favorites => favorites.map(fav => ({
+                ...fav,
+                // Logique pour déterminer l'URL de l'image (réel ou placeholder)
+                image: fav.quote.image_url || `https://placehold.co/160x120/4B5563/FFFFFF?text=${fav.quote.reference}`
+            })))
+        );
+    }
 
-  /**
-   * Ajoute un devis aux favoris.
-   */
-  addFavorite(quoteId: number): Observable<FavoriteItem> {
-    return this.http.post<FavoriteItem>(this.apiUrl, { quote_id: quoteId });
-  }
+    /**
+     * Ajoute un devis aux favoris.
+     */
+    addFavorite(quoteId: number): Observable<FavoriteItem> {
+        return this.http.post<FavoriteItem>(this.apiUrl, { quote_id: quoteId });
+    }
 
-  /**
-   * Supprime un favori.
-   */
-  removeFavorite(favoriteId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${favoriteId}`);
-  }
+    /**
+     * Supprime un favori.
+     */
+    removeFavorite(favoriteId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${favoriteId}`);
+    }
 }

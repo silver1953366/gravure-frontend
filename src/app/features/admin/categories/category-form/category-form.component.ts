@@ -4,11 +4,11 @@ import { ActivatedRoute, Router, Params, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { CategoryService, Category } from '../category.service';
+import { CategoryService } from '../category.service';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule], 
+    imports: [CommonModule, ReactiveFormsModule, RouterModule],
     selector: 'app-category-form',
     templateUrl: './category-form.component.html',
     styleUrls: ['./category-form.component.css']
@@ -19,6 +19,7 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
     currentCategoryId: number | null = null;
     isEditMode = false;
     isLoading = false;
+    isSlugLocked = true; // Pour verrouiller/déverrouiller le slug manuellement
     apiErrors: any = {};
     
     private routeSubscription!: Subscription;
@@ -30,9 +31,12 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
         private router: Router
     ) {
         this.categoryForm = this.fb.group({
-            name: ['', [Validators.required, Validators.maxLength(100)]],
-            slug: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]], 
-            description: [''],
+            name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+            slug: ['', [
+                Validators.required, 
+                Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) // Format url-propre-uniquement
+            ]], 
+            description: ['', [Validators.maxLength(500)]],
             is_active: [true],
         });
     }
@@ -44,28 +48,58 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
             
             if (this.isEditMode) {
                 this.loadCategoryData();
+            } else {
+                this.isSlugLocked = false; // En création, on laisse le slug libre
             }
         });
     }
 
     ngOnDestroy(): void {
-        if (this.routeSubscription) {
-            this.routeSubscription.unsubscribe();
-        }
+        if (this.routeSubscription) this.routeSubscription.unsubscribe();
     }
 
     loadCategoryData(): void {
         this.isLoading = true;
-        this.categoryService.getCategory(this.currentCategoryId!).subscribe({
+        this.categoryService.getCategory(this.currentCategoryId!).pipe(take(1)).subscribe({
             next: (category) => {
                 this.categoryForm.patchValue(category);
                 this.isLoading = false;
             },
-            error: (err) => {
-                console.error("Erreur de chargement des données de la catégorie:", err);
-                this.router.navigate(['/admin/categories']); 
-            }
+            error: () => this.router.navigate(['/admin/categories'])
         });
+    }
+
+    /**
+     * Déclenché à chaque saisie du nom.
+     * Génère le slug automatiquement si on n'est pas en mode édition verrouillé.
+     */
+    onNameChange(): void {
+        if (!this.isEditMode || !this.isSlugLocked) {
+            const nameValue = this.categoryForm.get('name')?.value;
+            if (nameValue) {
+                this.categoryForm.get('slug')?.setValue(this.slugify(nameValue));
+            }
+        }
+    }
+
+    /**
+     * Transforme une chaîne en slug propre (ex: "Acier & Fer !" -> "acier-fer")
+     */
+    private slugify(text: string): string {
+        return text
+            .toString()
+            .toLowerCase()
+            .normalize('NFD') // Sépare les accents des lettres
+            .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
+            .replace(/\s+/g, '-') // Remplace espaces par -
+            .replace(/[^\w\-]+/g, '') // Supprime tout ce qui n'est pas mot ou tiret
+            .replace(/\-\-+/g, '-') // Remplace doubles tirets par un seul
+            .replace(/^-+/, '') // Supprime tiret au début
+            .replace(/-+$/, ''); // Supprime tiret à la fin
+    }
+
+    toggleSlugLock(): void {
+        this.isSlugLocked = !this.isSlugLocked;
     }
 
     onSubmit(): void {
@@ -76,40 +110,17 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
 
         this.isLoading = true;
         this.apiErrors = {};
-        const data = this.categoryForm.value;
         
-        const request = this.isEditMode && this.currentCategoryId
-            ? this.categoryService.updateCategory(this.currentCategoryId, data)
-            : this.categoryService.createCategory(data);
+        const request = this.isEditMode 
+            ? this.categoryService.updateCategory(this.currentCategoryId!, this.categoryForm.value)
+            : this.categoryService.createCategory(this.categoryForm.value);
 
         request.pipe(take(1)).subscribe({
-            next: () => {
-                this.isLoading = false;
-                this.router.navigate(['/admin/categories']);
-            },
+            next: () => this.router.navigate(['/admin/categories']),
             error: (err) => {
                 this.isLoading = false;
-                if (err.status === 422 && err.error.errors) {
-                    this.apiErrors = err.error.errors;
-                } else {
-                    this.apiErrors = { general: "Une erreur inattendue est survenue lors de la sauvegarde." };
-                }
-                console.error("Erreur API:", err);
+                this.apiErrors = err.status === 422 ? err.error.errors : { general: "Erreur serveur" };
             }
         });
-    }
-    
-    // Logique pour générer le slug automatiquement
-    onNameChange(): void {
-        if (!this.isEditMode) {
-            const name = this.categoryForm.get('name')?.value;
-            if (name) {
-                const slug = name.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .trim()
-                    .replace(/\s+/g, '-');
-                this.categoryForm.get('slug')?.setValue(slug);
-            }
-        }
     }
 }

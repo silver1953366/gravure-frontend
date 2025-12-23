@@ -3,59 +3,101 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment'; 
 
+/**
+ * Interface représentant un article en stock.
+ * Elle reflète la table 'inventories' et ses relations avec le catalogue 'material_dimensions'.
+ */
 export interface InventoryItem {
     id: number;
-    // Propriétés provenant de MaterialDimension ou Material (pour l'affichage)
-    reference: string; 
-    description: string;
-    location: string; // (Assumé, peut-être lié à l'emplacement physique)
-    material_id?: number; 
+    // Clé étrangère vers le catalogue de prix
+    material_dimension_id: number; 
     
-    // Propriétés provenant de la table Inventory
-    stock_quantity: number; //  CORRIGÉ : Nom plus explicite pour le stock total
-    reserved_quantity: number; // Quantité réservée (stock_reserve dans votre ancienne interface)
-    minimum_threshold: number; // Seuil minimum (stock_minimum dans votre ancienne interface)
+    // Propriétés de stock physiques
+    stock_quantity: number; 
+    reserved_quantity: number; 
+    minimum_threshold: number; 
+    
+    // Prix de revient spécifique à ce lot en stock
     price_per_unit: number; 
     
-    // Propriété calculée (comme dans le modèle Laravel)
+    // Propriété calculée (Stock Physique - Réservations)
     available_quantity: number; 
+
+    /** * Relation vers le catalogue (MaterialDimension)
+     * Contient les informations descriptives du matériau, de la forme et de la catégorie.
+     */
+    material_dimension?: {
+        id: number;
+        dimension_label: string;
+        unit_price_fcfa: number; // Prix théorique du catalogue
+        is_active: boolean;
+        
+        material?: {
+            id: number;
+            name: string;
+        };
+        shape?: {
+            id: number;
+            name: string;
+        };
+        category?: {
+            id: number;
+            name: string;
+        };
+    };
+    
+    // Timestamps Laravel
+    last_restock_at?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class InventoryService {
-    // URL Publique (pour la lecture par les rôles 'controller' ou 'logistics')
-    private readonly publicApiUrl = `${environment.apiUrl}/inventory`; 
-    // URL Admin (pour la création/modification/suppression par le rôle 'admin')
-    private readonly adminApiUrl = `${environment.apiUrl}/admin/inventory`; 
+    /** * URL Publique : Pour la consultation (Rôles : Controller, Logistics, Admin)
+     * Correspond généralement aux routes protégées par 'auth:api'
+     */
+    private readonly publicApiUrl = `${environment.apiUrl}/inventory`; 
 
-    constructor(private http: HttpClient) {}
+    /** * URL Admin : Pour les modifications (Rôle : Admin uniquement)
+     * Correspond aux routes protégées par le middleware 'admin' sur le backend
+     */
+    private readonly adminApiUrl = `${environment.apiUrl}/admin/inventory`; 
 
-    /** GET: Récupère la liste de tout l'inventaire */
-    // Cette route est accessible via /api/inventory (protégée par IsController/Logistics)
-    getInventory(): Observable<InventoryItem[]> {
-        return this.http.get<InventoryItem[]>(this.publicApiUrl);
-    }
-    
-    /** GET: Récupère un seul article (pour l'édition ou les détails) */
-    // Cette route est accessible via /api/inventory/{id}
-    getInventoryItem(itemId: number): Observable<InventoryItem> {
-        return this.http.get<InventoryItem>(`${this.publicApiUrl}/${itemId}`);
-    }
+    constructor(private http: HttpClient) {}
 
-    /** POST: Crée un nouvel article d'inventaire (Admin only) */
-    createItem(itemData: Partial<InventoryItem>): Observable<InventoryItem> {
-        return this.http.post<InventoryItem>(this.adminApiUrl, itemData);
-    }
+    /** * GET: Récupère la liste de tout l'inventaire.
+     * Le backend doit retourner les relations avec : 
+     * Inventory::with(['material_dimension.material', 'material_dimension.shape', 'material_dimension.category'])
+     */
+    getInventory(): Observable<InventoryItem[]> {
+        return this.http.get<InventoryItem[]>(this.publicApiUrl);
+    }
+    
+    /** * GET: Récupère un article spécifique par son ID.
+     */
+    getInventoryItem(itemId: number): Observable<InventoryItem> {
+        return this.http.get<InventoryItem>(`${this.publicApiUrl}/${itemId}`);
+    }
 
-    /** PUT: Met à jour un article d'inventaire existant (Admin only) */
-    updateItem(itemId: number, itemData: Partial<InventoryItem>): Observable<InventoryItem> {
-        return this.http.put<InventoryItem>(`${this.adminApiUrl}/${itemId}`, itemData);
-    }
+    /** * POST: Crée une nouvelle entrée d'inventaire.
+     * @param itemData Contient au minimum material_dimension_id, stock_quantity et price_per_unit
+     */
+    createItem(itemData: Partial<InventoryItem>): Observable<InventoryItem> {
+        return this.http.post<InventoryItem>(this.adminApiUrl, itemData);
+    }
 
-    /** DELETE: Supprime un article d'inventaire (Admin only) */
-    deleteItem(itemId: number): Observable<void> {
-        return this.http.delete<void>(`${this.adminApiUrl}/${itemId}`);
-    }
+    /** * PUT: Met à jour les quantités ou le prix d'un article existant.
+     */
+    updateItem(itemId: number, itemData: Partial<InventoryItem>): Observable<InventoryItem> {
+        return this.http.put<InventoryItem>(`${this.adminApiUrl}/${itemId}`, itemData);
+    }
+
+    /** * DELETE: Supprime définitivement une référence de l'inventaire (Admin).
+     */
+    deleteItem(itemId: number): Observable<void> {
+        return this.http.delete<void>(`${this.adminApiUrl}/${itemId}`);
+    }
 }

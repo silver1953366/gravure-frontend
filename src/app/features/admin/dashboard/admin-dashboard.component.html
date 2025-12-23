@@ -1,67 +1,186 @@
-<div class="admin-dashboard-container">
-    <h2>Tableau de Bord - Aperçu Général</h2>
-    
-    <div *ngIf="error" class="alert-error">{{ error }}</div>
-
-    <div class="stats-cards">
-        <div class="card" routerLink="/admin/quotes">
-            <h3 class="card-title">Devis Soumis</h3>
-            <div class="card-value" *ngIf="stats">{{ stats.activeQuotes | number }}</div>
-            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
-            <p class="card-footer">En attente de traitement/conversion</p>
-        </div>
-
-        <div class="card" routerLink="/admin/admin-orders">
-            <h3 class="card-title">Commandes en Cours</h3>
-            <div class="card-value" *ngIf="stats">{{ stats.pendingOrders | number }}</div>
-            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
-            <p class="card-footer">Paiement en attente ou en fabrication</p>
-        </div>
-
-        <div class="card primary-card" routerLink="/admin/reports">
-            <h3 class="card-title">Chiffre d'Affaires Total (CA)</h3>
-            <div class="card-value" *ngIf="stats">{{ stats.totalRevenue | number:'1.0-0' }} FCFA</div>
-            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
-            <p class="card-footer">Basé sur les commandes complétées</p>
-        </div>
-
-        <div class="card danger-card" routerLink="/admin/inventory">
-            <h3 class="card-title">Alertes Inventaire</h3>
-            <div class="card-value" *ngIf="stats">{{ stats.inventoryAlerts | number }}</div>
-            <div class="card-value loading-placeholder" *ngIf="isLoadingStats">...</div>
-            <p class="card-footer">Articles en dessous du seuil min.</p>
-        </div>
+<div class="dashboard-container">
+  
+  <header class="welcome-section">
+    <div>
+      <h1 class="welcome-title">Console d'Administration</h1>
+      <p class="welcome-subtitle">Heureux de vous revoir, {{ user()?.name || 'Administrateur' }}</p>
     </div>
-    
-    <div class="dashboard-details">
-        
-        <div class="chart-panel">
-            <h3>Évolution du Chiffre d'Affaires</h3>
-            <div class="chart-area">
-                <p *ngIf="revenueData">
-                    Simulation de graphique : {{ revenueData.period.join(', ') }} vs Revenu.
-                </p>
-                <div *ngIf="!revenueData" class="alert-info">
-                    Données de graphique non disponibles ou service non implémenté.
-                </div>
-            </div>
+    <div class="date-display">
+      <i class="fa-regular fa-calendar-check"></i>
+      <span>{{ today | date:'dd MMMM yyyy':'':'fr' }}</span>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card card-blue" routerLink="/admin/quotes">
+      <div class="stat-icon">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+      </div>
+      <div class="stat-content">
+        <span class="label">Devis à traiter</span>
+        <span class="value">{{ stats()?.activeQuotes || 0 }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card card-purple" routerLink="/admin/admin-orders">
+      <div class="stat-icon">
+        <i class="fa-solid fa-box-open"></i>
+      </div>
+      <div class="stat-content">
+        <span class="label">Commandes actives</span>
+        <span class="value">{{ stats()?.pendingOrders || 0 }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card card-green" routerLink="/admin/reports">
+      <div class="stat-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="stat-content">
+        <span class="label">Revenu Global</span>
+        <span class="value">{{ (stats()?.totalRevenue || 0) | number:'1.0-0' }}</span>
+        <span class="sub">FCFA (validés)</span>
+      </div>
+    </div>
+
+    <div class="stat-card card-red" routerLink="/admin/inventory">
+      <div class="stat-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="stat-content">
+        <span class="label">Alertes Stock</span>
+        <span class="value">{{ stats()?.inventoryAlerts || 0 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-card">
+    <div class="card-header">
+      <h2>Journal des Opérations</h2>
+      
+      <div class="filter-group">
+        <button [class.active]="filterStatus() === 'all'" (click)="setFilter('all')">Tout</button>
+        <button [class.active]="filterStatus() === 'pending'" (click)="setFilter('pending')">En attente</button>
+        <button [class.active]="filterStatus() === 'completed'" (click)="setFilter('completed')">Terminé</button>
+        <button [class.active]="filterStatus() === 'alert'" (click)="setFilter('alert')">Alertes</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th class="type-column">Type</th>
+            <th>Référence</th>
+            <th>Action / Détails</th>
+            <th>Auteur</th>
+            <th>Date & Heure</th>
+            <th>Statut</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 3rem;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Chargement des données...
+              </td>
+            </tr>
+          } 
+          
+          @else {
+            @for (item of paginatedActivities(); track item.id) {
+              <tr>
+                <td class="type-column">
+                  <i [class]="'fa-solid type-icon ' + item.action" 
+                     [ngClass]="{
+                       'fa-file-lines quote': item.action === 'quote',
+                       'fa-truck-fast order': item.action === 'order',
+                       'fa-layer-group inventory': item.action === 'inventory'
+                     }">
+                  </i>
+                </td>
+                <td><span class="ref-badge">{{ item.reference }}</span></td>
+                <td>
+                  <span class="project-name">{{ item.details }}</span>
+                </td>
+                <td>
+                  <span class="user-label">{{ item.user }}</span>
+                </td>
+                <td>
+                  <div class="date-container">
+                    <span class="date-text">{{ item.created_at | date:'dd/MM/yyyy' }}</span>
+                    <span class="time-text">{{ item.created_at | date:'HH:mm' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="'status-' + item.status">
+                    {{ item.status === 'pending' ? 'En attente' : 
+                       item.status === 'completed' ? 'Terminé' : 
+                       item.status === 'alert' ? 'Critique' : item.status }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div class="action-menu-container">
+                    <button class="btn-dots" (click)="toggleMenu($event, item.id)">
+                      <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+
+                    @if (activeMenuId() === item.id) {
+                      <div class="dropdown-menu">
+                        <a (click)="viewDetails(item)">
+                          <i class="fa-solid fa-eye"></i> Consulter le dossier
+                        </a>
+                        @if (item.status === 'pending') {
+                          <a (click)="approveActivity(item)">
+                            <i class="fa-solid fa-check"></i> Valider l'action
+                          </a>
+                        }
+                        <a (click)="deleteActivity(item)" style="color: #ef4444;">
+                          <i class="fa-solid fa-trash-can"></i> Supprimer du log
+                        </a>
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } 
+            
+            @empty {
+              <tr>
+                <td colspan="7" class="empty-state-container">
+                  <div class="empty-state-content">
+                    <div class="empty-folder-icon">
+                      <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <p>Aucune activité trouvée pour cette sélection.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination-bar">
+        <button class="btn-nav" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+          <i class="fa-solid fa-arrow-left"></i> Précédent
+        </button>
+
+        <div class="page-numbers">
+          @for (p of pagesArray(); track p) {
+            <button class="page-num" [class.active]="p === currentPage()" (click)="goToPage(p)">
+              {{ p }}
+            </button>
+          }
         </div>
 
-        <div class="activity-panel">
-            <h3>Journal d'Activité Récente</h3>
-            <div *ngIf="isLoadingActivity" class="loading-message">Chargement du journal...</div>
-            <ul class="activity-list" *ngIf="!isLoadingActivity && recentActivities.length > 0">
-                <li *ngFor="let activity of recentActivities">
-                    <span class="activity-time">{{ activity.created_at | date:'shortTime' }}</span>
-                    <span class="activity-desc">{{ formatActivity(activity) }}</span>
-                </li>
-                <li class="view-all-activity">
-                    <a routerLink="/admin/activity-log">Voir tout le journal d'activité...</a>
-                </li>
-            </ul>
-            <div *ngIf="!isLoadingActivity && recentActivities.length === 0" class="alert-info">
-                Aucune activité récente.
-            </div>
-        </div>
-    </div>
+        <button class="btn-nav" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+          Suivant <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    }
+  </div>
 </div>

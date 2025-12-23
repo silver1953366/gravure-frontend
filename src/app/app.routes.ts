@@ -54,14 +54,14 @@ export const routes: Routes = [
 
 
      // 3. Domaine CLIENT (Inchangé)
-     {
-     path: 'client',
+    // 3. Domaine CLIENT (Mis à jour pour utiliser loadChildren)
+    {
+        path: 'client',
         canActivate: [authGuard, roleGuard],
         data: { roles: ['client'] },
-        children: [
-            // ... routes client ...
-       ]
-   },
+        // On lie ici le fichier que nous venons de créer
+        loadChildren: () => import('./features/client/client.routes').then(r => r.CLIENT_ROUTES)
+    },
 
 
     // 4. Domaine CONTROLLER (Inchangé)

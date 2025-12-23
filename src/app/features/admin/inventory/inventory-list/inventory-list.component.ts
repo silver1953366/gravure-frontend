@@ -1,111 +1,165 @@
 import { Component, OnInit } from '@angular/core';
-import { InventoryService, InventoryItem } from '../inventory.service'; // 🛑 CORRECTION du chemin
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
-// Service hypothétique pour obtenir le rôle de l'utilisateur
-
-interface UserAuth {
-    isAdmin: boolean;
-    isController: boolean;
-}
-const FAKE_AUTH_SERVICE = {
-    getUserRoles(): UserAuth {
-    // isAdmin: true pour tests CRUD Admin, false pour tests simple Controller/Consultation
-    return { isAdmin: true, isController: true }; 
-   }
-};
-
+import { FormsModule } from '@angular/forms'; // Nécessaire pour le [(ngModel)] de recherche
+import { InventoryService, InventoryItem } from '../inventory.service';
 
 @Component({
-   standalone: true,
-   imports: [CommonModule, RouterModule], 
-   selector: 'app-inventory-list',
-   templateUrl: './inventory-list.component.html',
-   styleUrls: ['./inventory-list.component.css']
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+  selector: 'app-inventory-list',
+  templateUrl: './inventory-list.component.html',
+  styleUrls: ['./inventory-list.component.css']
 })
 export class InventoryListComponent implements OnInit {
-   inventory: InventoryItem[] = [];
-   isLoading = true;
-   error: any = null;
- 
- // Permission pour masquer/afficher les actions CRUD
-    canAdministerInventory: boolean = false; 
+  
+  // Liste source (complète)
+  inventory: InventoryItem[] = [];
+  
+  // États de l'interface
+  isLoading = true;
+  error: string | null = null;
+  canAdministerInventory: boolean = true; 
 
-    constructor(
-      private inventoryService: InventoryService,
-      private router: Router
-    ) {}
+  // --- Recherche & Pagination ---
+  searchTerm: string = '';
+  currentPage: number = 1;
+  itemsPerPage: number = 10; // Nombre d'éléments par page
 
-    ngOnInit(): void {
-        this.checkPermissions();
-        this.fetchInventory();
-    }
-    
-    checkPermissions(): void {
-        const roles = FAKE_AUTH_SERVICE.getUserRoles();
-        // L'admin a les droits CRUD. Le controller/logisticien a seulement les droits de lecture (fetchInventory)
-        this.canAdministerInventory = roles.isAdmin; 
-    }
+  constructor(
+    private inventoryService: InventoryService,
+    private router: Router
+  ) {}
 
-    fetchInventory(): void {
-        this.isLoading = true;
-        this.error = null;
-        this.inventoryService.getInventory().subscribe({
-            next: (data) => {
-                this.inventory = data;
-                this.isLoading = false;
-            },
-            error: (err) => {
-                console.error("Erreur de chargement de l'inventaire", err);
-                // 🛑 Erreur 403 (Accès refusé) ou autre. Indique à l'utilisateur de vérifier son rôle.
-                this.error = "Impossible de charger l'inventaire. Accès Controller/Admin requis ou erreur serveur.";
-                this.isLoading = false;
-            }
-        });
-    }
+  ngOnInit(): void {
+    this.fetchInventory();
+  }
 
-    // 🎯 NOUVELLE MÉTHODE : Détermine l'état visuel du stock
-    getStockStatusClass(item: InventoryItem): string {
-        const available = item.available_quantity;
-        const minimum = item.minimum_threshold;
+  /**
+   * Récupère les données depuis l'API Laravel
+   */
+  fetchInventory(): void {
+    this.isLoading = true;
+    this.error = null;
 
-        if (available <= 0) {
-            return 'status-empty';
-        } else if (available <= (minimum / 2)) {
-            // Moins de la moitié du seuil minimum = Alerte Critique
-            return 'status-alert';
-        } else if (available <= minimum) {
-            // Sous le seuil minimum = Stock Bas
-            return 'status-low';
-        }
-        return 'status-ok'; // Stock OK
+    this.inventoryService.getInventory().subscribe({
+      next: (data: InventoryItem[]) => {
+        this.inventory = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error("Erreur de chargement:", err);
+        this.error = "Impossible de récupérer les données du stock.";
+        this.isLoading = false;
+      }
+    });
+  }
+
+  /**
+   * FILTRE : Retourne les articles dont le nom du matériau correspond à la recherche
+   */
+  get filteredInventory(): InventoryItem[] {
+    if (!this.searchTerm.trim()) {
+      return this.inventory;
     }
+    
+    const searchLower = this.searchTerm.toLowerCase();
+    return this.inventory.filter(item => {
+      // On cherche dans le nom du matériau lié à la dimension
+      const materialName = item.material_dimension?.material?.name?.toLowerCase() || '';
+      return materialName.includes(searchLower);
+    });
+  }
 
-    onDeleteItem(itemId: number): void {
-        if (!this.canAdministerInventory) return;
-        
-        if (confirm("Êtes-vous sûr de vouloir supprimer cet article du stock ? Cette action est irréversible et nécessite le rôle Admin.")) {
-            this.inventoryService.deleteItem(itemId).subscribe({
-                next: () => {
-                    this.inventory = this.inventory.filter(i => i.id !== itemId);
-                    // Notification de succès
-                },
-                error: (err) => {
-                    console.error("Erreur de suppression", err);
-                    alert("Erreur lors de la suppression. Veuillez vérifier si vous avez la permission d'administrateur.");
-                }
-            });
-        }
-    }
+  /**
+   * PAGINATION : Découpe la liste filtrée pour n'afficher que la page actuelle
+   */
+  get paginatedInventory(): InventoryItem[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredInventory.slice(startIndex, endIndex);
+  }
 
-    onEditItem(itemId: number): void {
-        if (!this.canAdministerInventory) return;
-        this.router.navigate(['/admin/inventory/edit', itemId]);
-    }
-    
-    onCreateItem(): void {
-        if (!this.canAdministerInventory) return;
-        this.router.navigate(['/admin/inventory/create']);
-    }
+  /**
+   * Calcul du nombre total de pages
+   */
+  get totalPages(): number {
+    const total = this.filteredInventory.length;
+    return Math.ceil(total / this.itemsPerPage) || 1;
+  }
+
+  /**
+   * Navigation entre les pages
+   */
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  /**
+   * Réinitialise la page lors d'une nouvelle recherche
+   */
+  onSearchChange(): void {
+    this.currentPage = 1;
+  }
+
+  /**
+   * Formate le nom complet de l'article pour le tableau
+   */
+  getItemDisplayName(item: InventoryItem): string {
+    const dim = item.material_dimension;
+    if (!dim) return 'Article non configuré';
+    
+    const matName = dim.material?.name || 'Inconnu';
+    const shapeName = dim.shape?.name || 'Inconnue';
+    
+    return `${matName} - ${shapeName}`;
+  }
+
+  getDimensionLabel(item: InventoryItem): string {
+    return item.material_dimension?.dimension_label || 'N/A';
+  }
+
+  /**
+   * Détermine la classe CSS pour le badge de statut
+   */
+  getStockStatusClass(item: InventoryItem): string {
+    const available = item.available_quantity;
+    const minimum = item.minimum_threshold;
+
+    if (available <= 0) return 'status-empty';
+    if (available <= (minimum / 2)) return 'status-alert';
+    if (available <= minimum) return 'status-low';
+    return 'status-ok';
+  }
+
+  /**
+   * Suppression d'un article
+   */
+  onDeleteItem(itemId: number): void {
+    if (confirm("Voulez-vous vraiment supprimer cet article du stock ?")) {
+      this.inventoryService.deleteItem(itemId).subscribe({
+        next: () => {
+          this.inventory = this.inventory.filter(i => i.id !== itemId);
+          // Si la page actuelle devient vide après suppression, on recule d'une page
+          if (this.paginatedInventory.length === 0 && this.currentPage > 1) {
+            this.currentPage--;
+          }
+        },
+        error: (err) => {
+          alert("Erreur lors de la suppression.");
+        }
+      });
+    }
+  }
+
+  // Navigation CRUD
+  onEditItem(itemId: number): void {
+    this.router.navigate(['/admin/inventory/edit', itemId]);
+  }
+  
+  onCreateItem(): void {
+    this.router.navigate(['/admin/inventory/create']);
+  }
 }

@@ -1,168 +1,140 @@
-// src/app/features/client/dashboard/client-dashboard.component.ts (MIS À JOUR)
-
-import { ChangeDetectionStrategy, Component, signal, computed, LOCALE_ID, OnInit, DestroyRef, inject } from '@angular/core';
-// Importez ces éléments, mais ils doivent aussi être dans le tableau imports ci-dessous
-import { DatePipe, NgClass, NgFor, NgIf, CurrencyPipe } from '@angular/common'; 
-import { RouterLink } from '@angular/router';
-// Importez vos services et modèles ici (exemples)
-import { FavoritesService, FavoriteItem } from '../../../core/services/favorites.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-// Importez les vrais composants si ce sont des composants Angular Standalone
-// (Sinon, laissez-les commentés si ce sont des placeholders pour des éléments HTML non-Angular)
-// import { ClientSidebarComponent } from '...';
-// import { ClientNavbarComponent } from '...';
-// import { ClientFooterComponent } from '...';
-const ClientSidebarComponent = 'app-client-sidebar';
-const ClientNavbarComponent = 'app-client-navbar';
-const ClientFooterComponent = 'app-client-footer';
-
+import { Component, OnInit, inject, signal, computed, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { forkJoin, catchError, of } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
+import { FavoritesService } from '../../../core/services/favorites.service';
+import { CartService } from '../../../core/services/cart.service';
+import { ClientQuoteService } from '../../../core/services/client/client-quote.service';
+import { OrderService } from '../../../core/services/client/order.service'; 
+import { Quote } from '../../../core/models/client/quotes/quote.model';
+import { Order } from '../../../core/models/order.model';
 
 @Component({
-  selector: 'app-client-dashboard',
-  templateUrl: './client-dashboard.component.html',
-  styleUrls: ['./client-dashboard.component.css'],
-  standalone: true,
-  providers: [
-    { provide: LOCALE_ID, useValue: 'fr' },
-    // 🟢 AJOUTÉ : Fourniture explicite des pipes si nécessaire pour l'injection
-    DatePipe, 
-    CurrencyPipe
-  ],
-  imports: [
-    RouterLink,
-    
-    // 🟢 CORRECTION NG8004 (date, currency) & NG8002 (ngClass) : 
-    // Il faut importer explicitement les pipes et directives dans les composants Standalone.
-    NgIf,
-    NgFor,
-    NgClass,        // Permet d'utiliser [ngClass]
-    DatePipe,       // Permet d'utiliser le pipe | date
-    CurrencyPipe,   // Permet d'utiliser le pipe | currency
-
-    // Note: Remplacez ces chaînes par les vrais composants si ce ne sont pas des exemples
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-client-dashboard',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './client-dashboard.component.html',
+  styleUrls: ['./client-dashboard.component.css']
 })
 export class ClientDashboardComponent implements OnInit {
-  
-  private destroyRef = inject(DestroyRef); 
-  // ... (Le reste de la classe reste inchangé)
+  private authService = inject(AuthService);
+  private favoritesService = inject(FavoritesService);
+  private cartService = inject(CartService);
+  private quoteService = inject(ClientQuoteService);
+  private orderService = inject(OrderService);
 
-  // --- STATE AND DATA ---
-  
-  favourites = signal<FavoriteItem[]>([]);
-  isLoadingFavorites = signal(true);
-  isSidebarOpen = signal(true);
-  userName: string = 'Jean Dubois';
-  memberSince: Date = new Date(2022, 5, 15);
-  isLoading: boolean = false; 
+  today: Date = new Date();
+  user = this.authService.currentUser;
+  
+  favourites = signal<any[]>([]);
+  allActivities = signal<any[]>([]); 
+  filterType = signal<'all' | 'quote' | 'order'>('all');
 
-  // Order Tracker Data
-  orderStages = [
-    { label: 'Projet créé', details: '24 Jan 2024' },
-    { label: 'Design validé', details: '28 Jan 2024' },
-    { label: 'Gravure en cours', details: 'En production' },
-    { label: 'Expédition imminente', details: 'Prochainement' },
-  ];
-  
-  latestOrderTracker = {
-    title: 'Plaque d\'inauguration',
-    product: 'Laiton Brossé 30x40cm',
-    eta: new Date(2024, 2, 10),
-    status: 'Gravure en cours'
-  };
-  
-  // Quotes Data
-  quotes = [
-    { id: 'QT-9821', name: 'Plaques Bureau RDC', status: 'Approved', updatedAt: new Date(2024, 0, 30) },
-    { id: 'QT-9820', name: 'Signalétique Entrepôt', status: 'Pending', updatedAt: new Date(2024, 0, 25) },
-    { id: 'QT-9819', name: 'Cartes Visite PVC', status: 'Draft', updatedAt: new Date(2024, 0, 20) },
-    { id: 'QT-9818', name: 'Plaque Salle Réunion', status: 'Approved', updatedAt: new Date(2023, 11, 15) },
-  ];
-  
-  // Cart Summary Data
-  cartSummary = {
-    items: 4,
-    amount: 14250,
-    currency: 'EUR'
-  };
+  // --- PAGINATION ---
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(5);
+  activeMenuId = signal<string | null>(null);
 
-  // Status mapping for CSS classes
-  statusChipClasses: { [key: string]: string } = {
-    'Draft': 'draft',
-    'Pending': 'pending',
-    'Approved': 'approved',
-    'Ordered': 'ordered',
-  };
+  // Stats simplifiées
+  cartCount = computed(() => (this.cartService as any).itemCount?.() || 0);
+  cartTotal = computed(() => (this.cartService as any).totalAmount?.() || 0);
+  quoteCount = computed(() => this.allActivities().filter(a => a.type === 'quote').length);
+  orderCount = computed(() => this.allActivities().filter(a => a.type === 'order').length);
 
+  // 1. Filtrage par type
+  filteredActivities = computed(() => {
+    const list = this.allActivities();
+    if (this.filterType() === 'all') return list;
+    return list.filter(item => item.type === this.filterType());
+  });
 
-  constructor(private favoritesService: FavoritesService) {
-    // Les computed signals accèdent aux signaux locaux
-  }
-  
-  ngOnInit(): void {
-    this.loadFavorites();
-  }
+  // 2. Découpage pour la pagination (5 par page)
+  paginatedActivities = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    return this.filteredActivities().slice(startIndex, startIndex + this.pageSize());
+  });
 
-  // --- LOGIQUE DU SERVICE ---
+  // 3. Calcul des pages
+  totalPages = computed(() => Math.ceil(this.filteredActivities().length / this.pageSize()) || 1);
+  pagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
-  loadFavorites(): void {
-    this.isLoadingFavorites.set(true);
-    this.favoritesService.getFavorites()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (items) => {
-          // Transformation des données pour l'affichage
-          const transformedItems = items.map(item => ({
-            ...item,
-            image: item.quote.image_url || `https://placehold.co/160x120/4B5563/FFFFFF?text=${item.quote.reference}`
-          }));
-          this.favourites.set(transformedItems);
-          this.isLoadingFavorites.set(false);
-        },
-        error: (err) => {
-          console.error("Erreur lors du chargement des favoris", err);
-          this.isLoadingFavorites.set(false);
-        }
-      });
-  }
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
 
-  relaunchConfiguration(quoteId: number): void {
-    console.log(`Relancer la configuration pour le Devis ID: ${quoteId}`);
-    // Logique de navigation (ex: router.navigate(['/config', quoteId]))
-  }
+  loadDashboardData(): void {
+    this.favoritesService.getFavorites().pipe(catchError(() => of([]))).subscribe(data => this.favourites.set(data));
 
+    forkJoin({
+      quotes: this.quoteService.getQuotes().pipe(catchError(() => of([]))),
+      orders: this.orderService.getOrders().pipe(catchError(() => of([])))
+    }).subscribe(result => {
+      const quotesMap = result.quotes.map((q: Quote) => ({
+        id: q.reference || `DEV-${q.id}`,
+        name: q.material?.name || 'Devis personnalisé',
+        type: 'quote',
+        status: q.status,
+        date: q.updated_at,
+        amount: q.final_price_fcfa,
+        rawId: q.id // Utilisé pour le lien de redirection
+      }));
 
-  // --- COMPUTED SIGNALS et METHODS ---
+      const ordersMap = result.orders.map((o: Order) => ({
+        id: o.reference || `CMD-${o.id}`,
+        name: o.material?.name || 'Commande signalétique',
+        type: 'order',
+        status: o.status,
+        date: o.created_at,
+        amount: o.final_price_fcfa,
+        rawId: o.id
+      }));
 
-  activeStageIndex = computed(() => {
-    const status = this.latestOrderTracker.status;
-    const index = this.orderStages.findIndex(stage => stage.label === status);
-    return index > -1 ? index : 0; 
-  });
+      const combined = [...quotesMap, ...ordersMap].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      this.allActivities.set(combined);
+    });
+  }
 
-  timelineProgress = computed(() => {
-    const totalStages = this.orderStages.length;
-    const progress = (this.activeStageIndex() + 1) / totalStages * 100;
-    return progress > 100 ? 100 : progress;
-  });
-  
-  toggleSidebar() {
-    this.isSidebarOpen.update(current => !current);
-  }
+  // Navigation
+  setFilter(type: 'all' | 'quote' | 'order') {
+    this.filterType.set(type);
+    this.currentPage.set(1); // Reset à la page 1 lors du filtrage
+  }
 
-  getQuoteActionText(quote: { status: string }): string {
-    switch (quote.status) {
-      case 'Draft':
-        return 'Finaliser';
-      case 'Pending':
-      case 'Ordered':
-        return 'Télécharger';
-      case 'Approved':
-        return 'Convertir en Cde';
-      default:
-        return 'Voir Détails';
-    }
-  }
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  // Menu "..."
+  toggleMenu(id: string, event: Event) {
+    event.stopPropagation();
+    this.activeMenuId.set(this.activeMenuId() === id ? null : id);
+  }
+
+  @HostListener('document:click')
+  closeMenu() { this.activeMenuId.set(null); }
+
+  // Libellés et Styles
+  translateStatus(status: string): string {
+    const translations: any = {
+      'draft': 'Brouillon', 'sent': 'Envoyé', 'calculated': 'Calculé',
+      'ordered': 'Commandé', 'pending_payment': 'En attente', 'paid': 'Payé',
+      'processing': 'En cours', 'shipped': 'Expédié', 'completed': 'Livré', 'canceled': 'Annulé'
+    };
+    return translations[status] || status;
+  }
+
+  getStatusClass(status: string): string {
+    const map: any = { 
+      'calculated': 'status-info', 'ordered': 'status-success', 'paid': 'status-success',
+      'completed': 'status-success', 'processing': 'status-warning', 'pending_payment': 'status-danger'
+    };
+    return map[status] || 'status-neutral';
+  }
+
+  openCart() { (this.cartService as any).openCartModal?.(); }
 }

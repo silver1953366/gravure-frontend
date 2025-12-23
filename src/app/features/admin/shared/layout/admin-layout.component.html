@@ -1,0 +1,31 @@
+<div class="admin-app-shell">
+  
+  <aside class="sidebar-container" 
+         [class.mini]="isSidebarMini()" 
+         [class.mobile-show]="isMobileOpen()">
+    
+    <app-admin-sidebar 
+        [isMini]="isSidebarMini()" 
+        (toggleSidebar)="toggleSidebar()">
+    </app-admin-sidebar>
+  </aside>
+
+  @if (isMobileOpen()) {
+    <div class="mobile-overlay" (click)="toggleSidebar()"></div>
+  }
+
+  <div class="main-wrapper" [class.mini-margin]="isSidebarMini()">
+    
+    <app-admin-navbar 
+        [isSidebarMini]="isSidebarMini()"
+        (toggleSidebar)="toggleSidebar()">
+    </app-admin-navbar>
+    
+    <main class="content-view">
+      <div class="page-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+  </div>
+</div>

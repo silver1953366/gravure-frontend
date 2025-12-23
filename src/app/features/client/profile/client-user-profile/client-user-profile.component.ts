@@ -1,10 +1,9 @@
-// src/app/features/client/profile/user-profile/client-user-profile.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ClientUserProfileService, ClientUser } from '../../client-user-profile.service';
+import { ClientUserProfileService, ClientUser } from '../client-user-profile.service';
 
 @Component({
   selector: 'app-client-user-profile',

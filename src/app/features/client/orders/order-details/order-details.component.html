@@ -1,118 +1,123 @@
 <div class="container">
   <a routerLink="/client/orders" class="back-link">
-      ← Retour à l'historique des commandes
+    <span class="icon">←</span> Retour à l'historique des commandes
   </a>
 
-  @if (isLoading()) {
-    <div class="loading-state">
-      Chargement des détails de la commande...
-    </div>
-  } @else if (error()) {
-    <div class="error-message">
-      {{ error() }}
-    </div>
-  } @else if (order()) {
-    <div class="card detail-page-card">
-      <div class="p-8">
-        <header class="card-header">
-          <h1 class="card-header-title">
-            Commande #{{ order()!.reference }}
-          </h1>
-          <span class="{{ getStatusClass(order()!.status) }}">
-            {{ order()!.status | uppercase }}
-          </span>
-        </header>
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement de votre commande...</p>
+  </div>
 
-        <div class="detail-grid">
+  <div *ngIf="error()" class="error-message">
+    <div class="alert-box">
+      <span class="icon">⚠️</span>
+      <p>{{ error() }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="order() as data" class="card detail-page-card">
+    <div class="p-8">
+      
+      <header class="card-header">
+        <div class="title-group">
+          <h1 class="card-header-title">Commande #{{ data.reference }}</h1>
+          <p class="order-date">Passée le {{ data.created_at | date: 'dd MMMM yyyy' }}</p>
+        </div>
+        <span [class]="getStatusClass(data.status)">
+          {{ data.status | uppercase }}
+        </span>
+      </header>
+
+      <div class="detail-grid">
+        
+        <div class="detail-block">
+          <h3><span class="icon">💳</span> Statut & Paiement</h3>
+          <dl class="data-list">
+            <div class="data-item">
+              <dt>Montant total :</dt>
+              <dd class="final-price">{{ data.final_price_fcfa | number:'1.0-0' }} FCFA</dd>
+            </div>
+            <div class="data-item" *ngIf="data.payment_id">
+              <dt>Transaction :</dt>
+              <dd><code>{{ data.payment_id }}</code></dd>
+            </div>
+          </dl>
           
-          <div class="detail-block">
-            <h2>Statut & Paiement</h2>
-            <dl class="data-list">
-              <div>
-                <dt>Date de commande:</dt>
-                <dd>{{ order()!.created_at | date: 'fullDate' }}</dd>
-              </div>
-              <div>
-                <dt>Montant total:</dt>
-                <dd class="final-price">{{ order()!.final_price_fcfa | number:'1.0-0' }} FCFA</dd>
-              </div>
-              @if (order()!.payment_id) {
-                <div>
-                  <dt>ID Transaction:</dt>
-                  <dd>{{ order()!.payment_id }}</dd>
-                </div>
-              }
-            </dl>
-            
-            @if (order()!.status === 'pending_payment') {
-              <button (click)="handlePayment()"
-                      class="payment-button">
-                Procéder au Paiement
-              </button>
-            } @else if (order()!.status === 'completed') {
-              <p class="completed-message">La commande est terminée. Merci.</p>
-            }
-          </div>
-
-          <div class="detail-block">
-            <h2>Adresse de Livraison</h2>
-            <address>
-              <p class="font-semibold">{{ order()!.client_details.name }}</p>
-              <p>{{ order()!.shipping_address.street }}</p>
-              <p>{{ order()!.shipping_address.postal_code }} {{ order()!.shipping_address.city }}</p>
-              <p>Tél: {{ order()!.client_details.phone }}</p>
-              <p>Email: {{ order()!.client_details.email }}</p>
-            </address>
-          </div>
-
-          <div class="detail-block">
-            <h2>Produit commandé</h2>
-            <dl class="data-list">
-              <div>
-                <dt>Matériau:</dt>
-                <dd>{{ order()!.material?.name || 'N/A' }}</dd>
-              </div>
-              <div>
-                <dt>Forme:</dt>
-                <dd>{{ order()!.shape?.name || 'N/A' }}</dd>
-              </div>
-              <div>
-                <dt>Dimension:</dt>
-                <dd>{{ order()!.material_dimension?.dimension_label || 'N/A' }}</dd> 
-              </div>
-              <div>
-                <dt>Quantité:</dt>
-                <dd class="quantity">{{ order()!.quantity }}</dd>
-              </div>
-            </dl>
+          <div class="action-zone" *ngIf="data.status === 'pending_payment'">
+            <button (click)="handlePayment()" class="payment-button">
+              Procéder au Paiement
+            </button>
           </div>
         </div>
-        
-        <div class="instructions-attachments-section full-width">
-            <h3>Instructions du Client</h3>
-            <p>
-                {{ order()!.details_snapshot.description || 'Aucune instruction ou description fournie lors de la commande.' }}
-            </p>
 
-            @if (order()!.attachments?.length) {
-                <h3 class="mt-6">Fichiers Joints</h3>
-                <ul class="attachment-list">
-                    @for (att of order()!.attachments; track att.id) {
-                        <li class="attachment-item">
-                            <span class="file-name">{{ att.original_name }}</span> 
-                            <div class="file-info-actions">
-                                <span class="file-size">{{ att.size | number:'1.0-0':'fr' }} octets</span>
-                                <a [href]="getAttachmentDownloadUrl(att.id)" target="_blank" class="download-link" title="Télécharger">
-                                    Télécharger
-                                    <svg class="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-4-4l4 4 4-4"/></svg>
-                                </a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
+        <div class="detail-block">
+          <h3><span class="icon">📍</span> Livraison</h3>
+          <address class="shipping-info">
+            <p class="name">{{ data.client_details?.name || 'Client' }}</p>
+            <p>{{ data.shipping_address?.street }}</p>
+            <p>{{ data.shipping_address?.postal_code }} {{ data.shipping_address?.city }}</p>
+            <div class="contact-mini">
+              <p>📞 {{ data.client_details?.phone || 'N/A' }}</p>
+              <p>✉️ {{ data.client_details?.email || 'N/A' }}</p>
+            </div>
+          </address>
+        </div>
+
+        <div class="detail-block">
+          <h3><span class="icon">🛠️</span> Configuration</h3>
+          <dl class="data-list">
+            <div class="data-item">
+              <dt>Matériau :</dt>
+              <dd>{{ data.material?.name || 'N/A' }}</dd>
+            </div>
+            <div class="data-item">
+              <dt>Forme :</dt>
+              <dd>{{ data.shape?.name || 'N/A' }}</dd>
+            </div>
+            <div class="data-item">
+              <dt>Dimension :</dt>
+              <dd>{{ data.material_dimension?.dimension_label || 'Standard' }}</dd>
+            </div>
+            <div class="data-item">
+              <dt>Quantité :</dt>
+              <dd><strong>x{{ data.quantity }}</strong></dd>
+            </div>
+          </dl>
         </div>
       </div>
+      
+      <hr class="section-divider">
+
+      <div class="full-width-section">
+        <div class="instructions-area">
+          <h3>Instructions particulières</h3>
+          <p class="description-text">
+            {{ data.details_snapshot?.description || 'Aucune instruction spécifique fournie lors de la commande.' }}
+          </p>
+        </div>
+
+        <div class="attachments-area" *ngIf="data.attachments && data.attachments.length > 0">
+          <h3>Pièces jointes ({{ data.attachments.length }})</h3>
+          <ul class="attachment-list">
+            @for (att of data.attachments; track att.id) {
+              <li class="attachment-item">
+                <div class="file-icon">📄</div>
+                <div class="file-meta">
+                  <span class="file-name">{{ att.original_name }}</span>
+                  <span class="file-size">{{ (att.size / 1024) | number:'1.0-1' }} KB</span>
+                </div>
+                <a [href]="getAttachmentDownloadUrl(att.id)" 
+                   target="_blank" 
+                   class="download-btn"
+                   title="Télécharger le fichier">
+                   Télécharger
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+
     </div>
-  }
+  </div>
 </div>

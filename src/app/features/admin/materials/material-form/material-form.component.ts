@@ -1,10 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, Params, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MaterialService, Material } from '../material.service';
+
+// --- CORRECTION DES IMPORTS ---
+// On remonte de 3 niveaux : materials (1) -> admin (2) -> features (3) -> app/core...
+import { Category } from '../../../../core/models/category.model';
+import { Material } from '../../../../core/models/material.model';
+
+// Imports de vos services
+import { MaterialService } from '../material.service';
+import { CatalogService } from '../../../../core/services/catalog/catalog.service';
 
 @Component({
     standalone: true,
@@ -15,36 +23,41 @@ import { MaterialService, Material } from '../material.service';
 })
 export class MaterialFormComponent implements OnInit, OnDestroy {
     
+    private fb = inject(FormBuilder);
+    private materialService = inject(MaterialService);
+    private catalogService = inject(CatalogService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+
     materialForm: FormGroup;
     currentMaterialId: number | null = null;
     isEditMode = false;
     isLoading = false;
+    
+    categories: Category[] = []; 
     apiErrors: any = {};
     
     selectedFile: File | null = null;
-    imageUrlPreview: string | ArrayBuffer | null = null; // Pour afficher l'image avant l'upload
+    imageUrlPreview: string | ArrayBuffer | null = null; 
     
     private routeSubscription!: Subscription;
 
-    constructor(
-        private fb: FormBuilder,
-        private materialService: MaterialService,
-        private route: ActivatedRoute,
-        private router: Router
-    ) {
+    constructor() {
         this.materialForm = this.fb.group({
             name: ['', [Validators.required, Validators.maxLength(100)]],
             slug: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]], 
+            category_id: [null],
             description: [''],
-            // Le champ image_url est conservé pour stocker l'URL reçue du backend en mode édition
-            image_url: [''], 
-            price_per_sq_meter: [0, [Validators.required, Validators.min(0.01)]], 
+            price_per_sq_meter: [null, [Validators.min(0)]], 
             thickness_options: [''], 
             is_active: [true],
+            image_url: [''] 
         });
     }
 
     ngOnInit(): void {
+        this.loadCategories();
+
         this.routeSubscription = this.route.params.subscribe((params: Params) => {
             this.currentMaterialId = params['id'] ? +params['id'] : null;
             this.isEditMode = !!this.currentMaterialId;
@@ -56,52 +69,67 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.routeSubscription) {
-            this.routeSubscription.unsubscribe();
-        }
+        if (this.routeSubscription) this.routeSubscription.unsubscribe();
+    }
+
+    loadCategories(): void {
+        this.catalogService.getCategories().subscribe({
+            next: (data) => {
+                this.categories = data;
+            },
+            error: (err) => console.error('Erreur catégories', err)
+        });
     }
 
     loadMaterialData(): void {
         this.isLoading = true;
         this.materialService.getMaterial(this.currentMaterialId!).subscribe({
-            next: (material) => {
+            next: (material: Material) => { // Type explicite ici
                 this.patchForm(material);
                 this.isLoading = false;
             },
             error: (err) => {
-                console.error("Erreur de chargement des données du matériau:", err);
                 this.router.navigate(['/admin/materials']); 
             }
         });
     }
 
     patchForm(material: Material): void {
-           this.materialForm.patchValue({
-               name: material.name,
-               slug: material.slug,
-               description: material.description,
-               price_per_sq_meter: material.price_per_sq_meter,
-               thickness_options: material.thickness_options,
-               is_active: material.is_active,
-               image_url: material.image_url || '', // Conserver l'URL existante
-           });
-           this.imageUrlPreview = material.image_url || null; // Afficher l'image existante
+        this.materialForm.patchValue({
+            name: material.name,
+            slug: material.slug,
+            category_id: material.category_id,
+            description: material.description,
+            price_per_sq_meter: material.price_per_sq_meter,
+            thickness_options: material.thickness_options,
+            is_active: material.is_active,
+            image_url: material.image_url || ''
+        });
+        this.imageUrlPreview = material.image_url || null;
     }
 
+    // ... Garder les méthodes onFileSelected, onNameChange et onSubmit identiques
     onFileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
             this.selectedFile = input.files[0];
-            
-            // Prévisualisation de l'image
             const reader = new FileReader();
             reader.onload = e => this.imageUrlPreview = reader.result;
             reader.readAsDataURL(this.selectedFile!);
+        }
+    }
 
-        } else {
-            this.selectedFile = null;
-            // Si l'utilisateur annule la sélection, revenir à l'image existante si elle y est
-            this.imageUrlPreview = this.materialForm.get('image_url')?.value || null;
+    onNameChange(): void {
+        if (!this.isEditMode) {
+            const name = this.materialForm.get('name')?.value;
+            if (name) {
+                const slug = name.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .trim()
+                    .replace(/\s+/g, '-');
+                this.materialForm.get('slug')?.setValue(slug, { emitEvent: false });
+            }
         }
     }
 
@@ -114,33 +142,21 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         this.apiErrors = {};
         
-        // 1. Construire l'objet FormData
         const formData = new FormData();
-        const rawData = this.materialForm.getRawValue(); // Utiliser getRawValue pour récupérer les valeurs
+        const rawData = this.materialForm.getRawValue();
         
-        // Ajouter tous les champs textuels
         Object.keys(rawData).forEach(key => {
-            // Exclure le champ image_url car il est géré par l'upload
             if (key !== 'image_url') { 
-                // Ajouter tous les autres champs
                 let value = rawData[key];
-                
-                // Gérer les valeurs booléennes pour FormData
-                if (key === 'is_active') {
-                    value = value ? '1' : '0'; // Envoyer 1 ou 0 pour les booléens
-                }
-                
-                formData.append(key, value !== null ? value : '');
+                if (key === 'is_active') value = value ? '1' : '0';
+                formData.append(key, (value !== null && value !== undefined) ? value : '');
             }
         });
         
-        // 2. Ajouter le fichier (si présent)
         if (this.selectedFile) {
-            // 'image' doit correspondre au nom de champ attendu par votre API Laravel pour l'upload
             formData.append('image', this.selectedFile, this.selectedFile.name);
         }
 
-        // 3. Choisir entre création et mise à jour
         const request = this.isEditMode && this.currentMaterialId
             ? this.materialService.updateMaterial(this.currentMaterialId, formData)
             : this.materialService.createMaterial(formData);
@@ -152,30 +168,12 @@ export class MaterialFormComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 this.isLoading = false;
-                
-                if (err.status === 422 && err.error && err.error.errors) {
-                    // Mappage des erreurs de validation Laravel
+                if (err.status === 422) {
                     this.apiErrors = err.error.errors;
                 } else {
-                    this.apiErrors = { general: "Une erreur inattendue est survenue lors de la sauvegarde." };
+                    this.apiErrors = { general: "Une erreur inattendue est survenue." };
                 }
-                console.error("Erreur API:", err);
             }
         });
-    }
-    
-    onNameChange(): void {
-        // Le slug n'est généré automatiquement qu'en mode création
-        if (!this.isEditMode) {
-            const name = this.materialForm.get('name')?.value;
-            if (name) {
-                const slug = name.toLowerCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Supprimer les accents
-                    .replace(/[^a-z0-9\s-]/g, '') // Supprimer les caractères spéciaux sauf espaces et tirets
-                    .trim()
-                    .replace(/\s+/g, '-'); // Remplacer les espaces par des tirets
-                this.materialForm.get('slug')?.setValue(slug, { emitEvent: false }); // Pas besoin de trigger un autre event
-            }
-        }
     }
 }

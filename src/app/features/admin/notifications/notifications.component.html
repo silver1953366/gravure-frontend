@@ -1,95 +1,190 @@
-<div class="notifications-container">
-    <h2>Gestion et Journal des Notifications Système</h2>
+<div class="admin-page-header">
+  <div class="header-content">
+    <h1><i class="fa-solid fa-bullhorn"></i> Gestion des Notifications</h1>
+    <p>Envoyez des alertes à un client spécifique ou à l'ensemble de votre base de données.</p>
+  </div>
+</div>
 
-    <div class="send-notification-section">
-        <h3>Envoyer une Notification Manuelle</h3>
-        <form [formGroup]="notificationForm" (ngSubmit)="onSendNotification()">
-
-            <div *ngIf="apiErrors.general" class="alert-error">{{ apiErrors.general }}</div>
-            <div *ngIf="sendSuccessMessage" class="alert-success">{{ sendSuccessMessage }}</div>
-
-            <div class="form-group">
-                <label for="user_ids">IDs Utilisateurs Destinataires (séparés par une virgule)</label>
-                <input id="user_ids" type="text" formControlName="user_ids" placeholder="Ex: 1, 5, 8">
-                <div *ngIf="notificationForm.controls['user_ids'].touched && notificationForm.controls['user_ids'].invalid" class="error-message">
-                    Le ou les IDs utilisateurs sont requis et doivent être des nombres séparés par des virgules.
-                </div>
-                <div *ngIf="apiErrors.user_id" class="error-message">{{ apiErrors.user_id }}</div>
-            </div>
-
-            <div class="form-group">
-                <label for="type">Type de Notification</label>
-                <select id="type" formControlName="type">
-                    <option *ngFor="let t of notificationTypes" [value]="t">{{ t | uppercase }}</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="title">Titre</label>
-                <input id="title" type="text" formControlName="title">
-                <div *ngIf="apiErrors.title" class="error-message">{{ apiErrors.title }}</div>
-            </div>
-
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" formControlName="message"></textarea>
-                <div *ngIf="apiErrors.message" class="error-message">{{ apiErrors.message }}</div>
-            </div>
-
-            <div class="form-group">
-                <label for="link">Lien (URL, optionnel)</label>
-                <input id="link" type="url" formControlName="link">
-                <div *ngIf="apiErrors.link" class="error-message">{{ apiErrors.link }}</div>
-            </div>
-
-            <button type="submit" [disabled]="notificationForm.invalid || isSending">
-                {{ isSending ? 'Envoi en cours...' : 'Envoyer la Notification' }}
-            </button>
-        </form>
+<div class="notifications-grid">
+  
+  <section class="card send-section">
+    <div class="card-header">
+      <i class="fa-solid fa-paper-plane"></i>
+      <h3>Diffuser une alerte</h3>
     </div>
 
-    <hr>
-    
-    <div class="notifications-list-section">
-        <h3>Journal des Notifications Système Envoyées</h3>
-
-        <div *ngIf="isLoadingNotifications" class="loading-message">Chargement du journal des notifications...</div>
-        <div *ngIf="errorNotifications" class="alert-error">{{ errorNotifications }}</div>
-        
-        <table *ngIf="!isLoadingNotifications && allNotifications.length > 0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Destinataire</th>
-                    <th>Type</th>
-                    <th>Titre</th>
-                    <th>Lue</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let notification of allNotifications">
-                    <td>{{ notification.id }}</td>
-                    <td>{{ notification.user?.name || 'Inconnu' }} (ID: {{ notification.user_id }})</td>
-                    <td><span class="type-badge type-{{ notification.type }}">{{ notification.type | uppercase }}</span></td>
-                    <td>{{ notification.title }}</td>
-                    <td>
-                        <span [class]="notification.is_read ? 'status-read' : 'status-unread'">
-                            {{ notification.is_read ? 'Oui' : 'Non' }}
-                        </span>
-                    </td>
-                    <td>{{ notification.created_at | date:'short' }}</td>
-                    <td>
-                        <a *ngIf="notification.link" [href]="notification.link" target="_blank" class="btn-link">Voir</a>
-                        <button (click)="onDeleteNotification(notification.id)" class="btn-danger">Supprimer</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div *ngIf="!isLoadingNotifications && allNotifications.length === 0 && !errorNotifications">
-            Le journal des notifications est vide.
+    <form [formGroup]="notificationForm" (ngSubmit)="onSendNotification()">
+      
+      @if (sendSuccessMessage()) {
+        <div class="alert alert-success">
+          <i class="fa-solid fa-circle-check"></i> {{ sendSuccessMessage() }}
         </div>
+      }
+
+      @if (apiErrors().general) {
+        <div class="alert alert-error">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ apiErrors().general }}
+        </div>
+      }
+
+      <div class="form-body">
+        
+        <div class="form-group">
+          <label for="userSelect">Destinataire(s)</label>
+          <div class="select-wrapper">
+            <select id="userSelect" (change)="onUserSelected($event)" class="custom-select">
+              <option value="">-- Choisir un ou plusieurs clients --</option>
+              <option value="all" class="opt-all">📢 ENVOYER À TOUS LES CLIENTS ({{ usersList().length }})</option>
+              <option disabled>────────────────────</option>
+              @for (user of usersList(); track user.id) {
+                <option [value]="user.id">{{ user.name }} ({{ user.email }})</option>
+              }
+            </select>
+          </div>
+
+          <div class="selection-status">
+            <div class="status-header">
+              <span class="count-badge" [class.multiple]="selectedUsers().length > 1">
+                {{ selectedUsers().length }} client(s) sélectionné(s)
+              </span>
+              @if (selectedUsers().length > 0) {
+                <button type="button" (click)="clearAllSelected()" class="btn-link-danger">
+                  Tout retirer
+                </button>
+              }
+            </div>
+
+            <div class="selected-users-list">
+              @for (user of selectedUsers(); track user.id) {
+                <span class="user-chip shadow-sm">
+                  <i class="fa-solid fa-user-circle"></i>
+                  <span class="chip-name">{{ user.name }}</span>
+                  <button type="button" (click)="removeUser(user.id)" title="Retirer">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </span>
+              } @empty {
+                <p class="empty-selection-text">Aucun destinataire sélectionné.</p>
+              }
+            </div>
+          </div>
+          
+          @if (notificationForm.get('user_ids')?.touched && selectedUsers().length === 0) {
+            <span class="error-hint">Veuillez sélectionner au moins un client.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Niveau de priorité</label>
+            <select formControlName="type">
+              @for (t of notificationTypes; track t) {
+                <option [value]="t">{{ t | titlecase }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Titre de l'alerte</label>
+            <input type="text" formControlName="title" placeholder="Ex: Maintenance système">
+            @if (notificationForm.get('title')?.touched && notificationForm.get('title')?.invalid) {
+              <span class="error-hint">Titre requis (min. 3 car.).</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Contenu du message</label>
+          <textarea formControlName="message" rows="4" placeholder="Tapez votre annonce ici..."></textarea>
+          @if (notificationForm.get('message')?.touched && notificationForm.get('message')?.invalid) {
+            <span class="error-hint">Message requis (min. 5 car.).</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Lien URL <small>(Redirection optionnelle)</small></label>
+          <input type="url" formControlName="link" placeholder="https://votre-boutique.com/promo">
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" 
+                class="btn-submit" 
+                [disabled]="notificationForm.invalid || isSending() || selectedUsers().length === 0">
+          @if (isSending()) {
+            <i class="fa-solid fa-spinner fa-spin"></i> Traitement...
+          } @else {
+            <i class="fa-solid fa-paper-plane"></i> Envoyer maintenant
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card list-section">
+    <div class="card-header header-between">
+      <h3><i class="fa-solid fa-history"></i> Historique des envois</h3>
+      <button class="btn-refresh" (click)="refreshHistory()" [disabled]="isLoadingNotifications()">
+        <i class="fa-solid fa-sync" [class.fa-spin]="isLoadingNotifications()"></i>
+      </button>
     </div>
+
+    <div class="table-container">
+      @if (isLoadingNotifications()) {
+        <div class="loading-state">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <p>Chargement des données...</p>
+        </div>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Message</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (notif of allNotifications(); track notif.id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <span class="user-name">{{ notif.user?.name || 'Inconnu' }}</span>
+                    <span class="user-id">ID: {{ notif.user_id }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="content-cell">
+                    <span class="badge" [attr.data-type]="notif.type">{{ notif.type }}</span>
+                    <span class="msg-title">{{ notif.title }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-indicator" [class.is-read]="notif.is_read">
+                    <i class="fa-solid" [class.fa-check-double]="notif.is_read" [class.fa-check]="!notif.is_read"></i>
+                    {{ notif.is_read ? 'Lue' : 'Envoyée' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <button (click)="onDeleteNotification(notif.id)" class="action-btn delete" title="Supprimer">
+                      <i class="fa-solid fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-row">
+                  <i class="fa-solid fa-folder-open"></i>
+                  <p>Aucune notification trouvée dans l'historique.</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </section>
 </div>

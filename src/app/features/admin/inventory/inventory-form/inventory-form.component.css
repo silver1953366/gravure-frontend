@@ -1,219 +1,322 @@
-/* Variables de base - Cohérence avec l'application */
-:root {
-    --primary-color: #0e7490; /* Teal Profond pour l'accentuation et le focus */
-    --primary-hover: #0f7689; /* Teal plus clair pour le survol */
-    --text-color: #1f2937; /* Gris foncé (Texte principal) */
-    --border-color: #d1d5db; /* Gris clair (Bordures des champs) */
-    --error-color: #ef4444; /* Rouge (Messages d'erreur) */
-    --bg-light: #f3f4f6; /* Gris très clair (Fond des champs read-only) */
-    --shadow-color: rgba(14, 116, 144, 0.2); /* Ombre basée sur la couleur primaire */
+/* src/app/features/admin/inventory/inventory-form/inventory-form.component.css */
+
+:host {
+    --primary: #0e7490;
+    --primary-hover: #0891b2;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg-page: #f8fafc;
+    --error: #ef4444;
+    --warning-bg: #fffbeb;
+    --warning-text: #b45309;
+    --info-bg: #f0f9ff;
+    --info-text: #0369a1;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* ----------------------------------- */
-/* 1. Conteneur et Général */
-/* ----------------------------------- */
-
 .inventory-form-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 16px;
-    /* Ombre plus douce et élégante */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+    max-width: 850px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* --- Header --- */
+.form-header {
+    margin-bottom: 2rem;
 }
 
 .back-link {
-    display: inline-flex; /* Pour aligner le texte et l'icône */
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 25px;
-    color: var(--primary-color);
+    gap: 0.5rem;
+    color: var(--primary);
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.2s, transform 0.2s;
-    font-size: 1.05em;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+    cursor: pointer;
 }
+
 .back-link:hover {
-    color: var(--primary-hover);
-    transform: translateX(-3px); /* Petit effet de glissement */
+    transform: translateX(-5px);
 }
 
-h3 {
-    font-size: 2.2em;
-    color: var(--text-color);
-    margin-bottom: 30px;
-    border-bottom: 4px solid var(--primary-color); /* Ligne de séparation forte */
-    padding-bottom: 10px;
+.form-header h1 {
+    font-size: 1.85rem;
+    color: var(--text-main);
     font-weight: 800;
+    margin: 0;
 }
 
-/* ----------------------------------- */
-/* 2. Fieldset et Legend */
-/* ----------------------------------- */
+.subtitle {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
 
-fieldset {
-    border: 1px solid var(--border-color);
-    border-radius: 12px; /* Coins plus arrondis */
-    padding: 25px;
-    margin-bottom: 30px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+/* --- Form Card & Sections --- */
+.shadow-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }
-fieldset:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 5px rgba(14, 116, 144, 0.1);
+
+.form-section {
+    border: none;
+    padding: 0;
+    margin-bottom: 2.5rem;
 }
-legend {
+
+.form-section legend {
+    font-size: 1.1rem;
     font-weight: 700;
-    font-size: 1.2em;
-    color: var(--primary-color);
-    padding: 0 15px;
-    background-color: #fff; /* Fond blanc pour couper la ligne de bordure */
-    margin-left: -10px;
-}
-
-/* ----------------------------------- */
-/* 3. Layout de Formulaire */
-/* ----------------------------------- */
-
-.form-row {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
     display: flex;
-    gap: 24px; /* Espacement accru */
-}
-.form-row.three-cols .form-group {
-    flex: 1 1 30%;
-}
-.form-group.half-width {
-    flex: 1 1 50%;
-}
-.form-group {
-    margin-bottom: 20px;
-    flex-grow: 1;
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
 }
 
-/* ----------------------------------- */
-/* 4. Inputs et Textareas */
-/* ----------------------------------- */
+/* --- Inputs & Groups --- */
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
 
 label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600; /* Plus de gras */
-    color: var(--text-color);
-    font-size: 0.95em;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
+/* Style spécifique pour le SELECT */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
+    padding-right: 2.5rem;
+}
+
+.form-control, 
+input[type="number"], 
+input[type="text"] {
     width: 100%;
-    padding: 12px 14px; /* Plus de padding */
-    border: 1px solid var(--border-color);
-    border-radius: 8px; /* Plus arrondis */
-    box-sizing: border-box;
-    font-size: 1em;
-    color: var(--text-color);
-    background-color: #ffffff;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-input:focus, textarea:focus {
-    border-color: var(--primary-color);
-    /* Ombre subtile pour le focus */
-    box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.2); 
-    outline: none;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-/* Inputs en lecture seule (reserved_quantity) */
-input:disabled, input[readonly] {
-    background-color: var(--bg-light);
-    color: #4b5563; /* Gris un peu plus foncé */
-    cursor: not-allowed;
-    border-style: dashed; /* Indicateur visuel clair */
-}
-
-/* ----------------------------------- */
-/* 5. Messages d'Erreur */
-/* ----------------------------------- */
-
-.error-message {
-    color: var(--error-color);
-    background-color: #fef2f2; /* Fond très clair */
-    padding: 8px 10px;
-    border-radius: 4px;
-    border-left: 3px solid var(--error-color);
-    font-size: 0.85em;
-    margin-top: 5px;
-    font-weight: 500;
-}
-.alert-error {
-    background-color: #fee2e2;
-    color: var(--error-color);
-    padding: 15px;
-    border: 1px solid #fca5a5;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
     border-radius: 10px;
-    margin-bottom: 25px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background-color: #fff;
+    color: var(--text-main);
+}
+
+/* Groupes avec Icônes */
+.input-prefix {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-prefix i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    z-index: 10;
+}
+
+.input-prefix input {
+    padding-left: 2.75rem;
+}
+
+/* État Focus */
+.form-control:focus, 
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+}
+
+/* Validation visuelle */
+.is-invalid {
+    border-color: var(--error) !important;
+    background-color: #fff8f8;
+}
+
+.error-feedback {
+    color: var(--error);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.4rem;
+}
+
+/* Champs Read-only / Bloqués */
+.input-prefix.disabled {
+    background-color: var(--bg-page);
+    border-radius: 10px;
+    cursor: not-allowed;
+}
+
+input[readonly], 
+select:disabled,
+input:disabled {
+    background-color: var(--bg-page) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed !important;
+    border-style: dashed;
+}
+
+/* --- Grid Layout --- */
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.three-cols .form-group {
+    flex: 1;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* --- Actions & Buttons --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn {
+    padding: 0.8rem 1.75rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(14, 116, 144, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(14, 116, 144, 0.3);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Messages Contextuels (Nouveau) --- */
+.hint-text {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.hint-text.info {
+    color: var(--info-text);
+    background: var(--info-bg);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.hint-text.warning {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.alert-error {
+    background: #fff1f2;
+    color: #991b1b;
+    padding: 1.1rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--error);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     font-weight: 600;
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
 }
 
-/* ----------------------------------- */
-/* 6. Bouton de Soumission (Action Forte) */
-/* ----------------------------------- */
-
-.btn-submit {
-    display: block;
-    width: 100%;
-    padding: 14px 20px; /* Plus grand */
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.15em;
-    font-weight: 700; /* Plus de gras */
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-    margin-top: 30px;
-    
-    /* Style de bouton fort (identique aux boutons d'action de la liste) */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-}
-.btn-submit:hover:not(:disabled) {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px var(--shadow-color); /* Ombre colorée */
-}
-.btn-submit:disabled {
-    background-color: #9ca3af;
-    color: #e5e7eb;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* État de chargement */
+/* --- Loading State --- */
 .loading-state {
     text-align: center;
-    font-style: italic;
-    color: var(--primary-color);
-    padding: 20px 0;
-    font-size: 1.1em;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: var(--shadow);
 }
 
-/* Responsivité */
+.animate-fadeIn {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .form-row {
         flex-direction: column;
         gap: 0;
     }
-    .inventory-form-container {
-        margin: 20px;
-        padding: 20px;
+    .half-width {
+        width: 100%;
+    }
+    .shadow-card {
+        padding: 1.5rem;
+    }
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    .btn {
+        width: 100%;
     }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivityService, Activity, PaginatedActivities } from '../../activity/activity.service';
+import { ActivityService, Activity, PaginatedActivities } from './activity.service';
 
 @Component({
   standalone: true,
@@ -17,12 +17,15 @@ export class ActivityLogComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   
+  // Modale Snapshot
+  selectedActivity: Activity | null = null;
+  isModalOpen = false;
+
   // Pagination & Filtering
   currentPage = 1;
   filterUserId: number | null = null;
   filterAction: string = '';
   
-  // Liste des actions communes pour le filtre
   commonActions = ['created', 'updated', 'deleted', 'login', 'logout', 'price_estimate', 'order_converted'];
 
   constructor(private activityService: ActivityService) {}
@@ -55,7 +58,7 @@ export class ActivityLogComponent implements OnInit {
   }
   
   applyFilters(): void {
-      this.fetchActivities(1); // Retourne à la première page
+      this.fetchActivities(1);
   }
   
   onPageChange(page: number): void {
@@ -63,9 +66,27 @@ export class ActivityLogComponent implements OnInit {
           this.fetchActivities(page);
       }
   }
-  
-  // Fonction utilitaire pour extraire le nom du modèle (ex: 'App\Models\Order' devient 'Order')
-  getModelName(modelType: string): string {
+
+  // --- Gestion de la Modale ---
+  openModal(activity: Activity): void {
+    this.selectedActivity = activity;
+    this.isModalOpen = true;
+    document.body.style.overflow = 'hidden'; // Bloque le scroll arrière
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.selectedActivity = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  formatSnapshot(data: any): string {
+    if (!data) return "Aucune donnée disponible";
+    return JSON.stringify(data, null, 2);
+  }
+
+  getModelName(modelType: string | undefined): string {
+      if (!modelType) return 'N/A';
       const parts = modelType.split('\\');
       return parts[parts.length - 1];
   }

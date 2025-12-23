@@ -1,48 +1,70 @@
-// src/app/features/admin/services/admin-dashboard.service.ts
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-// --- Interfaces du Dashboard (Conservées) ---
+// --- Interfaces pour typer les données ---
+
 export interface DashboardStats {
-    totalUsers: number;
-    activeQuotes: number; 
-    pendingOrders: number; 
-    totalRevenue: number; 
-    inventoryAlerts: number; 
+  activeQuotes: number;      // Devis en attente
+  pendingOrders: number;     // Commandes en cours
+  totalRevenue: number;      // Chiffre d'affaires total
+  inventoryAlerts: number;   // Articles en rupture/seuil bas
 }
 
 export interface ChartData {
-    period: string[]; 
-    revenue: number[];
+  period: string[];          // Ex: ['Jan', 'Fev', 'Mar']
+  revenue: number[];         // Ex: [150000, 250000, 180000]
+}
+
+export interface AdminActivity {
+  id: string;
+  reference: string;         // REF-123
+  action: string;            // 'quote_created', 'order_paid', etc.
+  details: string;           // "Mise à jour du stock..."
+  user: string;              // "Admin Jean"
+  created_at: string | Date;
+  status: 'pending' | 'processing' | 'completed' | 'alert';
 }
 
 @Injectable({
-    // Le service est toujours fourni à la racine, mais sa localisation est logique.
-    providedIn: 'root' 
+  providedIn: 'root'
 })
-// Le service est renommé pour refléter sa spécificité Admin
-export class AdminDashboardService { 
-    
-    private readonly dashboardUrl = `${environment.apiUrl}/admin/dashboard`;
-    private readonly reportsUrl = `${environment.apiUrl}/admin/reports`;
+export class AdminDashboardService {
+  private http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/admin`;
 
-    constructor(private http: HttpClient) {}
+  /**
+   * Récupère les compteurs globaux pour les cartes du haut
+   */
+  getStatsCards(): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard/stats`);
+  }
 
-    /** GET: Récupère les cartes de statistiques principales (Admin). */
-    getStatsCards(): Observable<DashboardStats> {
-        return this.http.get<DashboardStats>(`${this.dashboardUrl}/stats`);
-    }
-    
-    /** GET: Récupère les données pour un graphique de revenus (Admin). */
-    getRevenueChartData(period: 'month' | 'year' = 'month'): Observable<ChartData> {
-        return this.http.get<ChartData>(`${this.reportsUrl}/revenue?period=${period}`);
-    }
+  /**
+   * Récupère les données pour le graphique de performance
+   * @param period 'week' | 'month' | 'year'
+   */
+  getRevenueChartData(period: string = 'month'): Observable<ChartData> {
+    const params = new HttpParams().set('period', period);
+    return this.http.get<ChartData>(`${this.apiUrl}/reports/revenue`, { params });
+  }
 
-    /** GET: Récupère les 5 dernières activités système (Admin). */
-    getRecentActivity(): Observable<any[]> {
-        return this.http.get<any[]>(`${environment.apiUrl}/admin/activities?limit=5`);
-    }
+  /**
+   * Récupère le journal d'activité récent
+   * @param limit Nombre de résultats à remonter
+   */
+  getRecentActivity(limit: number = 50): Observable<AdminActivity[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AdminActivity[]>(`${this.apiUrl}/activities`, { params });
+  }
+
+  /**
+   * Méthode utilitaire pour exporter les rapports (Exemple)
+   */
+  exportReport(type: 'pdf' | 'csv'): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/export?format=${type}`, {
+      responseType: 'blob'
+    });
+  }
 }

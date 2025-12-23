@@ -6,9 +6,9 @@
 
     <div *ngIf="error" class="alert-error">{{ error }}</div> 
     
-    <ng-container *ngIf="user && !isLoading">
-        </ng-container>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div> 
 
+    <div *ngIf="isLoading" class="loading-state">Chargement du profil...</div>
 
     <ng-container *ngIf="user && !isLoading">
         

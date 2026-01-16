@@ -1,0 +1,61 @@
+<header class="navbar-container">
+    <nav class="navbar-content">
+
+        <div class="brand-section">
+            
+           <button 
+                *ngIf="isLoggedIn()"
+                (click)="onToggleSidebar()" class="action-btn toggle-sidebar-btn" 
+                [class.is-open]="isSidebarOpen()" aria-label="Toggle sidebar"
+            >
+            </button>
+            <a routerLink="/catalog" class="logo-link">
+                <img src="./../../../../assets/Logo/logo.png" alt="Logo E.M.E.S" class="logo">
+                <span class="brand-name">E.M.E.S</span>
+            </a>
+        </div>
+
+        <div class="main-options-section">
+            <a routerLink="/configurator" class="main-cta">
+                <span class="cta-icon">
+                    &#9654;
+                </span>
+                Démarrer votre Projet
+            </a>
+        </div>
+
+        <div class="user-actions-section">
+            
+            <span *ngIf="isLoggedIn() && userName" class="user-name-display">
+                Bienvenue, {{ userName }}
+            </span>
+            
+            <button 
+                *ngIf="!isLoggedIn()" 
+                (click)="onLoginClick()" 
+                class="action-btn login-btn"
+            >
+                Connexion
+            </button>
+
+            <a *ngIf="isLoggedIn()" routerLink="/client/dashboard" class="action-link profile-link" title="Tableau de bord">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </a>
+            
+            <button *ngIf="isLoggedIn()" (click)="onLogout()" class="action-btn logout-btn" title="Déconnexion">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+            
+            <app-cart-summary (openCartModal)="onCartIconClick()"/>
+
+        </div>
+
+    </nav>
+</header>

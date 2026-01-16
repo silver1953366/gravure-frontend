@@ -1,0 +1,148 @@
+<div class="admin-orders-container">
+  <header class="dashboard-header">
+    <div class="title-section">
+      <h1>Gestion des Commandes</h1>
+      <p class="subtitle">{{ filteredOrders.length }} commande(s) au total</p>
+    </div>
+
+    <div class="header-tools">
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="currentPage = 1" 
+          placeholder="Référence, client ou devis..."
+        >
+      </div>
+
+      <button (click)="toggleSort()" class="btn-tool" [title]="sortOrder === 'desc' ? 'Plus récentes en premier' : 'Plus anciennes en premier'">
+        <i class="fas" [ngClass]="sortOrder === 'desc' ? 'fa-sort-amount-down' : 'fa-sort-amount-up'"></i>
+      </button>
+
+      <button (click)="loadOrders()" class="btn-refresh" [class.spinning]="isLoading" [disabled]="isLoading">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="error" class="banner error animate-in">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+  </div>
+  <div *ngIf="successMessage" class="banner success animate-in">
+    <i class="fas fa-check-double"></i> {{ successMessage }}
+  </div>
+
+  <div class="content-card">
+    
+    <div *ngIf="isLoading" class="skeleton-container">
+      <div *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
+        <div class="skeleton-cell pulse short"></div>
+        <div class="skeleton-cell pulse long"></div>
+        <div class="skeleton-cell pulse medium"></div>
+        <div class="skeleton-cell pulse short"></div>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && filteredOrders.length > 0">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Client & Source</th>
+            <th class="text-right">Montant Final</th>
+            <th>Statut État</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of paginatedOrders" class="order-row">
+            <td>
+              <div class="id-badge">{{ order.reference || '#' + order.id }}</div>
+              <span class="timestamp">{{ order.created_at | date:'dd MMM yyyy HH:mm' }}</span>
+            </td>
+
+            <td>
+              <div class="client-cell">
+                <div class="avatar-circle">
+                  {{ (order.user?.name || 'U') | slice:0:1 | uppercase }}
+                </div>
+                <div class="client-info">
+                  <span class="name">{{ order.user?.name || 'Client Inconnu' }}</span>
+                  <span class="email">Issu du Devis #{{ order.quote_id }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="text-right font-bold price-text">
+              {{ order.final_price_fcfa | number:'1.0-0' }} <small>FCFA</small>
+            </td>
+
+            <td>
+              <div class="status-wrapper">
+                <select 
+                  [ngModel]="order.status" 
+                  (ngModelChange)="onStatusChange(order, $event)"
+                  [class]="'status-select ' + order.status"
+                  [disabled]="isProcessing">
+                  <option *ngFor="let s of availableStatuses" [value]="s.value">
+                    {{ s.label }}
+                  </option>
+                </select>
+              </div>
+            </td>
+
+            <td class="action-cell">
+              <div class="button-group">
+                <button (click)="goToDetails(order.id)"
+                        class="action-btn view" title="Voir Facture / Détails">
+                  <i class="fas fa-file-invoice"></i>
+                </button>
+                
+                <button class="action-btn print" title="Imprimer">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <footer class="table-footer">
+        <div class="page-info">
+          Affichage de <strong>{{ paginatedOrders.length }}</strong> sur {{ filteredOrders.length }} commandes
+        </div>
+        
+        <div class="pagination-controls">
+          <button class="nav-btn" [disabled]="currentPage === 1" (click)="currentPage = currentPage - 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          
+          <div class="page-numbers">
+            <button 
+              *ngFor="let p of [].constructor(totalPages); let i = index" 
+              [class.active]="currentPage === i + 1"
+              (click)="currentPage = i + 1">
+              {{ i + 1 }}
+            </button>
+          </div>
+
+          <button class="nav-btn" [disabled]="currentPage === totalPages" (click)="currentPage = currentPage + 1">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <div *ngIf="!isLoading && filteredOrders.length === 0" class="empty-state animate-in">
+      <div class="empty-icon-wrapper">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <h3>Aucune commande trouvée</h3>
+      <p>Aucun résultat pour "<strong>{{ searchTerm }}</strong>".</p>
+      <button (click)="searchTerm = ''; currentPage = 1" class="btn-outline">
+        Voir toutes les commandes
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="shape-selection-grid">
+    <button *ngFor="let shape of availableShapes" 
+            [class.selected]="shape.id === selectedShapeId"
+            (click)="selectShape(shape.id)"
+            class="shape-tile">
+        <div class="shape-icon">
+            <svg></svg> 
+        </div>
+        <span class="shape-name">{{ shape.name }}</span>
+    </button>
+</div>

@@ -1,0 +1,148 @@
+<div class="inventory-management-container animate-fadeIn">
+  <header class="page-header">
+    <div class="header-title">
+      <div class="icon-main">
+        <i class="fas fa-boxes"></i>
+      </div>
+      <div>
+        <h1>Gestion des Stocks</h1>
+        <p>Suivi en temps réel et alertes de seuil critique</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-controls">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearchChange()" 
+        placeholder="Rechercher par matériau (ex: Acier, Inox...)"
+      >
+      <button *ngIf="searchTerm" class="clear-search" (click)="searchTerm = ''; onSearchChange()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="header-actions" *ngIf="canAdministerInventory">
+      <button class="btn btn-primary" (click)="onCreateItem()">
+        <i class="fas fa-plus"></i> Ajouter au stock
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-message card">
+    <i class="fas fa-spinner fa-spin"></i> Synchronisation des données en cours...
+  </div>
+  
+  <div *ngIf="error" class="alert-error">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+  </div>
+
+  <div class="card" *ngIf="!isLoading && filteredInventory.length > 0">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Configuration Article</th>
+          <th class="text-center">Dimension</th>
+          <th class="text-center">Physique</th>
+          <th class="text-center">Réservé</th>
+          <th class="text-center">Disponible</th>
+          <th class="text-center">Seuil Min.</th>
+          <th class="text-right">Prix Unit.</th>
+          <th *ngIf="canAdministerInventory" class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of paginatedInventory" class="row-hover">
+          <td>
+            <div class="config-cell">
+              <span class="mat-name">
+                {{ getItemDisplayName(item) }}
+              </span>
+              <span class="badge-category" *ngIf="item.material_dimension?.category">
+                <i class="fas fa-tag"></i> {{ item.material_dimension?.category?.name }}
+              </span>
+            </div>
+          </td>
+
+          <td class="text-center dimension-label">
+            <i class="fas fa-ruler-combined"></i> {{ getDimensionLabel(item) }}
+          </td>
+
+          <td class="text-center font-bold">{{ item.stock_quantity }}</td>
+          <td class="text-center reserved-stock">{{ item.reserved_quantity }}</td>
+          
+          <td class="text-center">
+            <span class="status-badge" [class]="getStockStatusClass(item)">
+              {{ item.available_quantity }}
+            </span>
+          </td>
+
+          <td class="text-center text-muted">{{ item.minimum_threshold }}</td>
+
+          <td class="text-right price-cell">
+            {{ item.price_per_unit | number:'1.0-0' }} <small>FCFA</small>
+          </td>
+
+          <td *ngIf="canAdministerInventory" class="text-center actions-cell">
+            <div class="action-buttons">
+              <button (click)="onEditItem(item.id)" class="btn-icon edit" title="Modifier le stock">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="onDeleteItem(item.id)" class="btn-icon delete" title="Supprimer de l'inventaire">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-footer">
+      <div class="pagination-info">
+        Affichage de <strong>{{ paginatedInventory.length }}</strong> sur <strong>{{ filteredInventory.length }}</strong> articles
+        <span *ngIf="searchTerm"> (filtrés)</span>
+      </div>
+      
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="btn-page">
+          <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+        
+        <div class="page-numbers">
+          <span class="current-page">Page {{ currentPage }} / {{ totalPages }}</span>
+        </div>
+
+        <button [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)" class="btn-page">
+          Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredInventory.length === 0 && searchTerm" class="empty-state-container card">
+    <div class="empty-state-icon">
+      <i class="fas fa-search-minus"></i>
+    </div>
+    <h4>Aucun résultat</h4>
+    <p>Aucun article ne correspond à votre recherche "<strong>{{ searchTerm }}</strong>".</p>
+    <button class="btn btn-secondary" (click)="searchTerm = ''; onSearchChange()">
+      Effacer la recherche
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && inventory.length === 0 && !error" class="empty-state-container card">
+    <div class="empty-state-icon">
+      <i class="fas fa-warehouse"></i>
+    </div>
+    <h4>Stock vide</h4>
+    <p>Aucun article n'est actuellement répertorié dans votre inventaire.</p>
+    <div class="empty-state-suggestions" *ngIf="canAdministerInventory">
+      <button class="btn btn-primary" (click)="onCreateItem()">
+        <i class="fas fa-plus"></i> Créer mon premier stock
+      </button>
+    </div>
+  </div>
+</div>

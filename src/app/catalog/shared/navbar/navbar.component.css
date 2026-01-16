@@ -1,0 +1,164 @@
+/* src/app/components/navbar/navbar.component.css */
+
+/* --- Couleurs et Base --- */
+:host {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Niveau de base pour la navbar */
+}
+
+.navbar-container {
+    background-color: #172554; /* Bleu foncé professionnel (Navy Blue) */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #f1f5f9; 
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 24px;
+}
+
+/* --- Section 1: Marque (Gauche) --- */
+.brand-section {
+    display: flex;
+    align-items: center;
+    /* Retiré flex-grow: 1 pour ne prendre que l'espace nécessaire */
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo {
+    height: 35px;
+    margin-right: 8px;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white; 
+    letter-spacing: 1px;
+    white-space: nowrap; /* Empêche le texte de se casser */
+}
+
+/* --- Section 2: Option Principale (Milieu) --- */
+.main-options-section {
+    flex-grow: 1; /* Permet d'occuper l'espace central */
+    text-align: center;
+    margin: 0 20px; /* Ajout d'une marge pour séparer les sections */
+}
+
+.main-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #2563eb; /* Bleu vif pour attirer l'attention */
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    font-size: 1rem;
+    white-space: nowrap; /* Empêche le texte de se casser */
+}
+
+.main-cta:hover {
+    background-color: #3b82f6;
+}
+
+.cta-icon {
+    font-size: 1.1rem;
+}
+
+/* --- Section 3: Actions Utilisateur (Droite) --- */
+.user-actions-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Boutons et liens d'action */
+.action-btn, .action-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.action-btn {
+    border: 1px solid white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap; /* Empêche le bouton de se casser */
+}
+
+.action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cart-link {
+    position: relative;
+    font-size: 1.5rem;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ef4444; /* Rouge pour la notification */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Style général des icônes pour le professionnalisme */
+.fa-solid {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+}
+
+.user-actions-section .logout-btn {
+    /* Reprendre le style de login-btn ou donner un style distinct (ex: rouge) */
+    background-color: #f44336; /* Exemple de couleur rouge */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 4px;
+    margin-left: 10px; /* Ajouter un petit espace */
+}
+
+.user-actions-section .action-btn {
+    /* Styles communs pour les boutons d'action */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+/* S'assurer que les liens d'action comme le profil sont alignés */
+.user-actions-section .action-link {
+    margin-left: 10px;
+    color: var(--primary-color, #007bff); /* Utiliser votre couleur primaire */
+    text-decoration: none;
+    font-size: 1.2rem;
+}

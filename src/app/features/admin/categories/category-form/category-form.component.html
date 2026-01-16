@@ -1,0 +1,62 @@
+<div class="category-form-container">
+    <header class="form-header">
+        <a routerLink="/admin/categories" class="back-link">Retour aux catégories</a>
+        <h2>{{ isEditMode ? 'Modifier' : 'Nouvelle' }} Catégorie</h2>
+    </header>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="styled-form">
+        
+        <div *ngIf="apiErrors.general" class="alert alert-danger">{{ apiErrors.general }}</div>
+        
+        <div class="form-group">
+            <label for="name">Nom de la catégorie *</label>
+            <input id="name" type="text" formControlName="name" 
+                   (input)="onNameChange()" placeholder="Ex: Matériaux de construction">
+            <small class="error" *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.hasError('required')">
+                Le nom est obligatoire.
+            </small>
+            <small class="error" *ngIf="apiErrors.name">{{ apiErrors.name }}</small>
+        </div>
+
+        <div class="form-group">
+            <label for="slug">Slug (URL unique)</label>
+            <div class="slug-input-wrapper">
+                <input id="slug" type="text" formControlName="slug" 
+                       [readonly]="isEditMode && isSlugLocked"
+                       [class.locked]="isEditMode && isSlugLocked">
+                
+                <button type="button" *ngIf="isEditMode" class="btn-unlock" (click)="toggleSlugLock()">
+                    {{ isSlugLocked ? 'Modifier' : 'Verrouiller' }}
+                </button>
+            </div>
+            <small class="hint">Lien généré : /categories/{{ categoryForm.get('slug')?.value }}</small>
+            <small class="error" *ngIf="categoryForm.get('slug')?.hasError('pattern')">
+                Format invalide : utilisez des minuscules et des tirets uniquement.
+            </small>
+            <small class="error" *ngIf="apiErrors.slug">{{ apiErrors.slug }}</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description (Optionnel)</label>
+            <textarea id="description" formControlName="description" rows="4" 
+                      placeholder="Décrivez brièvement cette catégorie..."></textarea>
+            <small class="error" *ngIf="apiErrors.description">{{ apiErrors.description }}</small>
+        </div>
+
+        <div class="form-group inline">
+            <label class="switch-label">
+                <input type="checkbox" formControlName="is_active">
+                <span class="slider"></span>
+                Rendre cette catégorie active sur le site
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" routerLink="/admin/categories" class="btn-secondary">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="categoryForm.invalid || isLoading">
+                <span *ngIf="!isLoading">{{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}</span>
+                <span *ngIf="isLoading" class="loader">Patientez...</span>
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,163 @@
+:host {
+    display: block;
+    height: 100%;
+    --color-primary: #10b981;
+    --color-bg-active: #ecfdf5;
+    --color-text-main: #1e293b;
+    --color-text-muted: #64748b;
+    --sidebar-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.client-sidebar-content {
+    padding: 1.5rem 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    transition: var(--sidebar-transition);
+    overflow-x: hidden;
+}
+
+/* --- Header Profil --- */
+.account-header {
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    transition: padding var(--sidebar-transition);
+}
+
+.account-icon-wrapper {
+    min-width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--color-primary), #059669);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+.account-name {
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.account-welcome {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Ajustement Header en mode Mini */
+.sidebar-mini-active .account-header {
+    justify-content: center;
+    padding: 0;
+}
+
+/* --- Navigation --- */
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    margin: 0.25rem 0.75rem;
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.nav-item i {
+    font-size: 1.15rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+.nav-label {
+    margin-left: 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* --- ÉTAT MINI : AJUSTEMENT DES ICONES --- */
+.sidebar-mini-active .nav-item {
+    justify-content: center; /* Centre l'icône dans les 80px */
+    padding: 0.85rem 0;
+    margin: 0.25rem 0.5rem;
+}
+
+.sidebar-mini-active .nav-item i {
+    margin: 0;
+    min-width: unset;
+    font-size: 1.3rem; /* Légèrement plus grand pour le confort visuel */
+}
+
+/* Hover & Active */
+.nav-item:hover {
+    background-color: #f1f5f9;
+    color: var(--color-text-main);
+}
+
+.nav-item.active {
+    background-color: var(--color-bg-active);
+    color: var(--color-primary);
+}
+
+/* --- Tooltips pour le mode mini --- */
+.sidebar-mini-active .nav-item[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1e293b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1001;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+/* --- Footer --- */
+.sidebar-footer {
+    padding: 1.5rem 0.75rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.sidebar-mini-active .sidebar-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--color-primary);
+}

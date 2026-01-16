@@ -1,0 +1,12 @@
+<div class="product-preview-box">
+    <div class="preview-visual">
+        <svg *ngIf="config.shape" [attr.class]="'shape-' + config.shape" viewBox="0 0 100 100">
+            </svg>
+        <p *ngIf="!config.shape" class="placeholder-text">Choisissez une forme pour l'aperçu...</p>
+    </div>
+    <div class="preview-details">
+        <p>Matériau: <strong>{{ config.materialName || 'N/A' }}</strong></p>
+        <p>Forme: <strong>{{ config.shape || 'N/A' }}</strong></p>
+        <p *ngIf="config.width">Dimensions: <strong>{{ config.width }} x {{ config.height }} mm</strong></p>
+    </div>
+</div>

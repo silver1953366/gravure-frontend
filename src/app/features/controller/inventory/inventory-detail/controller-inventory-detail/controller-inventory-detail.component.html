@@ -1,0 +1,26 @@
+<div class="detail-container">
+    <button (click)="onBack()" class="btn-back">← Retour à l'Inventaire</button>
+
+    <div *ngIf="isLoading">Chargement des détails de l'article...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <ng-container *ngIf="inventoryItem && !isLoading">
+        <h2>Détails de l'Article #{{ inventoryItem.id }}</h2>
+        <p>Vue des spécifications et du stock actuel pour la production.</p>
+
+        <div class="data-card">
+            <div class="data-row">
+                <strong>Référence Matériau :</strong>
+                <span>{{ inventoryItem.material_id }}</span>
+            </div>
+            <div class="data-row">
+                <strong>Quantité en Stock :</strong>
+                <span class="stock-qty">{{ inventoryItem.quantity | number }} unités</span>
+            </div>
+            
+            <p class="disclaimer">
+                *Toute modification du stock est réservée à l'Administrateur via le module d'administration.
+            </p>
+        </div>
+    </ng-container>
+</div>

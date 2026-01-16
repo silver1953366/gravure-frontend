@@ -1,0 +1,155 @@
+<div class="details-container">
+  <div class="content-wrapper">
+    
+    <nav class="top-nav">
+      <a routerLink="/client/orders" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Retour à mes commandes
+      </a>
+    </nav>
+
+    @if (isLoading()) {
+      <div class="state-card loading">
+        <div class="spinner"></div>
+        <p>Synchronisation des données...</p>
+      </div>
+    } @else if (error()) {
+      <div class="state-card error">
+        <div class="error-icon">✕</div>
+        <h3>Erreur de chargement</h3>
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (order()) {
+      
+      <div class="order-sheet">
+        <header class="sheet-header">
+          <div class="header-main">
+            <div class="badge-row">
+              <span class="type-label">DOCUMENT OFFICIEL • BON DE COMMANDE</span>
+              <span [class]="getStatusClass(order()?.status)">
+                {{ order()?.status?.replace('_', ' ') | uppercase }}
+              </span>
+            </div>
+            <h1 class="order-title">Référence #{{ order()?.reference }}</h1>
+            <p class="order-meta">Enregistré le {{ order()?.created_at | date: 'dd MMMM yyyy' }}</p>
+          </div>
+          
+          <div class="header-price">
+            <span class="price-label">MONTANT TOTAL HT</span>
+            <div class="price-value">
+              {{ order()?.final_price_fcfa | number:'1.0-0' }} <span class="currency">XAF</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="info-grid">
+          
+          <section class="info-section border-right">
+            <div class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              Configuration Technique
+            </div>
+            <div class="data-group">
+              <div class="data-row">
+                <span class="label">Matériau choisi</span>
+                <span class="value">{{ order()?.material?.name || 'Standard' }}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Forme de découpe</span>
+                <span class="value">{{ order()?.shape?.name || 'Personnalisée' }}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Dimensions</span>
+                <span class="value">{{ order()?.material_dimension?.dimension_label || 'Sur mesure' }}</span>
+              </div>
+              <div class="data-row highlight">
+                <span class="label">Volume commande</span>
+                <span class="value">{{ order()?.quantity }} unité(s)</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="info-section border-right bg-soft">
+            <div class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Lieu de Livraison
+            </div>
+            <div class="address-box">
+              <strong class="client-name">{{ order()?.client_details?.name }}</strong>
+              <p>{{ order()?.shipping_address?.street }}</p>
+              <p>{{ order()?.shipping_address?.postal_code }}, {{ order()?.shipping_address?.city }}</p>
+              
+              <div class="contact-mini">
+                <div class="contact-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  {{ order()?.client_details?.phone }}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="info-section">
+            <div class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              Transaction & Règlement
+            </div>
+            <div class="payment-box">
+              <div class="id-tag">
+                <span class="tag-label">ID PAIEMENT</span>
+                <code>{{ order()?.payment_id || 'EN ATTENTE' }}</code>
+              </div>
+
+              @if (order()?.status === 'pending_payment') {
+                <button (click)="handlePayment()" class="btn-pay-now">
+                  Finaliser le règlement
+                </button>
+              } @else {
+                <div class="status-confirmed">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Paiement confirmé
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+
+        <div class="footer-layout">
+          <div class="notes-area">
+            <h4>Instructions de production</h4>
+            <div class="note-content">
+              <p>{{ order()?.details_snapshot?.description || 'Aucune consigne spécifique transmise.' }}</p>
+            </div>
+            @if (order()?.details_snapshot?.width) {
+              <div class="spec-pills">
+                <span>Largeur: {{ order()?.details_snapshot?.width }}mm</span>
+                <span>Hauteur: {{ order()?.details_snapshot?.height }}mm</span>
+              </div>
+            }
+          </div>
+
+          <div class="attachments-area">
+            <h4>Pièces jointes techniques ({{ order()?.attachments?.length || 0 }})</h4>
+            <div class="file-grid">
+              @for (att of order()?.attachments; track att.id) {
+                <div class="file-card">
+                  <div class="file-icon-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                  </div>
+                  <div class="file-details">
+                    <span class="name">{{ att.original_name }}</span>
+                    <span class="size">{{ (att.size / 1024) | number:'1.0-0' }} KB</span>
+                  </div>
+                  <a [href]="getAttachmentDownloadUrl(att.id)" class="download-link" title="Télécharger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </a>
+                </div>
+              } @empty {
+                <div class="empty-state">Aucun fichier technique lié.</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="configurator-wrapper">
+    <div class="preview-zone">
+        <div class="preview-container">
+            <h2 class="preview-title">Aperçu du Produit</h2>
+            <div class="plaque-display-area">
+                <div class="plaque-render-wrapper">
+                    <div
+                        class="simulated-plaque"
+                        [ngStyle]="simulatedStyles()" 
+                        [style.backgroundColor]="selectedMaterial()?.color || '#FFFFFF'"
+                        [style.borderColor]="selectedMaterial()?.color || '#E2E8F0'"
+                    >
+                        <p class="engraving-text-display">
+                            {{ engravingText() || 'Entrez votre texte ici' }}
+                        </p>
+                        <p class="dimension-label-display">
+                            ({{ selectedDimension()?.dimension_label || 'Dimension ?' }})
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="steps-column">
+
+        <div *ngIf="currentStep() === 1" class="step-section step-1-material">
+            <h3 class="step-title">1. Choisir le Matériau</h3>
+            <div *ngIf="isLoadingMaterials()">Chargement des matériaux...</div>
+            <app-material-selector 
+                *ngIf="!isLoadingMaterials()"
+                [materials]="availableMaterials()" 
+                [selectedMaterial]="selectedMaterial()"
+                [isLoading]="isLoadingMaterials()"
+                (materialSelected)="onMaterialSelect($event)">
+            </app-material-selector>
+        </div>
+
+        <div *ngIf="currentStep() === 2" class="step-section step-2-shape">
+            <button class="back-button" (click)="goBack()">
+                ← Matériau Précédent
+            </button>
+            <h3 class="step-title">2. Choisir la Forme</h3>
+            <div *ngIf="isLoadingShapes()">Chargement des formes...</div>
+            <app-shape-selector
+                *ngIf="!isLoadingShapes()"
+                [shapes]="availableShapes()"
+                [selectedShape]="selectedShape()"
+                [isLoading]="isLoadingShapes()"
+                (shapeSelected)="onShapeSelect($event)">
+            </app-shape-selector>
+        </div>
+
+        <div *ngIf="currentStep() === 3" class="step-section step-3-dimension">
+            <button class="back-button" (click)="goBack()">
+                ← Forme Précédente
+            </button>
+            <h3 class="step-title">3. Choisir la Dimension</h3>
+            <app-dimension-selector
+                [dimensions]="availableDimensions()"
+                [selectedDimension]="selectedDimension()"
+                (dimensionSelected)="onDimensionSelect($event)">
+            </app-dimension-selector>
+        </div>
+        
+        <div *ngIf="currentStep() === 4" class="step-section step-4-finition">
+            <button class="back-button" (click)="goBack()">
+                ← Dimension Précédente
+            </button>
+            <h3 class="step-title">4. Gravure, Finition, Fixation et Quantité</h3>
+            
+            <div class="option-box engraving-option-box">
+                <label class="input-label engraving-label">Texte à Graver</label>
+                <input 
+                    type="text" 
+                    placeholder="Ex: E.M.E.S - Salle 101"
+                    class="input-field"
+                    [value]="engravingText()"
+                    (input)="onEngravingTextChange($event)"
+                    maxlength="100"
+                />
+            </div>
+            
+            <div class="mounting-option-box option-box">
+                <label class="input-label">Type de fixation</label>
+                <select class="select-field" [(ngModel)]="mountingOptionModel">
+                    <option [ngValue]="'none'">Sans trous</option>
+                    <option [ngValue]="'4-corners'">4 trous aux coins</option>
+                    <option [ngValue]="'adhesive'">Bande adhésive</option>
+                </select>
+            </div>
+
+            <div class="option-box quantity-control-box">
+                <label class="quantity-label">Quantité :</label>
+                <button class="quantity-button" (click)="updateQuantity(-1)">-</button>
+                <span class="quantity-value">{{ quantity() }}</span>
+                <button class="quantity-button" (click)="updateQuantity(1)">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="configurator-footer">
+    <div class="footer-content-wrapper">
+        <div class="price-details">
+            <span class="price-label">PRIX TOTAL HT</span>
+            <span class="total-price-value">{{ totalPrice() | number:'1.2-2' }} FCFA</span>
+            
+            <span class="engraving-cost-info">
+                Coût de la gravure ({{ engravingCost() | number:'1.0-0':'fr' }} FCFA/unité) 
+                <span *ngIf="engravingCost() === 0">non</span> inclus.
+            </span>
+        </div>
+        
+        <div class="footer-actions">
+            <button 
+                class="action-button primary-button" 
+                (click)="onAddToCart()"
+                [disabled]="!selectedDimension()"
+            >
+                Ajouter au panier
+            </button>
+        </div>
+    </div>
+</footer>

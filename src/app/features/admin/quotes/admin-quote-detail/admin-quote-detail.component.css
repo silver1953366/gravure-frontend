@@ -1,0 +1,263 @@
+/* ------------------------------------------------------------------- */
+/* --- STYLES GÉNÉRAUX & CONTENEUR --- */
+/* ------------------------------------------------------------------- */
+
+.admin-detail-container {
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Barre d'outils administrative (Fixe en haut) */
+.action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* ------------------------------------------------------------------- */
+/* --- CARTE DE GESTION ADMIN (PANNEAU SUPÉRIEUR) --- */
+/* ------------------------------------------------------------------- */
+
+.admin-card {
+    background: #fff;
+    border-radius: 8px;
+    border-left: 5px solid #2c3e50;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.pricing-form {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.input-wrapper input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* ------------------------------------------------------------------- */
+/* --- GALERIE DE FICHIERS (MODERNE) --- */
+/* ------------------------------------------------------------------- */
+
+.attachments-section {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.attachment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.file-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.file-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+.file-preview {
+    height: 100px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.file-preview img { width: 100%; height: 100%; object-fit: cover; }
+.file-preview i { font-size: 40px; color: #94a3b8; }
+
+.file-info {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.file-name {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.file-actions {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 5px;
+}
+
+/* ------------------------------------------------------------------- */
+/* --- DOCUMENT A4 (STYLE EXCEL POUR IMPRESSION) --- */
+/* ------------------------------------------------------------------- */
+
+.a4-document {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20mm;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.doc-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 3px solid #000;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.logo-img { max-height: 80px; margin-bottom: 10px; }
+
+/* Badges de statut */
+.badge-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid;
+    margin-top: 10px;
+}
+
+.badge-status[data-status="sent"] { color: #f59e0b; border-color: #f59e0b; }
+.badge-status[data-status="calculated"] { color: #10b981; border-color: #10b981; }
+.badge-status[data-status="rejected"] { color: #ef4444; border-color: #ef4444; }
+
+/* Table style Excel */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+}
+
+.items-table th {
+    background: #333;
+    color: #fff;
+    border: 1px solid #000;
+    padding: 12px;
+    text-transform: uppercase;
+}
+
+.items-table td {
+    border: 1px solid #000;
+    padding: 12px;
+    vertical-align: top;
+}
+
+.empty-row td { height: 30px; }
+
+/* Totaux */
+.doc-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.totals-summary { width: 40%; }
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.grand-total {
+    border-top: 2px solid #000;
+    background: #f1f5f9;
+    font-size: 1.2em;
+    padding: 10px 5px;
+}
+
+/* Signatures */
+.signatures-area {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sig-box {
+    width: 250px;
+    text-align: center;
+}
+
+.sig-placeholder {
+    height: 100px;
+    border: 1px dashed #cbd5e1;
+    margin-top: 10px;
+    background: #fafafa;
+}
+
+/* ------------------------------------------------------------------- */
+/* --- GESTION DE L'IMPRESSION (MEDIA PRINT) --- */
+/* ------------------------------------------------------------------- */
+
+@media print {
+    /* Cache tout sauf le document A4 */
+    body * { visibility: hidden; }
+    #printable-area, #printable-area * { visibility: visible; }
+    
+    #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm;
+        margin: 0;
+        padding: 10mm;
+        box-shadow: none;
+    }
+
+    .non-printable { display: none !important; }
+    
+    /* Force l'impression des couleurs de fond (Excel style) */
+    .items-table th { background-color: #333 !important; color: #fff !important; -webkit-print-color-adjust: exact; }
+    .grand-total { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
+
+    @page { size: A4; margin: 0; }
+}
+
+/* Utilitaires boutons */
+.btn-confirm { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+.btn-outline-danger { border: 1px solid #ef4444; color: #ef4444; background: transparent; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+.btn-icon { background: none; border: none; cursor: pointer; color: #64748b; padding: 5px; }
+.btn-icon:hover { color: #1e293b; }

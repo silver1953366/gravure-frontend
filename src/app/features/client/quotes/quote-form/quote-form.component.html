@@ -1,0 +1,186 @@
+<div class="form-container">
+  <div class="header-actions">
+    <button (click)="goBack()" class="btn-back" type="button">
+      <i class="fa-solid fa-arrow-left"></i> Retour
+    </button>
+  </div>
+
+  <h1 class="page-title">Configuration de votre projet</h1>
+
+  @if (isDataLoading()) {
+    <div class="loader-full">
+      <div class="spinner-large"></div>
+      <p>Initialisation du configurateur technique...</p>
+    </div>
+  } 
+  
+  @else {
+    <form [formGroup]="quoteForm" (ngSubmit)="onSubmit()" class="quote-form-layout">
+      
+      <div class="form-main-content">
+        
+        <section class="config-section animated-fade">
+          <h2 class="section-title">
+            <i class="fa-solid fa-layer-group"></i> Choix techniques
+          </h2>
+          
+          <div class="fields-grid">
+            <div class="form-field">
+              <label for="material">Matériau *</label>
+              <select id="material" formControlName="material_id" class="form-select">
+                <option [ngValue]="null" disabled>Choisir un matériau</option>
+                @for (m of materials(); track m.id) {
+                  <option [ngValue]="m.id">{{ m.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="shape">Forme souhaitée *</label>
+              <select id="shape" formControlName="shape_id" class="form-select">
+                <option [ngValue]="null" disabled>Choisir une forme</option>
+                @for (s of shapes(); track s.id) {
+                  <option [ngValue]="s.id">{{ s.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="dimension">Format / Dimension *</label>
+              <select id="dimension" 
+                      formControlName="material_dimension_id" 
+                      class="form-select" 
+                      [disabled]="filteredDimensions().length === 0">
+                <option [ngValue]="null" disabled>
+                  {{ filteredDimensions().length === 0 ? 'En attente des choix...' : 'Sélectionner le format' }}
+                </option>
+                @for (d of filteredDimensions(); track d.id) {
+                  <option [ngValue]="d.id">{{ d.dimension_label }}</option>
+                }
+              </select>
+              @if (quoteForm.get('shape_id')?.value && filteredDimensions().length === 0) {
+                <small class="error-hint">Aucun format disponible pour cette combinaison.</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="quantity">Quantité *</label>
+              <input type="number" id="quantity" formControlName="quantity" class="form-input" min="1">
+            </div>
+          </div>
+        </section>
+
+        <section class="config-section animated-fade" style="animation-delay: 0.1s;">
+          <h2 class="section-title">
+            <i class="fa-solid fa-file-import"></i> Fichiers & Instructions
+          </h2>
+          
+          <div class="form-field full-width">
+            <app-attachment-uploader
+              [quoteId]="quoteIdForAttachments()" 
+              [attachments]="attachments()"
+              (attachmentAdded)="onAttachmentAdded($event)"
+              (attachmentRemoved)="onAttachmentRemoved($event)"
+            ></app-attachment-uploader>
+          </div>
+
+          <div class="form-field full-width" style="margin-top: 1.5rem;">
+            <label for="description">Commentaires particuliers (Optionnel)</label>
+            <textarea 
+              id="description" 
+              formControlName="description" 
+              class="form-textarea" 
+              placeholder="Précisez ici vos besoins spécifiques (couleurs, polices, urgence...)" 
+              rows="4">
+            </textarea>
+          </div>
+        </section>
+      </div>
+
+      <aside class="form-sidebar">
+        <div class="sticky-card animated-fade" style="animation-delay: 0.2s;">
+          <h3>Récapitulatif</h3>
+          
+          <div class="estimate-box">
+            @if (isEstimating()) {
+              <div class="calc-loader">
+                <div class="dots-pulse"></div>
+                <span>Calcul en cours...</span>
+              </div>
+            } 
+            
+            @else if (estimate()) {
+              <div class="price-details">
+                <div class="row">
+                  <span class="label">Prix HT :</span>
+                  <span class="value">{{ estimate()?.cost_details?.base_price_fcfa | number:'1.0-0' }} FCFA</span>
+                </div>
+                
+                @if (estimate()?.cost_details?.discount_amount_fcfa && estimate()!.cost_details.discount_amount_fcfa > 0) {
+                  <div class="row discount">
+                    <span class="label">Remise volume :</span>
+                    <span class="value">- {{ estimate()?.cost_details?.discount_amount_fcfa | number:'1.0-0' }} FCFA</span>
+                  </div>
+                }
+
+                <div class="total-divider"></div>
+                
+                <div class="row total">
+                  <span>Total estimé</span>
+                  <strong class="total-price">{{ estimate()?.cost_details?.final_price_fcfa | number:'1.0-0' }} FCFA</strong>
+                </div>
+                
+                <div class="info-details">
+                  <small>{{ estimate()?.dimension_label }} (x{{ estimate()?.quantity }})</small>
+                </div>
+              </div>
+            } 
+            
+            @else {
+              <div class="placeholder-content">
+                <i class="fa-solid fa-calculator"></i>
+                <p>Sélectionnez vos options pour voir l'estimation en temps réel.</p>
+              </div>
+            }
+          </div>
+
+          @if (estimateError()) {
+            <div class="error-badge">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              {{ estimateError() }}
+            </div>
+          }
+
+          <div class="actions-group">
+            <button type="submit" 
+                    class="btn-submit" 
+                    [disabled]="quoteForm.invalid || isSubmitting() || isSavingDraft() || isEstimating()">
+              @if (isSubmitting()) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Envoi de la demande...
+              } @else {
+                <i class="fa-solid fa-paper-plane"></i> Envoyer ma demande
+              }
+            </button>
+
+            <button type="button" 
+                    class="btn-draft" 
+                    (click)="submitForm(true)"
+                    [disabled]="quoteForm.invalid || isSubmitting() || isSavingDraft() || isEstimating()">
+              @if (isSavingDraft()) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Sauvegarde...
+              } @else {
+                <i class="fa-solid fa-floppy-disk"></i> Mettre au brouillon
+              }
+            </button>
+          </div>
+
+          <div class="trust-indicators">
+            <span><i class="fa-solid fa-shield-halved"></i> Devis gratuit</span>
+            <span><i class="fa-solid fa-clock-rotate-left"></i> Réponse < 24h</span>
+          </div>
+        </div>
+      </aside>
+
+    </form>
+  }
+</div>

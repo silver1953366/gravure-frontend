@@ -1,0 +1,118 @@
+<div class="reports-container">
+  <header class="dashboard-header">
+    <div class="title-section">
+      <h1>Analyses & Statistiques</h1>
+      <p class="subtitle">Rapport d'activité des revenus et commandes finalisées</p>
+    </div>
+
+    <div class="header-tools">
+      <form (ngSubmit)="applyFilters()" class="filter-bar">
+        <div class="input-group">
+          <label for="start">Du</label>
+          <input id="start" type="date" [(ngModel)]="startDate" name="startDate">
+        </div>
+        <div class="input-group">
+          <label for="end">Au</label>
+          <input id="end" type="date" [(ngModel)]="endDate" name="endDate">
+        </div>
+        <button type="submit" class="btn-apply" [disabled]="isLoading">
+          <i class="fas fa-filter"></i>
+          <span>Filtrer</span>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <div *ngIf="error" class="banner error animate-in">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+  </div>
+
+  <div *ngIf="isLoading" class="skeleton-dashboard">
+    <div class="sk-card pulse" *ngFor="let i of [1,2,3]"></div>
+  </div>
+
+  <div *ngIf="revenueReport && !isLoading" class="stats-grid animate-in">
+    <div class="stat-card revenue">
+      <div class="stat-icon">
+        <i class="fas fa-money-bill-wave"></i>
+      </div>
+      <div class="stat-content">
+        <h4>Revenu Total</h4>
+        <div class="value">
+          {{ revenueReport.summary.total_revenue_fcfa | number:'1.0-0' }} 
+          <small>FCFA</small>
+        </div>
+        <span class="label">Période sélectionnée</span>
+      </div>
+    </div>
+
+    <div class="stat-card orders">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h4>Commandes Livrées</h4>
+        <div class="value">{{ revenueReport.summary.total_completed_orders }}</div>
+        <span class="label">Ventes finalisées</span>
+      </div>
+    </div>
+
+    <div class="stat-card average">
+      <div class="stat-icon">
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div class="stat-content">
+        <h4>Panier Moyen</h4>
+        <div class="value">
+          {{ revenueReport.summary.average_order_value_fcfa | number:'1.0-0' }} 
+          <small>FCFA</small>
+        </div>
+        <span class="label">Moyenne par client</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-main animate-in" *ngIf="!isLoading && revenueReport">
+    <div class="content-card">
+      <div class="card-header">
+        <h3><i class="fas fa-table"></i> Répartition des revenus par mois</h3>
+        <span class="date-range" *ngIf="startDate && endDate">
+          {{ startDate | date:'dd/MM/yyyy' }} — {{ endDate | date:'dd/MM/yyyy' }}
+        </span>
+      </div>
+
+      <div class="table-responsive" *ngIf="monthlyData.length > 0">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Mois</th>
+              <th class="text-right">Revenu (FCFA)</th>
+              <th class="text-center" style="width: 300px;">Performance Visuelle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of monthlyData">
+              <td class="month-cell">{{ item.month }}</td>
+              <td class="text-right font-bold price-cell">
+                {{ item.revenue | number:'1.0-0' }}
+              </td>
+              <td class="text-center">
+                <div class="progress-container">
+                  <div class="progress-bar" 
+                       [style.width.%]="getPerformanceWidth(item.revenue)"
+                       [title]="getPerformanceWidth(item.revenue).toFixed(0) + '% du max'">
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="monthlyData.length === 0" class="empty-state">
+        <div class="empty-icon"><i class="fas fa-history"></i></div>
+        <p>Aucun revenu enregistré sur cette période mensuelle.</p>
+      </div>
+    </div>
+  </div>
+</div>

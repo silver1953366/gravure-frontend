@@ -1,0 +1,227 @@
+<div class="admin-detail-container">
+  
+  <nav class="action-header non-printable">
+    <button (click)="router.navigate(['/admin/quotes'])" class="btn-back">
+      <i class="fas fa-chevron-left"></i> Retour aux devis
+    </button>
+    
+    <div class="right-actions">
+      <button (click)="onDeleteQuote()" 
+              [disabled]="isProcessing() || !!quote()?.order_id" 
+              class="btn-delete">
+        <i class="fas fa-trash-alt"></i> Supprimer
+      </button>
+      <button onclick="window.print()" class="btn-print">
+        <i class="fas fa-print"></i> Imprimer / PDF
+      </button>
+    </div>
+  </nav>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement du devis en cours...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger animate-in">
+      <i class="fas fa-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert alert-success animate-in">
+      <i class="fas fa-check-circle"></i> {{ successMessage() }}
+    </div>
+  }
+
+  @if (quote(); as q) {
+    <div class="main-content">
+      
+      <section class="admin-card non-printable">
+        <div class="card-header">
+          <i class="fas fa-user-shield"></i>
+          <h3>Gestion Administrative - Devis #{{ q.id }}</h3>
+        </div>
+        
+        <div class="card-body">
+          <div class="pricing-form">
+            <label for="priceInput">Définir le prix total définitif (FCFA)</label>
+            <div class="input-wrapper">
+              <input 
+                id="priceInput"
+                type="number" 
+                [(ngModel)]="newFinalPrice" 
+                [disabled]="q.status !== 'sent' || isProcessing()"
+                placeholder="Ex: 55000">
+              <button 
+                (click)="onCalculateQuote()" 
+                [disabled]="isProcessing() || q.status !== 'sent' || !newFinalPrice"
+                class="btn-confirm">
+                Valider & Notifier le client
+              </button>
+            </div>
+          </div>
+
+          <div class="secondary-actions">
+            <button 
+              (click)="onRejectQuote()" 
+              [disabled]="isProcessing() || (q.status !== 'sent' && q.status !== 'calculated')"
+              class="btn-outline-danger">
+              Rejeter la demande
+            </button>
+          </div>
+        </div>
+
+        @if (q.order_id) {
+          <div class="order-link-banner">
+            <i class="fas fa-check-double"></i>
+            Ce devis a été converti en commande : <strong>#{{ q.order_id }}</strong>
+          </div>
+        }
+      </section>
+
+      <div class="a4-document" id="printable-area">
+        
+        <header class="doc-header">
+          <div class="company-brand">
+            <img src="../../../../../assets/Logo/logo.png" alt="Logo EMES" class="logo-img">
+            <div class="company-details">
+              <h2>E.M.E.S GRAVURE</h2>
+              <p>Libreville, Gabon • +241 07 40 22 78</p>
+              <p>Email: {{ transactionService.COMPANY_EMAIL }}</p>
+            </div>
+          </div>
+          <div class="doc-meta">
+            <h1>DEVIS PRESTATION</h1>
+            <p>Réf: <strong>#{{ q.id }}</strong></p>
+            <p>Date: {{ q.created_at | date:'dd/MM/yyyy' }}</p>
+            <div class="badge-status" [attr.data-status]="q.status">
+              {{ getStatusLabel(q.status) | uppercase }}
+            </div>
+          </div>
+        </header>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="label">Prestataire :</span>
+            <p><strong>Administration E.M.E.S</strong></p>
+            <p>BP 1234, Libreville</p>
+            <p>Gabon</p>
+          </div>
+          <div class="info-box client-box">
+            <span class="label">Destinataire (Client) :</span>
+            <p><strong>{{ q.client_details.name }}</strong></p>
+            <p>{{ q.client_details.email }}</p>
+            <p>{{ q.client_details.phone || 'Aucun téléphone' }}</p>
+          </div>
+        </div>
+
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Désignation technique</th>
+              <th class="text-center" width="100">Quantité</th>
+              <th class="text-right" width="150">Total HT (FCFA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="item-description">
+                <div class="product-name">{{ q.material?.name || 'Gravure sur mesure' }}</div>
+                <ul class="specs-list">
+                  <li><strong>Forme :</strong> {{ q.shape?.name || 'Standard' }}</li>
+                  <li><strong>Dimensions :</strong> {{ q.dimension_label }}</li>
+                </ul>
+
+                @if (q.details_snapshot['description']) {
+                  <div class="note-section">
+                    <strong>Instructions client :</strong>
+                    <p>{{ q.details_snapshot['description'] }}</p>
+                  </div>
+                }
+
+                @if (q.attachments && q.attachments.length > 0) {
+                  <div class="attachments-section non-printable">
+                    <p class="section-title"><i class="fas fa-paperclip"></i> Fichiers du projet :</p>
+                    <div class="attachment-grid">
+                      @for (file of q.attachments; track file.id) {
+                        <div class="file-card">
+                          <div class="file-preview" (click)="viewFile(file.stored_path)">
+                            @if (file.mime_type.startsWith('image/')) {
+                              <img [src]="getFileUrl(file.stored_path)" alt="Miniature">
+                            } @else if (file.mime_type === 'application/pdf') {
+                              <i class="fas fa-file-pdf"></i>
+                            } @else {
+                              <i class="fas fa-file-alt"></i>
+                            }
+                          </div>
+                          <div class="file-info">
+                            <span class="file-name" [title]="file.original_name">{{ file.original_name }}</span>
+                            <div class="file-actions">
+                              <button (click)="viewFile(file.stored_path)" class="btn-icon" title="Ouvrir">
+                                <i class="fas fa-eye"></i>
+                              </button>
+                              <button (click)="downloadFile(file.stored_path, file.original_name)" class="btn-icon" title="Télécharger">
+                                <i class="fas fa-download"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </td>
+              <td class="text-center">{{ q.quantity }}</td>
+              <td class="text-right price-col">
+                {{ q.final_price_fcfa | number:'1.0-0' }}
+              </td>
+            </tr>
+            <tr class="empty-row"><td colspan="3">&nbsp;</td></tr>
+            <tr class="empty-row"><td colspan="3">&nbsp;</td></tr>
+          </tbody>
+        </table>
+
+        <div class="doc-footer">
+          <div class="footer-left">
+            <h4>Conditions générales</h4>
+            <ul>
+              <li>Validité de l'offre : 30 jours calendaires.</li>
+              <li>Paiement : 100% à la commande.</li>
+              <li>Délais : Selon planning après confirmation du paiement.</li>
+            </ul>
+          </div>
+          <div class="footer-right">
+            <div class="total-line">
+              <span>Sous-total HT</span>
+              <span>{{ q.final_price_fcfa | number:'1.0-0' }} FCFA</span>
+            </div>
+            <div class="total-line grand-total">
+              <strong>TOTAL NET À PAYER</strong>
+              <strong>{{ q.final_price_fcfa | number:'1.0-0' }} FCFA</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="signatures-area">
+          <div class="sig-box">
+            <p>Signature Client (Précédé de "Bon pour accord")</p>
+            <div class="sig-placeholder"></div>
+          </div>
+          <div class="sig-box">
+            <p>Pour la Direction (Cachet et Signature)</p>
+            <div class="sig-placeholder"></div>
+          </div>
+        </div>
+
+        <footer class="legal-mentions">
+          <hr>
+          <p>SOCIÉTÉ AU CAPITAL DE 1.000.000 FCFA - RCCM : RG-LBV-XXXX-XXXX - NIF : 000000X</p>
+          <p class="print-only">Document généré le {{ today | date:'dd/MM/yyyy HH:mm' }}</p>
+        </footer>
+      </div>
+    </div>
+  }
+</div>

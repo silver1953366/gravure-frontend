@@ -1,0 +1,21 @@
+<div class="app-container">
+    <div class="content-wrapper">
+        <main class="page-content">
+            <router-outlet (activate)="onActivate($event)"></router-outlet>
+        </main>
+    </div>
+
+    @if (isLoginModalOpen()) {
+        <app-login-register-modal 
+            [isOpen]="isLoginModalOpen()"
+            (close)="closeLoginModal()">
+        </app-login-register-modal>
+    }
+    
+    @if (isCartModalOpen()) {
+        <app-cart-modal 
+            [isOpen]="isCartModalOpen()"
+            (close)="closeCartModal()">
+        </app-cart-modal>
+    }
+</div>

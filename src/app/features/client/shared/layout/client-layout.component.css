@@ -1,0 +1,81 @@
+:host {
+    --sidebar-width: 260px;
+    --sidebar-mini-width: 80px;
+    --navbar-height: 70px;
+    --transition-speed: 0.3s;
+    --bezier-curve: cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+}
+
+.client-app-shell {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+/* --- Sidebar --- */
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    z-index: 1000;
+    background: white;
+    transition: width var(--transition-speed) var(--bezier-curve);
+}
+
+.sidebar-container.mini {
+    width: var(--sidebar-mini-width);
+}
+
+/* --- Main Wrapper --- */
+.main-wrapper {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left var(--transition-speed) var(--bezier-curve), 
+                width var(--transition-speed) var(--bezier-curve);
+}
+
+.main-wrapper.mini-margin {
+    margin-left: var(--sidebar-mini-width);
+    width: calc(100% - var(--sidebar-mini-width));
+}
+
+/* --- Pilotage du décalage de la Navbar --- */
+app-client-navbar {
+    left: var(--sidebar-width);
+}
+
+.main-wrapper.mini-margin app-client-navbar {
+    left: var(--sidebar-mini-width);
+}
+
+/* --- Content View : Compenser la Navbar fixe --- */
+.content-view {
+    padding: 2rem;
+    /* On ajoute la hauteur de la navbar pour que le contenu commence en dessous */
+    padding-top: calc(var(--navbar-height) + 2rem); 
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* Overlay Mobile */
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+@media (max-width: 1023px) {
+    .sidebar-container { transform: translateX(-100%); }
+    .sidebar-container.mobile-show { transform: translateX(0); }
+    .main-wrapper { margin-left: 0 !important; width: 100% !important; }
+    app-client-navbar { left: 0 !important; }
+}

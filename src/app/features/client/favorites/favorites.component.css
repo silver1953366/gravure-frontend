@@ -1,0 +1,154 @@
+/* src/app/features/client/favorites/favorites.component.css */
+
+.favorites-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1f2937; /* Gray 800 */
+    border-bottom: 3px solid #4f46e5; /* Indigo 600 */
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+/* --- Grille des Favoris --- */
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.favorite-card {
+    background-color: white;
+    border: 1px solid #e5e7eb; /* Gray 200 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.favorite-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.quote-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.content {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.reference {
+    display: block;
+    font-size: 0.875rem;
+    color: #4f46e5; /* Indigo 600 */
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #374151; /* Gray 700 */
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.material {
+    font-size: 1rem;
+    color: #6b7280; /* Gray 500 */
+    margin-bottom: 1rem;
+}
+
+/* --- Actions --- */
+.actions {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dashed #e5e7eb;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-details, .btn-remove {
+    flex-grow: 1;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.15s;
+    text-decoration: none; /* Pour le lien */
+    cursor: pointer;
+}
+
+.btn-details {
+    background-color: #f3f4f6; /* Gray 100 */
+    color: #4f46e5; /* Indigo 600 */
+    border: 1px solid #4f46e5;
+}
+
+.btn-details:hover {
+    background-color: #4f46e5;
+    color: white;
+}
+
+.btn-remove {
+    background-color: #fee2e2; /* Red 100 */
+    color: #ef4444; /* Red 500 */
+    border: 1px solid #ef4444;
+}
+
+.btn-remove:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* --- États Vides et Erreurs --- */
+.loading-state, .alert-error, .empty-state {
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.loading-state {
+    color: #4f46e5;
+    background-color: #eef2ff;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.empty-state {
+    background-color: #f9fafb;
+    color: #4b5563;
+    border: 1px dashed #ccc;
+}
+
+.link-action {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #10b981; /* Green 600 */
+    font-weight: 600;
+    text-decoration: none;
+}
+.link-action:hover {
+    text-decoration: underline;
+}

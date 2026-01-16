@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+    <h2>Tableau de Bord - Contrôle de Production 🏭</h2>
+    <p class="description">
+        Bienvenue dans votre espace. Aperçu rapide des tâches critiques et du suivi de la production.
+    </p>
+
+    <div class="stats-grid">
+        <div *ngFor="let stat of stats" class="card stat-card" [class]="stat.class">
+            <h3 class="stat-title">{{ stat.title }}</h3>
+            <div class="stat-value">{{ stat.value }}</div>
+            <p class="stat-detail">{{ stat.detail }}</p>
+            <a *ngIf="stat.link" [routerLink]="stat.link" class="card-link">
+                Voir Détails →
+            </a>
+        </div>
+    </div>
+    
+    <hr>
+
+    <div class="quick-actions-section">
+        <h3>Actions Rapides</h3>
+        <div class="actions-list">
+            <a *ngFor="let action of quickActions" 
+               [routerLink]="action.link" 
+               class="btn-quick-action">
+                <i class="icon check"></i> {{ action.label }}
+            </a>
+        </div>
+    </div>
+
+    <div class="card chart-placeholder">
+        <h3>Suivi Global de la Charge de Travail</h3>
+        <p>Graphique de charge de travail (Commandes en *Processing* vs. Capacité) </p>
+    </div>
+</div>

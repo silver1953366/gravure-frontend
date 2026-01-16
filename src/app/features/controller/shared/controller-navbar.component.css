@@ -1,0 +1,24 @@
+/* src/app/features/controller/shared/controller-navbar/controller-navbar.component.css */
+
+.controller-navbar {
+    background-color: #fcfcfc;
+    border-bottom: 1px solid #eee;
+    /* ... (Reste des styles de flexbox/padding identiques à l'AdminNavbar) */
+}
+
+/* Bouton Déconnexion */
+.controller-navbar .btn-logout {
+    background-color: #3f51b5; /* Couleur principale du Contrôleur */
+    color: white;
+}
+.controller-navbar .btn-logout:hover { 
+    background-color: #303f9f; 
+}
+
+/* Notifications Badge */
+.controller-navbar .badge {
+    background-color: #ff9800; /* Orange pour les alertes du Contrôleur */
+}
+
+/* Autres styles de notification et dropdown (identiques à l'AdminNavbar.css) */
+/* Copiez-collez les styles non spécifiques à la couleur de l'AdminNavbar ici pour le reste */

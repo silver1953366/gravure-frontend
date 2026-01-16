@@ -1,0 +1,40 @@
+<div class="clients-container">
+    <h2>Liste des Clients (Consultation)</h2>
+    <p>Visualisation des utilisateurs clients pour le suivi commercial et production.</p>
+
+    <div *ngIf="isLoading">Chargement de la liste des clients...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <table *ngIf="!isLoading && clients.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let client of clients">
+                <td>{{ client.id }}</td>
+                <td>{{ client.name }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.phone || 'N/A' }}</td>
+                <td>
+                    <button (click)="goToClientOrders(client.id)" class="btn-view">
+                        Voir Commandes/Devis
+                    </button>
+                    </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div *ngIf="!isLoading && clients.length === 0 && !error" class="alert-info">
+        Aucun utilisateur client trouvé.
+    </div>
+</div>
+
+<p class="disclaimer">
+    *La gestion des comptes utilisateurs (création, modification) est réservée au rôle Administrateur.
+</p>

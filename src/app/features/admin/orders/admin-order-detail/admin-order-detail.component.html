@@ -1,0 +1,136 @@
+<div class="order-detail-container">
+    <div class="header-actions">
+        <button (click)="router.navigate(['/admin/orders'])" class="btn-back">
+            <span class="icon">←</span> Retour à la liste
+        </button>
+        <div class="spacer"></div>
+        @if (order) {
+            <button (click)="onPrint()" class="btn-print">
+                🖨️ Imprimer la commande
+            </button>
+        }
+    </div>
+
+    @if (isLoading) {
+        <div class="state-container">
+            <div class="loader"></div>
+            <p>Chargement des détails de la commande...</p>
+        </div>
+    }
+
+    @if (error) {
+        <div class="alert alert-error">
+            <span class="icon">⚠️</span> {{ error }}
+        </div>
+    }
+
+    @if (successMessage) {
+        <div class="alert alert-success">
+            <span class="icon">✅</span> {{ successMessage }}
+        </div>
+    }
+
+    @if (order && !isLoading) {
+        <div class="detail-grid">
+            
+            <header class="order-header">
+                <div class="title-area">
+                    <h1>Commande #{{ order.id }}</h1>
+                    <span [class]="'badge-status status-' + order.status">
+                        {{ getStatusLabel(order.status) | uppercase }}
+                    </span>
+                </div>
+                <div class="meta-area">
+                    <p>Référence : <strong>{{ order.reference }}</strong></p>
+                    <p>Passée le : <strong>{{ order.created_at | date:'dd/MM/yyyy à HH:mm' }}</strong></p>
+                </div>
+            </header>
+
+            <div class="info-cards">
+                <section class="card client-card">
+                    <h3><span class="icon">👤</span> Client & Livraison</h3>
+                    <div class="card-content">
+                        <p><strong>Nom :</strong> {{ order.user?.name || 'Utilisateur #' + order.user_id }}</p>
+                        <p><strong>Email :</strong> {{ order.user?.email || 'N/A' }}</p>
+                        <hr>
+                        <p><strong>Adresse de livraison (Snapshot) :</strong></p>
+                        <address>
+                            {{ order.shipping_address.street }}<br>
+                            {{ order.shipping_address.postal_code }} {{ order.shipping_address.city }}
+                        </address>
+                    </div>
+                </section>
+
+                <section class="card status-card">
+                    <h3><span class="icon">⚙️</span> Administration</h3>
+                    <div class="card-content">
+                        <p><strong>ID Paiement :</strong> <code>{{ order.payment_id || 'En attente' }}</code></p>
+                        <p><strong>Prix Final :</strong> 
+                            <span class="total-amount">{{ order.final_price_fcfa | currency:'FCFA':'':'1.0-0' }} FCFA</span>
+                        </p>
+                        
+                        <div class="status-picker">
+                            <label for="status-select">Mettre à jour le statut :</label>
+                            <select 
+                                id="status-select"
+                                [(ngModel)]="currentStatus" 
+                                (ngModelChange)="onStatusChange($event)"
+                                [disabled]="isProcessing"
+                                [class]="'select-custom status-' + currentStatus">
+                                @for (status of availableStatuses; track status) {
+                                    <option [value]="status">
+                                        {{ getStatusLabel(status) }}
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="items-section">
+                <h3>Détails technique du produit</h3>
+                
+                <div class="table-wrapper">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Configuration (Matériau & Forme)</th>
+                                <th class="text-center">Quantité</th>
+                                <th class="text-right">Sous-total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <p class="product-name">
+                                            {{ order.material?.name || 'Matériau non spécifié' }}
+                                        </p>
+                                        <small>
+                                            Forme : {{ order.shape?.name || 'N/A' }} | 
+                                            Dimension : {{ order.material_dimension?.dimension_label || 'Standard' }}
+                                        </small>
+                                        @if (order.details_snapshot?.description) {
+                                            <p class="snapshot-desc"><em>Note : {{ order.details_snapshot?.description }}</em></p>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ order.quantity }}</td>
+                                <td class="text-right bold">{{ order.final_price_fcfa | currency:'FCFA':'':'1.0-0' }} FCFA</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-right">TOTAL NET PAYÉ</td>
+                                <td class="text-right total-final">
+                                    {{ order.final_price_fcfa | currency:'FCFA':'':'1.0-0' }} FCFA
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </div>
+    }
+</div>

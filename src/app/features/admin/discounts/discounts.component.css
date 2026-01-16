@@ -1,0 +1,309 @@
+/* src/app/features/admin/discounts/discounts.component.css */
+
+:host {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --success: #10b981;
+    --success-light: #ecfdf5;
+    --text-dark: #111827;
+    --text-main: #374151;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --bg-light: #f9fafb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.discounts-wrapper {
+    padding: 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+}
+
+/* --- Header & Navigation --- */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.list-header h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* --- Boutons --- */
+.btn-add, .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-add:hover, .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-light);
+    border-color: var(--text-muted);
+}
+
+/* --- Panneau de Formulaire --- */
+.form-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow-md);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-card h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.grid-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.full-width { grid-column: span 2; }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input, 
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* --- Tableau des Réductions --- */
+.table-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--bg-light);
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+tr:hover { background-color: #fafafa; }
+
+/* Cellules Spécifiques */
+.code-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.promo-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    width: fit-content;
+}
+
+.promo-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.value-tag {
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.min-amount {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.expiry-date {
+    font-size: 0.875rem;
+    color: var(--text-main);
+}
+
+/* --- Badges Statut --- */
+[class^="badge-"] {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-active { background: var(--success-light); color: #065f46; }
+.badge-inactive { background: #f3f4f6; color: #4b5563; border: 1px solid var(--border); }
+
+/* --- Actions & Icônes --- */
+.text-right { text-align: right; }
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon svg { width: 18px; height: 18px; }
+
+.btn-edit:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.btn-delete:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-light);
+}
+
+/* --- Alertes & Messages --- */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    background: var(--danger-light);
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.alert-success {
+    background: var(--success-light);
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+/* --- États Vides / Chargement --- */
+.loading-state, .empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: var(--text-muted);
+    background: white;
+    border: 2px dashed var(--border);
+    border-radius: 0.75rem;
+}
+
+.icon-sm { width: 1.2rem; height: 1.2rem; }

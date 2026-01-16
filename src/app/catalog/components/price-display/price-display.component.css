@@ -1,0 +1,40 @@
+.price-summary-box {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    background-color: #f8fafc;
+}
+
+.detail-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    padding: .5rem 0;
+    color: var(--color-text-soft);
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.detail-line p {
+    margin: 0;
+}
+
+.price-value {
+    font-weight: 600;
+    color: var(--color-primary-dark);
+}
+
+.detail-line.total-price-line {
+    border-bottom: none;
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary-dark); /* Le total est mis en évidence */
+}
+
+.total-price-value {
+    color: var(--color-secondary-accent);
+    font-size: 1.5rem;
+    font-weight: 700;
+}

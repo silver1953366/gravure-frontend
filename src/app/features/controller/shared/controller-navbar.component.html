@@ -1,0 +1,32 @@
+<header class="navbar controller-navbar">
+    <div class="navbar-left">
+        <span>Connecté en tant que **{{ user.name }}** | Rôle : {{ user.role }}</span>
+    </div>
+
+    <div class="navbar-right">
+        <!-- NOUVEAU: Lien direct vers le profil -->
+        <a routerLink="/controller/profile" class="nav-icon profile-link">
+            <i class="icon-profile">👤</i>
+        </a>
+        
+        <div class="notification-area" (click)="toggleNotificationDropdown()">
+            <i class="icon-bell">🔔</i>
+            <span class="badge">3</span> 
+            
+            <div class="notification-dropdown" *ngIf="showNotificationDropdown" (click)="$event.stopPropagation()">
+                <h4>Notifications (3 non lues)</h4>
+                <div class="notification-item">
+                    <div class="notif-content">
+                        <strong>Nouvelle Commande #123</strong>
+                        <p>À passer en production.</p>
+                    </div>
+                </div>
+                <a routerLink="/controller/notifications" class="view-all">Voir toutes les notifications...</a>
+            </div>
+        </div>
+
+        <button (click)="onLogout()" class="btn-logout">
+            <i class="icon-logout">🚪</i> Déconnexion
+        </button>
+    </div>
+</header>

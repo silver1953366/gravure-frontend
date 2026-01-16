@@ -1,0 +1,115 @@
+/* Variables de Footer */
+:host {
+    --color-footer-bg: #1f2937; /* Gris très foncé */
+    --color-footer-text: #d1d5db; /* Texte gris clair */
+    --color-primary: #2563eb; /* Bleu primaire */
+    --color-accent: #38a169; /* Vert Émeraude pour l'accent (cohérence CTA navbar) */
+    display: block;
+}
+
+.app-footer {
+    background-color: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    padding-top: 3rem;
+    font-size: 0.9rem;
+    font-family: 'Arial', sans-serif;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem 1.5rem;
+    
+    /* Structure Grid pour la responsivité */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section .title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+/* Style de la Marque */
+.brand-info .app-logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--color-accent); /* Couleur d'accent pour le logo */
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.description {
+    line-height: 1.6;
+}
+
+/* --- Liens et listes --- */
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+    color: var(--color-footer-text);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-section a:hover {
+    color: var(--color-accent); /* Survol en vert */
+}
+
+/* --- Infos de Contact & Sociaux --- */
+.contact-info p {
+    margin-bottom: 0.5rem;
+}
+
+.contact-link {
+    /* Assure que l'email/téléphone est affiché correctement */
+    display: block;
+}
+
+.social-icons i {
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    color: var(--color-footer-text);
+    transition: color 0.2s;
+}
+
+.social-icons a:hover i {
+    color: var(--color-accent);
+}
+
+/* --- Copyright --- */
+.copyright {
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #374151; /* Ligne de séparation */
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .footer-section {
+        /* Centre le texte pour la version mobile */
+        margin-bottom: 1.5rem;
+    }
+    .social-icons {
+        justify-content: center;
+        display: flex;
+    }
+}

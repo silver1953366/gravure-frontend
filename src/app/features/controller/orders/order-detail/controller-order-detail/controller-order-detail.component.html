@@ -1,0 +1,43 @@
+<div class="detail-container">
+    <a routerLink="/controller/orders" class="back-link">← Retour aux Commandes</a>
+
+    <div *ngIf="isLoading">Chargement des détails de la commande...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <ng-container *ngIf="order && !isLoading">
+        <h2>Commande #{{ order.id }}</h2>
+        <p>Statut actuel : <span [class]="'status-' + order.status">{{ order.status | uppercase }}</span></p>
+
+        <div class="card order-summary">
+            <h3>Résumé</h3>
+            <div class="info-row"><strong>Client ID:</strong> <span>{{ order.user_id }}</span></div>
+            <div class="info-row"><strong>Montant Total:</strong> <span>{{ order.total_amount | currency:'EUR':'symbol' }}</span></div>
+            <div class="info-row"><strong>Date de Création:</strong> <span>{{ order.created_at | date:'medium' }}</span></div>
+        </div>
+
+        <div class="card status-actions">
+            <h3>Actions de Production</h3>
+            
+            <button 
+                *ngIf="order.status === 'paid' || order.status === 'pending_payment'" 
+                (click)="updateStatus(STATUS_PROCESSING)" 
+                class="btn-primary">
+                Passer en Production (Processing)
+            </button>
+            
+            <button 
+                *ngIf="order.status === STATUS_PROCESSING" 
+                (click)="updateStatus(STATUS_SHIPPED)" 
+                class="btn-secondary">
+                Marquer comme Expédiée (Shipped)
+            </button>
+            
+            <button 
+                *ngIf="order.status === STATUS_SHIPPED" 
+                (click)="updateStatus('completed')" 
+                class="btn-success">
+                Finaliser (Completed)
+            </button>
+        </div>
+    </ng-container>
+</div>

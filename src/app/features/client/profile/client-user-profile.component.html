@@ -1,0 +1,152 @@
+<div class="profile-container">
+    <header class="profile-header">
+        <div class="header-content">
+            <h2 class="page-title">Paramètres du profil</h2>
+            <p class="page-subtitle" *ngIf="user">
+                Gérez vos informations personnelles et vos coordonnées de facturation.
+            </p>
+        </div>
+        <div class="header-actions" *ngIf="user && !isLoading">
+            <button (click)="toggleEdit()" 
+                    [class.btn-outline]="isEditing" 
+                    class="btn-action">
+                <i [class]="isEditing ? 'fas fa-times' : 'fas fa-user-edit'"></i>
+                <span>{{ isEditing ? 'Annuler' : 'Modifier le profil' }}</span>
+            </button>
+        </div>
+    </header>
+
+    <hr class="separator">
+
+    <div class="alert-box" *ngIf="error">
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+        </div>
+    </div>
+    
+    <div class="alert-box" *ngIf="successMessage">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ successMessage }}</span>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <span>Synchronisation de vos données...</span>
+    </div>
+
+    <ng-container *ngIf="user && !isLoading">
+        <div class="profile-layout">
+            
+            <div class="profile-main card">
+                
+                <form *ngIf="isEditing" (ngSubmit)="saveProfile()" #profileForm="ngForm" class="animated-fade">
+                    <h3 class="section-title">Édition des informations</h3>
+                    
+                    <div class="form-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Nom complet</label>
+                                <div class="input-wrapper">
+                                    <i class="far fa-user"></i>
+                                    <input id="name" name="name" [(ngModel)]="updatedUser.name" 
+                                           required placeholder="Ex: Jean Dupont">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Numéro de téléphone</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <input id="phone" name="phone" [(ngModel)]="updatedUser.phone" 
+                                           type="tel" placeholder="+241 ...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Adresse de facturation</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <textarea id="address" name="address" [(ngModel)]="updatedUser.address" 
+                                          rows="3" placeholder="Votre adresse complète..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Identifiant de connexion</label>
+                            <div class="input-wrapper disabled">
+                                <i class="far fa-envelope"></i>
+                                <input [value]="user.email" disabled>
+                            </div>
+                            <p class="input-hint">L'email ne peut pas être modifié pour des raisons de sécurité.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="submit" class="btn-save" [disabled]="!updatedUser.name || isSaving">
+                            <i *ngIf="!isSaving" class="fas fa-save"></i>
+                            <i *ngIf="isSaving" class="fas fa-circle-notch fa-spin"></i>
+                            <span>{{ isSaving ? 'Traitement...' : 'Sauvegarder les modifications' }}</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div *ngIf="!isEditing" class="view-section animated-fade">
+                    <h3 class="section-title">Informations du compte</h3>
+                    
+                    <div class="info-grid">
+                        <div class="info-block">
+                            <label>Nom complet</label>
+                            <p class="info-data">{{ user.name }}</p>
+                        </div>
+                        <div class="info-block">
+                            <label>Adresse email</label>
+                            <p class="info-data">{{ user.email }}</p>
+                        </div>
+                        <div class="info-block">
+                            <label>Téléphone</label>
+                            <p class="info-data">{{ user.phone || '— Non renseigné —' }}</p>
+                        </div>
+                        <div class="info-block">
+                            <label>Date d'inscription</label>
+                            <p class="info-data">{{ user.created_at | date:'dd MMMM yyyy' }}</p>
+                        </div>
+                        <div class="info-block full-width">
+                            <label>Adresse enregistrée</label>
+                            <p class="info-data address-box">{{ user.address || 'Aucune adresse enregistrée.' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="profile-sidebar">
+                <div class="card nav-card">
+                    <h3 class="sidebar-title">Activité récente</h3>
+                    <nav class="sidebar-nav">
+                        <a routerLink="/client/orders" class="nav-link">
+                            <div class="nav-icon-box">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="link-label">
+                                <strong>Mes Commandes</strong>
+                                <span>Suivi des achats</span>
+                            </div>
+                        </a>
+                        <a routerLink="/client/quotes" class="nav-link">
+                            <div class="nav-icon-box">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="link-label">
+                                <strong>Mes Devis</strong>
+                                <span>Demandes soumises</span>
+                            </div>
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+        </div>
+    </ng-container>
+</div>

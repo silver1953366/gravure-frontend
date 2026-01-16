@@ -1,0 +1,316 @@
+/* --- 1. VARIABLES ET CONFIGURATION --- */
+:host {
+  --primary: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 12px;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.reports-container {
+  padding: 2rem;
+  background-color: var(--bg-main);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+}
+
+/* --- 2. HEADER ET BARRE DE FILTRES --- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.title-section h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.input-group input[type="date"] {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: var(--primary);
+}
+
+.btn-apply {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-apply:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* --- 3. GRILLE DE KPI (CARTES STATISTIQUES) --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Variantes de couleurs pour les icônes */
+.revenue .stat-icon { background: #ecfdf5; color: var(--success); }
+.orders .stat-icon { background: #eff6ff; color: var(--primary); }
+.average .stat-icon { background: #fffbeb; color: var(--warning); }
+
+.stat-content h4 {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.stat-content .value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0.25rem 0;
+}
+
+.stat-content .value small {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.stat-content .label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* --- 4. SECTION TABLEAU ET DÉTAILS --- */
+.content-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.date-range {
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table th {
+  background: #f8fafc;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.modern-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.month-cell {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.price-cell {
+  color: var(--success);
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* --- 5. BARRE DE PROGRESSION (PERFORMANCE) --- */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #6366f1);
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- 6. ÉTATS DE CHARGEMENT (SKELETONS) --- */
+.skeleton-dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.sk-card {
+  height: 120px;
+  background: #e2e8f0;
+  border-radius: var(--radius);
+}
+
+.pulse {
+  animation: pulse-bg 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-bg {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* --- 7. ANIMATIONS --- */
+.animate-in {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 8. FEEDBACKS ET VIDE --- */
+.banner.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .dashboard-header { flex-direction: column; align-items: flex-start; }
+  .filter-bar { width: 100%; flex-direction: column; border-radius: 15px; align-items: stretch; }
+  .input-group { justify-content: space-between; }
+  .skeleton-dashboard { grid-template-columns: 1fr; }
+}

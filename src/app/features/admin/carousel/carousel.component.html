@@ -1,0 +1,219 @@
+<div class="admin-carousel-container">
+  
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+          <circle cx="9" cy="9" r="2"/>
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>{{ editingSlideId() ? 'Modifier la Slide' : 'Gestion du Carrousel' }}</h1>
+        <p>Pilotez l'identité visuelle de votre page d'accueil et vos promotions en cours</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-grid">
+    <section class="form-section">
+      <div class="admin-card">
+        <div class="card-header">
+          @if (editingSlideId()) {
+            <svg class="text-primary" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          } @else {
+            <svg class="text-success" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          }
+          <h3>{{ editingSlideId() ? 'Édition de la slide #' + editingSlideId() : 'Nouvelle Bannière' }}</h3>
+        </div>
+
+        <form [formGroup]="carouselForm" (ngSubmit)="onSubmit()" class="carousel-form">
+          <div class="input-group">
+            <label for="title">Titre accrocheur *</label>
+            <input id="title" type="text" formControlName="title" placeholder="Ex: Nouvelle Collection Automne">
+          </div>
+
+          <div class="input-group">
+            <label for="subtitle">Description courte *</label>
+            <textarea id="subtitle" formControlName="subtitle" rows="3" placeholder="Décrivez l'offre ou le message en quelques mots..."></textarea>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="btnText">Texte du bouton *</label>
+              <input id="btnText" type="text" formControlName="category_name" placeholder="Ex: Découvrir maintenant">
+            </div>
+            <div class="input-group">
+              <label for="order">Position / Ordre</label>
+              <input id="order" type="number" formControlName="order" min="1">
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="link_url">Destination du lien</label>
+              <select id="link_url" formControlName="link_url" class="select-modern">
+                @for (link of availableLinks; track link.url) {
+                  <option [value]="link.url">{{ link.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="status">Visibilité</label>
+              <select id="status" formControlName="is_active" class="select-status">
+                <option [ngValue]="true">Publié (Actif)</option>
+                <option [ngValue]="false">Brouillon (Masqué)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group dimension-control">
+            <div class="label-with-value">
+              <label>Hauteur d'affichage (300px - 1200px)</label>
+              <span class="badge-value">{{ carouselForm.get('image_height')?.value }}px</span>
+            </div>
+            <input type="range" formControlName="image_height" min="300" max="1200" step="1" class="range-slider">
+            <div class="range-labels">
+              <span>Portrait</span>
+              <span>Cinématique</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Visuel de la bannière {{ editingSlideId() ? '(Laissez vide pour conserver)' : '*' }}</label>
+            <div class="upload-wrapper">
+              <label class="drop-zone" [class.has-error]="!selectedFile && !editingSlideId() && carouselForm.touched">
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+                
+                @if (imagePreview(); as preview) {
+                  <div class="preview-container">
+                    <img [src]="preview" alt="Aperçu" class="image-preview" [style.maxHeight.px]="200">
+                    <div class="preview-overlay">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                      <span>Remplacer l'image</span>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="upload-hint">
+                    <div class="hint-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    </div>
+                    <p>Cliquez ou glissez une image ici</p>
+                    <small>Format JPG/PNG • Ratio conseillé 16:9 • Max 5Mo</small>
+                  </div>
+                }
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="resetForm()" [disabled]="isSubmitting()">
+              {{ editingSlideId() ? 'Annuler l\'édition' : 'Vider les champs' }}
+            </button>
+            
+            <button type="submit" class="btn-save" [disabled]="carouselForm.invalid || (!selectedFile && !editingSlideId()) || isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="loader"></span>
+                <span>Traitement...</span>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+                <span>{{ editingSlideId() ? 'Mettre à jour' : 'Publier la bannière' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="list-section">
+      <div class="list-header">
+        <div class="list-title">
+          <h3>Collection de Bannières</h3>
+          <span class="count-badge">{{ slides().length }} élément(s)</span>
+        </div>
+        <button class="btn-refresh" (click)="loadSlides()" [class.loading]="isLoading()" title="Actualiser la liste">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+        </button>
+      </div>
+
+      <div class="slides-container">
+        @if (isLoading()) {
+          <div class="loading-state">
+            <div class="loader-spinner"></div>
+            <p>Récupération des données en cours...</p>
+          </div>
+        }
+
+        @for (slide of paginatedSlides(); track slide.id) {
+          <article class="slide-item" 
+                   [class.is-editing]="editingSlideId() === slide.id"
+                   [class.removing]="removingId() === slide.id">
+            <div class="slide-img-box">
+              <img [src]="slide.full_image_url" [alt]="slide.title" loading="lazy">
+              <div class="slide-order-tag">Position #{{ slide.order }}</div>
+            </div>
+            
+            <div class="slide-info">
+              <div class="slide-text">
+                <div class="slide-title-row">
+                  <h4>{{ slide.title }}</h4>
+                  <span class="btn-text-badge">{{ slide.category_name }}</span>
+                </div>
+                <p class="slide-subtitle">{{ slide.subtitle }}</p>
+                
+                <div class="slide-details">
+                  <div class="detail-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <code>{{ slide.link || slide.link }}</code>
+                  </div>
+                  <div class="detail-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3v18H3V3h18z"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
+                    <span>Hauteur : <strong>{{ slide.height || slide.height }}px</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="slide-footer">
+                <span class="status-badge" [class.active]="slide.is_active">
+                  <span class="dot"></span>
+                  {{ slide.is_active ? 'Public' : 'Masqué' }}
+                </span>
+                
+                <div class="action-buttons">
+                  <button class="btn-edit-card" (click)="editSlide(slide)" title="Éditer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="btn-delete-card" (click)="deleteSlide(slide.id!)" title="Supprimer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        } @empty {
+          @if (!isLoading()) {
+            <div class="empty-message">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m15 8-5 5-5-5"/></svg>
+              <p>Aucune bannière configurée.</p>
+            </div>
+          }
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="pagination-bar">
+          <button class="btn-page" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">
+            &larr; Précédent
+          </button>
+          <div class="page-numbers">
+            <span>Page {{ currentPage() }} sur {{ totalPages() }}</span>
+          </div>
+          <button class="btn-page" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">
+            Suivant &rarr;
+          </button>
+        </div>
+      }
+    </section>
+  </div>
+</div>

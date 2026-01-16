@@ -1,0 +1,27 @@
+<nav class="controller-sidebar">
+    <div class="logo">E.M.E.S Controller</div>
+    
+    <ul class="menu-list">
+        <li *ngFor="let item of menus" [class.has-children]="item.children">
+            
+            <a *ngIf="!item.children" [routerLink]="item.link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                <span class="icon">{{ item.icon }}</span>
+                {{ item.label }}
+            </a>
+            
+            <a *ngIf="item.children" class="toggle" (click)="toggleSubMenu(item.label)">
+                <span class="icon">{{ item.icon }}</span>
+                {{ item.label }}
+                <span class="arrow">{{ isSubMenuOpen[item.label] ? '▼' : '►' }}</span>
+            </a>
+
+            <ul *ngIf="item.children && isSubMenuOpen[item.label]" class="sub-menu">
+                <li *ngFor="let subItem of item.children">
+                    <a [routerLink]="subItem.link" routerLinkActive="active">
+                        - {{ subItem.label }}
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>

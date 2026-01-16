@@ -1,0 +1,322 @@
+/* src/app/features/admin/inventory/inventory-form/inventory-form.component.css */
+
+:host {
+    --primary: #0e7490;
+    --primary-hover: #0891b2;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg-page: #f8fafc;
+    --error: #ef4444;
+    --warning-bg: #fffbeb;
+    --warning-text: #b45309;
+    --info-bg: #f0f9ff;
+    --info-text: #0369a1;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.inventory-form-container {
+    max-width: 850px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* --- Header --- */
+.form-header {
+    margin-bottom: 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.back-link:hover {
+    transform: translateX(-5px);
+}
+
+.form-header h1 {
+    font-size: 1.85rem;
+    color: var(--text-main);
+    font-weight: 800;
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* --- Form Card & Sections --- */
+.shadow-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.form-section {
+    border: none;
+    padding: 0;
+    margin-bottom: 2.5rem;
+}
+
+.form-section legend {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+}
+
+/* --- Inputs & Groups --- */
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+/* Style spécifique pour le SELECT */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
+    padding-right: 2.5rem;
+}
+
+.form-control, 
+input[type="number"], 
+input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background-color: #fff;
+    color: var(--text-main);
+}
+
+/* Groupes avec Icônes */
+.input-prefix {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-prefix i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    z-index: 10;
+}
+
+.input-prefix input {
+    padding-left: 2.75rem;
+}
+
+/* État Focus */
+.form-control:focus, 
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+}
+
+/* Validation visuelle */
+.is-invalid {
+    border-color: var(--error) !important;
+    background-color: #fff8f8;
+}
+
+.error-feedback {
+    color: var(--error);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.4rem;
+}
+
+/* Champs Read-only / Bloqués */
+.input-prefix.disabled {
+    background-color: var(--bg-page);
+    border-radius: 10px;
+    cursor: not-allowed;
+}
+
+input[readonly], 
+select:disabled,
+input:disabled {
+    background-color: var(--bg-page) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed !important;
+    border-style: dashed;
+}
+
+/* --- Grid Layout --- */
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.three-cols .form-group {
+    flex: 1;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* --- Actions & Buttons --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn {
+    padding: 0.8rem 1.75rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(14, 116, 144, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(14, 116, 144, 0.3);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Messages Contextuels (Nouveau) --- */
+.hint-text {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.hint-text.info {
+    color: var(--info-text);
+    background: var(--info-bg);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.hint-text.warning {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.alert-error {
+    background: #fff1f2;
+    color: #991b1b;
+    padding: 1.1rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--error);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+}
+
+/* --- Loading State --- */
+.loading-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .half-width {
+        width: 100%;
+    }
+    .shadow-card {
+        padding: 1.5rem;
+    }
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    .btn {
+        width: 100%;
+    }
+}

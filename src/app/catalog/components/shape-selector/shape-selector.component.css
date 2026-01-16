@@ -1,0 +1,43 @@
+.shape-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-md);
+}
+
+.shape-tile {
+    padding: var(--space-md);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--color-white);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    /* Reset du bouton par défaut */
+    appearance: none;
+    outline: none;
+}
+
+.shape-tile:hover {
+    border-color: var(--color-primary-accent);
+    box-shadow: 0 0 5px rgba(47, 128, 237, 0.15);
+}
+
+.shape-tile.selected {
+    border-color: var(--color-secondary-accent);
+    box-shadow: 0 0 0 2px var(--color-secondary-accent);
+}
+
+.shape-icon {
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shape-name {
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin-top: .25rem;
+    display: block;
+}

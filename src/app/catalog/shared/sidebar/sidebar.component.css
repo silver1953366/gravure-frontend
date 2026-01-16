@@ -1,0 +1,166 @@
+:host {
+    /* Variables locales */
+    --sidebar-width: 18rem; 
+    --color-primary: #2563eb;
+    --color-text-default: #1f2937;
+    --color-bg: #ffffff;
+}
+
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--sidebar-width);
+    background-color: var(--color-bg);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-container.open {
+    transform: translateX(0);
+}
+
+/* --- En-tête --- */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-default);
+    display: none; /* Caché sur desktop, visible sur mobile */
+}
+
+/* --- Contenu des Filtres --- */
+.sidebar-content {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.filter-group {
+    margin-bottom: 2rem;
+}
+
+.filter-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-default);
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dashed #d1d5db;
+    padding-bottom: 0.25rem;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.filter-option input {
+    margin-right: 0.75rem;
+    accent-color: var(--color-primary);
+}
+
+/* --- Filtre de Prix --- */
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.range-inputs input {
+    width: 45%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+}
+
+.price-display {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* --- Pied de Page --- */
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-reset {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-reset:hover {
+    background-color: #e5e7eb;
+}
+
+/* --- Overlay (Mobile/Tablette) --- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s;
+}
+
+.sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Media Queries --- */
+@media (max-width: 1024px) {
+    /* La sidebar est toujours initialement à gauche */
+    .sidebar-container {
+        transform: translateX(-100%);
+        width: 80%;
+    }
+    
+    /* Bouton Fermer est visible sur mobile */
+    .close-button {
+        display: block;
+    }
+}
+
+@media (min-width: 1025px) {
+    /* Sur desktop, la sidebar est statique, donc pas besoin d'overlay */
+    .sidebar-overlay {
+        display: none;
+    }
+}

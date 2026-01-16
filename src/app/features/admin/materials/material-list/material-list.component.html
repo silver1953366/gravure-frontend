@@ -1,0 +1,141 @@
+<div class="material-management-container">
+  <div class="list-header">
+    <div>
+      <h2>Gestion des Matériaux</h2>
+      <p class="subtitle">Visualisez et gérez vos matières premières avec leurs visuels.</p>
+    </div>
+    <button (click)="onCreateMaterial()" class="btn-create">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="icon-sm">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Nouveau matériau
+    </button>
+  </div>
+
+  <div class="search-filter-bar">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onFilterChange()" 
+        placeholder="Rechercher par nom..." 
+        class="form-control">
+    </div>
+
+    <div class="filter-box">
+      <select 
+        [(ngModel)]="selectedCategoryId" 
+        (change)="onFilterChange()" 
+        class="form-select">
+        <option value="">Toutes les catégories</option>
+        @for (cat of categories; track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (error) {
+    <div class="alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-sm">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+      {{ error }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement de vos matériaux...</p>
+    </div>
+  } @else {
+    
+    @if (paginatedMaterials.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-container">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="empty-folder-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+          </svg>
+        </div>
+        <p class="empty-message">Aucun matériau ne correspond à votre recherche.</p>
+        <button (click)="searchTerm = ''; selectedCategoryId = ''; onFilterChange()" class="btn-reset-filters">
+          Réinitialiser les filtres
+        </button>
+      </div>
+    } @else {
+      
+      <div class="materials-grid">
+        @for (material of paginatedMaterials; track material.id) {
+          <div class="material-card">
+            <div class="card-image-container">
+              <img 
+                [src]="material.image_url || 'assets/images/placeholder-material.png'" 
+                [alt]="material.name"
+                class="card-img">
+              <span [class]="material.is_active ? 'badge-active' : 'badge-inactive'">
+                {{ material.is_active ? 'Actif' : 'Inactif' }}
+              </span>
+            </div>
+
+            <div class="card-content">
+              <div class="card-header-info">
+                <span class="category-label">ID #{{ material.id }}</span>
+                <h3 class="material-title">{{ material.name }}</h3>
+              </div>
+              
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Prix Base</span>
+                  <span class="stat-value text-primary">{{ material.price_per_sq_meter | currency:'XOF':'symbol':'1.0-0' }}/m²</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Épaisseurs</span>
+                  <span class="stat-value">{{ material.thickness_options || 'N/A' }}</span>
+                </div>
+              </div>
+
+              <div class="card-footer-actions">
+                <button (click)="onEditMaterial(material.id)" class="btn-action-icon edit" title="Modifier">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </button>
+                <button (click)="onDeleteMaterial(material)" class="btn-action-icon delete" title="Supprimer">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (totalPages > 1) {
+        <div class="pagination-container">
+          <button 
+            [disabled]="currentPage === 1" 
+            (click)="currentPage = currentPage - 1" 
+            class="btn-pagination">
+            ← Précédent
+          </button>
+          
+          <div class="page-info">
+            Page <strong>{{ currentPage }}</strong> sur {{ totalPages }}
+          </div>
+          
+          <button 
+            [disabled]="currentPage === totalPages" 
+            (click)="currentPage = currentPage + 1" 
+            class="btn-pagination">
+            Suivant →
+          </button>
+        </div>
+      }
+    }
+  }
+</div>

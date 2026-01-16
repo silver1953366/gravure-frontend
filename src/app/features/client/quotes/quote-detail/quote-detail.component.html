@@ -1,0 +1,173 @@
+<div class="page-container">
+  
+  <div *ngIf="isLoading()" class="loader-overlay">
+    <div class="spinner"></div>
+    <p>Chargement des détails du devis...</p>
+  </div>
+
+  <div *ngIf="errorMessage() && !isLoading()" class="error-container">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>{{ errorMessage() }}</p>
+    <button (click)="ngOnInit()" class="btn-retry">Réessayer</button>
+  </div>
+
+  <ng-container *ngIf="quote() && !isLoading()">
+    
+    <div class="page-header">
+      <div class="header-left">
+        <button routerLink="/client/quotes" class="btn-icon-back" title="Retour à la liste">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h1 class="page-title">Devis #{{ quote()?.reference }}</h1>
+          <p class="page-subtitle">Créé le {{ quote()?.created_at | date:'dd MMMM yyyy' }}</p>
+        </div>
+      </div>
+      
+      <div class="header-right">
+        <div class="status-wrapper">
+          <span class="status-indicator-text">État actuel du devis</span>
+          <div [class]="'status-pill ' + getStatusConfig(quote()!.status).class">
+            <span class="status-dot"></span>
+            <i [class]="'fa-solid ' + getStatusConfig(quote()!.status).icon"></i>
+            <span class="status-label">{{ getStatusConfig(quote()!.status).label | uppercase }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid animated-fade">
+      
+      <div class="main-column">
+        <div class="glass-card">
+          <div class="card-header">
+            <i class="fa-solid fa-layer-group"></i>
+            <h2>Configuration de la gravure</h2>
+          </div>
+          
+          <div class="specs-grid">
+            <div class="spec-item">
+              <span class="spec-label">Matériau</span>
+              <span class="spec-value">{{ quote()?.material?.name || 'Non spécifié' }}</span>
+            </div>
+            
+            <div class="spec-item">
+              <span class="spec-label">Forme</span>
+              <span class="spec-value">{{ quote()?.shape?.name || 'Non spécifiée' }}</span>
+            </div>
+
+            <div class="spec-item highlight">
+              <span class="spec-label">Dimension (Catalogue)</span>
+              <span class="spec-value">{{ getDimensionDisplay() }}</span>
+            </div>
+            
+            <div class="spec-item">
+              <span class="spec-label">Quantité demandée</span>
+              <span class="spec-value">{{ quote()?.quantity }} unité(s)</span>
+            </div>
+          </div>
+
+          <div class="custom-note" *ngIf="quote()?.details_snapshot?.customization?.description">
+            <span class="spec-label">Instructions spécifiques :</span>
+            <p>{{ quote()?.details_snapshot?.customization?.description }}</p>
+          </div>
+        </div>
+
+        <div class="glass-card mt-24">
+          <div class="card-header">
+            <i class="fa-solid fa-paperclip"></i>
+            <h2>Pièces jointes</h2>
+          </div>
+          
+          <div class="files-list" *ngIf="quote()?.attachments?.length; else noFiles">
+            <div class="file-item" *ngFor="let att of quote()?.attachments">
+              <div class="file-info">
+                <i class="fa-solid fa-file-pdf"></i>
+                <div class="file-meta">
+                  <span class="file-name">{{ att.original_name }}</span>
+                  <span class="file-size">{{ (att.size / 1024) | number:'1.0-1' }} KB</span>
+                </div>
+              </div>
+              <a [href]="getAttachmentUrl(att.id)" target="_blank" class="btn-download">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+              </a>
+            </div>
+          </div>
+          <ng-template #noFiles>
+            <p class="empty-text">Aucun fichier joint à ce devis.</p>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="side-column">
+        <div class="glass-card billing-card">
+          <div class="card-header">
+            <i class="fa-solid fa-receipt"></i>
+            <h2>Résumé financier</h2>
+          </div>
+          
+          <div class="billing-details">
+            <div class="bill-line">
+              <span>Prix Unitaire HT</span>
+              <span>{{ quote()?.unit_price_fcfa | number }} FCFA</span>
+            </div>
+            <div class="bill-line">
+              <span>Sous-total</span>
+              <span>{{ quote()?.base_price_fcfa | number }} FCFA</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="bill-line total">
+              <span>Montant Total</span>
+              <span class="total-price">{{ quote()?.final_price_fcfa | number }} FCFA</span>
+            </div>
+          </div>
+
+          <button 
+            *ngIf="quote()?.status === 'calculated'" 
+            (click)="convertQuote()" 
+            [disabled]="isSubmitting()"
+            class="btn-primary-action">
+            <i class="fa-solid fa-cart-shopping" *ngIf="!isSubmitting()"></i>
+            <i class="fa-solid fa-circle-notch fa-spin" *ngIf="isSubmitting()"></i>
+            <span>{{ isSubmitting() ? 'Création de la commande...' : 'Convertir en Commande' }}</span>
+          </button>
+          
+          <div class="info-box-status success highlight-order" *ngIf="quote()?.status === 'ordered'">
+            <div class="info-content">
+              <i class="fa-solid fa-circle-check"></i>
+              <div class="text-group">
+                <strong>Devis déjà commandé</strong>
+                <p>Une commande a été générée pour ce devis. Cliquez ci-dessous pour suivre son état.</p>
+              </div>
+            </div>
+            
+            <button (click)="viewRelatedOrder()" class="btn-view-order">
+              <span>Voir la commande</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card mt-24">
+          <div class="card-header">
+            <i class="fa-solid fa-user-tie"></i>
+            <h2>Informations de livraison</h2>
+          </div>
+          <div class="address-content">
+            <p class="customer-name">{{ quote()?.client_details?.name }}</p>
+            <p class="customer-address">
+              <i class="fa-solid fa-location-dot"></i>
+              {{ quote()?.client_details?.address || 'Adresse par défaut (Profil)' }}
+            </p>
+            <p class="customer-contact">
+              <i class="fa-solid fa-envelope"></i> {{ quote()?.client_details?.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+</div>

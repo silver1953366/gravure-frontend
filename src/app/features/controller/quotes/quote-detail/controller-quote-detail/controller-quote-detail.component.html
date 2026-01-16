@@ -1,0 +1,26 @@
+<div class="detail-container">
+    <button (click)="onBack()" class="btn-back">← Retour aux Devis</button>
+
+    <div *ngIf="isLoading">Chargement des détails du devis...</div>
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <ng-container *ngIf="quote && !isLoading">
+        <h2>Devis #{{ quote.id }}</h2>
+        <p>Statut : <span [class]="'status-' + quote.status">{{ quote.status | uppercase }}</span></p>
+
+        <div class="card quote-summary">
+            <h3>Résumé du Devis</h3>
+            <div class="info-row"><strong>Client ID:</strong> <span>{{ quote.user_id }}</span></div>
+            <div class="info-row"><strong>Prix Total Estimé:</strong> <span>{{ quote.total_price | currency:'EUR':'symbol' }}</span></div>
+            <div class="info-row"><strong>Date:</strong> <span>{{ quote.created_at | date:'medium' }}</span></div>
+        </div>
+
+        <div class="card quote-items" *ngIf="quote.quote_items?.length">
+            <h3>Spécifications Techniques</h3>
+            </div>
+        
+        <p class="disclaimer">
+            *Ce module est en consultation. La conversion en commande et les ajustements de prix sont gérés par l'Admin.
+        </p>
+    </ng-container>
+</div>

@@ -1,0 +1,135 @@
+<div class="discounts-wrapper">
+    <div class="list-header">
+        <div>
+            <h2>🏷️ Réductions & Codes Promo</h2>
+            <p class="subtitle">Gérez vos offres spéciales et fidélisez vos clients.</p>
+        </div>
+        <button class="btn-add" (click)="startCreation()" *ngIf="!isCreating && !isEditing">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-sm">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nouvelle Réduction
+        </button>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <div class="form-card" *ngIf="isCreating || isEditing">
+        <header>
+            <h3>{{ isCreating ? 'Nouvelle Promotion' : 'Modifier la Promotion' }}</h3>
+        </header>
+        
+        <form #discountForm="ngForm" (ngSubmit)="saveDiscount(discountForm)" class="grid-form">
+            <div class="form-group full-width">
+                <label>Nom de la réduction *</label>
+                <input type="text" name="name" [(ngModel)]="currentDiscount.name" required placeholder="Ex: Soldes d'Été">
+            </div>
+
+            <div class="form-group">
+                <label>Code Promo</label>
+                <input type="text" name="code" [(ngModel)]="currentDiscount.code" placeholder="Ex: SUMMER20">
+                <small class="hint">Laissez vide pour une réduction automatique.</small>
+            </div>
+
+            <div class="form-group">
+                <label>Type de calcul</label>
+                <select name="type" [(ngModel)]="currentDiscount.type" required>
+                    <option value="percentage">Pourcentage (%)</option>
+                    <option value="fixed">Montant Fixe (FCFA)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Valeur ({{ currentDiscount.type === 'percentage' ? '%' : 'FCFA' }})</label>
+                <input type="number" name="value" [(ngModel)]="currentDiscount.value" required min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Min. Commande (FCFA)</label>
+                <input type="number" name="min_order_amount" [(ngModel)]="currentDiscount.min_order_amount">
+            </div>
+
+            <div class="form-group">
+                <label>Date d'expiration</label>
+                <input type="date" name="expires_at" [(ngModel)]="currentDiscount.expires_at">
+            </div>
+
+            <div class="form-group inline-flex">
+                <label class="switch">
+                    <input type="checkbox" name="is_active" [(ngModel)]="currentDiscount.is_active">
+                    <span class="slider"></span>
+                </label>
+                <span>Promotion active</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" (click)="cancelOperation()" class="btn-secondary">Annuler</button>
+                <button type="submit" class="btn-primary" [disabled]="discountForm.invalid">
+                    {{ isCreating ? 'Créer la réduction' : 'Enregistrer les modifications' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-card" *ngIf="!isLoading">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code / Nom</th>
+                    <th>Valeur</th>
+                    <th>Conditions</th>
+                    <th>Expiration</th>
+                    <th>Statut</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let discount of discounts">
+                    <td>
+                        <div class="code-info">
+                            <span class="promo-code">{{ discount.code || 'REDUC_AUTO' }}</span>
+                            <span class="promo-name">{{ discount.name }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="value-tag">
+                            {{ discount.value }}{{ discount.type === 'percentage' ? '%' : ' FCFA' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="min-amount" *ngIf="discount.min_order_amount">
+                            Dès {{ discount.min_order_amount | currency:'XOF':'':'1.0-0' }} FCFA
+                        </span>
+                        <span class="min-amount" *ngIf="!discount.min_order_amount">Aucun min.</span>
+                    </td>
+                    <td>
+                        <span class="expiry-date" [class.expired]="false">
+                            {{ discount.expires_at ? (discount.expires_at | date:'dd/MM/yyyy') : '∞' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span [class]="discount.is_active ? 'badge-active' : 'badge-inactive'">
+                            {{ discount.is_active ? 'Actif' : 'Désactivé' }}
+                        </span>
+                    </td>
+                    <td class="text-right">
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" (click)="startEditing(discount)" title="Modifier">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                            </button>
+                            <button class="btn-icon btn-delete" (click)="deleteDiscount(discount.id!)" title="Supprimer">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">Chargement...</div>
+    <div class="empty-state" *ngIf="!isLoading && discounts.length === 0">
+        <p>Aucune promotion active actuellement.</p>
+    </div>
+</div>

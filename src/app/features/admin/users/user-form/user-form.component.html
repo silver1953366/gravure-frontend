@@ -1,0 +1,115 @@
+<div class="form-page-wrapper">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="user-form-container">
+        <header class="form-header">
+            <div class="header-content">
+                <a routerLink="/admin/users" class="btn-back" title="Retour à la liste">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="title-group">
+                    <h2>{{ isEditMode ? (isOwnProfile ? 'Mon Profil' : 'Édition Utilisateur') : 'Nouvel Utilisateur' }}</h2>
+                    <p class="subtitle">Configuration des accès et informations de sécurité</p>
+                </div>
+            </div>
+        </header>
+
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-grid">
+            
+            <div *ngIf="apiErrors.general" class="alert-banner error full-width">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>{{ apiErrors.general }}</span>
+            </div>
+
+            <div class="form-group" [class.disabled-field]="isEditMode && !isOwnProfile">
+                <label for="name">Nom Complet</label>
+                <div class="input-container">
+                    <i class="fa-regular fa-user"></i>
+                    <input id="name" type="text" formControlName="name" placeholder="Ex: Jean Dupont">
+                    <div class="focus-border"></div>
+                </div>
+                <div class="error-container" *ngIf="userForm.controls['name'].touched && userForm.controls['name'].invalid">
+                    <span class="error-text">Le nom est requis (max 255 car.)</span>
+                </div>
+                <div class="error-container" *ngIf="apiErrors.name">
+                    <span class="error-text">{{ apiErrors.name }}</span>
+                </div>
+            </div>
+
+            <div class="form-group" [class.disabled-field]="isEditMode && !isOwnProfile">
+                <label for="email">Adresse Email</label>
+                <div class="input-container">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input id="email" type="email" formControlName="email" placeholder="jean.dupont@exemple.com">
+                    <div class="focus-border"></div>
+                </div>
+                <div class="error-container" *ngIf="userForm.controls['email'].touched && userForm.controls['email'].invalid">
+                    <span class="error-text">Veuillez entrer une adresse email valide</span>
+                </div>
+                <div class="error-container" *ngIf="apiErrors.email">
+                    <span class="error-text">{{ apiErrors.email }}</span>
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="!isEditMode || isOwnProfile">
+                <label for="password">
+                    Mot de passe 
+                    <small class="label-hint">{{ isEditMode ? '(Optionnel)' : '*' }}</small>
+                </label>
+                <div class="input-container">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="password" type="password" formControlName="password" placeholder="••••••••">
+                    <div class="focus-border"></div>
+                </div>
+                <div class="error-container" *ngIf="userForm.get('password')?.touched && userForm.get('password')?.invalid">
+                    <span class="error-text">Le mot de passe doit faire au moins 8 caractères</span>
+                </div>
+                <div class="error-container" *ngIf="apiErrors.password">
+                    <span class="error-text">{{ apiErrors.password }}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Rôle Utilisateur</label>
+                <div class="input-container">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <select id="role" formControlName="role">
+                        <option *ngFor="let role of roles" [value]="role">{{ role | uppercase }}</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down select-arrow"></i>
+                    <div class="focus-border"></div>
+                </div>
+                <div class="error-container" *ngIf="apiErrors.role">
+                    <span class="error-text">{{ apiErrors.role }}</span>
+                </div>
+            </div>
+
+            <div class="full-width" *ngIf="isEditMode && !isOwnProfile">
+                <div class="info-card">
+                    <i class="fa-solid fa-lock-keyhole"></i>
+                    <div class="info-content">
+                        <strong>Sécurité renforcée</strong>
+                        <p>En tant qu'administrateur, vous ne pouvez modifier que les privilèges. L'utilisateur garde le contrôle sur ses identifiants personnels.</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="form-actions full-width">
+                <button type="button" class="btn-cancel" routerLink="/admin/users">Annuler</button>
+                
+                <button type="submit" class="btn-submit" [disabled]="userForm.invalid || isLoading">
+                    <ng-container *ngIf="!isLoading">
+                        <span>Enregistrer les modifications</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </ng-container>
+                    
+                    <div class="loader-content" *ngIf="isLoading">
+                        <div class="spinner-mini"></div>
+                        <span>Traitement...</span>
+                    </div>
+                </button>
+            </footer>
+        </form>
+    </div>
+</div>

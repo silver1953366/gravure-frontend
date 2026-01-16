@@ -1,0 +1,104 @@
+<div class="orders-page-container">
+  <div class="content-wrapper">
+    
+    <header class="page-header">
+      <div class="header-text">
+        <nav class="breadcrumb">
+          <span>ESPACE CLIENT</span>
+          <svg class="chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+          </svg>
+          <span class="active">COMMANDES</span>
+        </nav>
+        <h1 class="main-title">Historique des commandes</h1>
+        <p class="subtitle">Gestion centralisée de vos acquisitions et suivi logistique en temps réel.</p>
+      </div>
+
+      <div class="header-actions">
+        <button (click)="loadOrders()" class="refresh-btn" [class.spinning]="isLoading()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <a routerLink="/configurator" class="primary-button">
+          Nouvelle commande
+        </a>
+      </div>
+    </header>
+
+    @if (isLoading()) {
+      <div class="skeleton-container">
+        <div class="skeleton-row" *ngFor="let i of [1,2,3]"></div>
+      </div>
+    } @else if (orders().length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Aucune donnée disponible</h2>
+        <p>Votre historique est actuellement vide. Commencez par configurer un produit pour passer commande.</p>
+      </div>
+    } @else {
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Date d'émission</th>
+                <th class="text-center">Statut</th>
+                <th class="text-right">Total HT</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders(); track order.id) {
+                <tr class="order-row" [routerLink]="['/client/orders', order.id]">
+                  <td class="ref-column">
+                    <div class="ref-wrapper">
+                      <div class="icon-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                      <span class="ref-text">{{ order.reference }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ order.created_at | date: 'dd MMM yyyy' }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span [class]="'status-badge ' + getStatusClass(order.status)">
+                      {{ order.status | uppercase }}
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <div class="price-wrapper">
+                      <span class="price-amount">{{ order.final_price_fcfa | number:'1.0-0' }}</span>
+                      <span class="price-currency">XAF</span>
+                    </div>
+                  </td>
+                  <td class="action-column">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        
+        <footer class="table-footer">
+          <p>Affichage de {{ orders().length }} résultat(s)</p>
+          <div class="pagination">
+            <button class="nav-btn disabled">Précédent</button>
+            <button class="nav-btn">Suivant</button>
+          </div>
+        </footer>
+      </div>
+    }
+  </div>
+</div>

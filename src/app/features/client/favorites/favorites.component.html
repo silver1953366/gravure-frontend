@@ -1,0 +1,40 @@
+<div class="favorites-container">
+    <h1 class="page-title">⭐ Mes Devis Favoris</h1>
+
+    @if (isLoading()) {
+        <div class="loading-state">
+            Chargement de vos favoris...
+        </div>
+    } @else if (error()) {
+        <div class="alert-error">{{ error() }}</div>
+    } @else if (favorites().length === 0) {
+        <div class="empty-state">
+            <p>Vous n'avez pas encore ajouté de devis à vos favoris.</p>
+            <a routerLink="/client/quotes" class="link-action">Découvrir les devis disponibles →</a>
+        </div>
+    } @else {
+        <div class="favorites-grid">
+            @for (item of favorites(); track item.id) {
+                <div class="favorite-card">
+                    
+                    <img [src]="item.image" [alt]="'Image pour ' + item.quote.reference" class="quote-image">
+                    
+                    <div class="content">
+                        <span class="reference">#{{ item.quote.reference }}</span>
+                        <h2 class="name">{{ item.quote.name }}</h2>
+                        <p class="material">Matériau : <strong>{{ item.quote.material }}</strong></p>
+                        
+                        <div class="actions">
+                            <a [routerLink]="['/client/quotes', item.quote_id]" class="btn-details">
+                                Voir le devis complet
+                            </a>
+                            <button class="btn-remove" (click)="removeFavorite(item.id)">
+                                Retirer des favoris 🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

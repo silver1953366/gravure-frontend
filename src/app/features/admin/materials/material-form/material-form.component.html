@@ -1,0 +1,134 @@
+<div class="material-form-container">
+    <a routerLink="/admin/materials" class="back-link">← Retour à la liste des matériaux</a>
+    
+    <h3>{{ isEditMode ? 'Modifier le matériau' : 'Ajouter un nouveau matériau' }}</h3>
+    
+    @if (isLoading && isEditMode) {
+        <div class="loading-data">Chargement des données du matériau...</div>
+    } @else {
+        <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
+            
+            @if (apiErrors.general) {
+                <div class="alert-error">{{ apiErrors.general }}</div>
+            }
+            
+            <div class="form-group">
+                <label for="name">Nom du Matériau (Ex: Aluminium 5052) <span class="required">*</span></label>
+                <input id="name" type="text" formControlName="name" (input)="onNameChange()" placeholder="Entrez le nom complet">
+                
+                @if (materialForm.controls['name'].touched && materialForm.controls['name'].invalid) {
+                    <div class="error-message">Le nom est requis (Max 100 caractères).</div>
+                }
+                @if (apiErrors.name) {
+                    <div class="error-message">{{ apiErrors.name }}</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="slug">Slug (Identifiant URL)</label>
+                <input id="slug" type="text" formControlName="slug" [readonly]="isEditMode" placeholder="slug-auto-genere">
+                
+                @if (!isEditMode) {
+                    <small class="info-text">Généré automatiquement à partir du nom. Format: minuscule-tirets.</small>
+                }
+                
+                @if (materialForm.controls['slug'].touched && materialForm.controls['slug'].invalid) {
+                    <div class="error-message">Le slug est requis et doit être au format 'minuscule-tirets'.</div>
+                }
+                @if (apiErrors.slug) {
+                    <div class="error-message">{{ apiErrors.slug }}</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="category_id">Catégorie du catalogue</label>
+                <select id="category_id" formControlName="category_id">
+                    <option [ngValue]="null">-- Sélectionner une catégorie (Optionnel) --</option>
+                    @for (cat of categories; track cat.id) {
+                        <option [value]="cat.id">{{ cat.name }}</option>
+                    }
+                </select>
+                @if (apiErrors.category_id) {
+                    <div class="error-message">{{ apiErrors.category_id }}</div>
+                }
+            </div>
+            
+            <div class="form-group">
+                <label for="file">Image du Matériau</label>
+                <input 
+                    id="file" 
+                    type="file" 
+                    accept="image/*" 
+                    (change)="onFileSelected($event)">
+                
+                @if (isEditMode) {
+                    <small class="info-text">Laissez vide pour conserver l'image existante.</small>
+                }
+                
+                @if (imageUrlPreview) {
+                    <div class="image-preview">
+                        <img [src]="imageUrlPreview" alt="Aperçu du matériau">
+                    </div>
+                }
+                
+                @if (apiErrors.image) {
+                    <div class="error-message">{{ apiErrors.image }}</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="price_per_sq_meter">Prix de base (FCFA/m²)</label>
+                <input id="price_per_sq_meter" type="number" formControlName="price_per_sq_meter" step="1" min="0" placeholder="Ex: 45000">
+                <small class="info-text">Laissez vide si le prix est géré uniquement par les dimensions spécifiques.</small>
+                
+                @if (materialForm.controls['price_per_sq_meter'].touched && materialForm.controls['price_per_sq_meter'].invalid) {
+                    <div class="error-message">Le prix doit être un nombre positif.</div>
+                }
+                @if (apiErrors.price_per_sq_meter) {
+                    <div class="error-message">{{ apiErrors.price_per_sq_meter }}</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="thickness_options">Options d'Épaisseur</label>
+                <input id="thickness_options" type="text" formControlName="thickness_options" placeholder="Ex: 1mm, 2mm, 3mm">
+                <small class="info-text">Séparez les valeurs par une virgule.</small>
+                
+                @if (apiErrors.thickness_options) {
+                    <div class="error-message">{{ apiErrors.thickness_options }}</div>
+                }
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" formControlName="description" rows="4" placeholder="Propriétés du matériau..."></textarea>
+                
+                @if (apiErrors.description) {
+                    <div class="error-message">{{ apiErrors.description }}</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="is_active">Statut <span class="required">*</span></label>
+                <select id="is_active" formControlName="is_active">
+                    <option [ngValue]="true">Actif (Visible)</option>
+                    <option [ngValue]="false">Inactif (Masqué)</option>
+                </select>
+                
+                @if (apiErrors.is_active) {
+                    <div class="error-message">{{ apiErrors.is_active }}</div>
+                }
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" [disabled]="materialForm.invalid || isLoading" class="btn-submit">
+                    @if (isLoading) {
+                        <span class="spinner"></span> Sauvegarde...
+                    } @else {
+                        {{ isEditMode ? 'Mettre à jour le matériau' : 'Enregistrer le matériau' }}
+                    }
+                </button>
+            </div>
+        </form>
+    }
+</div>

@@ -1,0 +1,164 @@
+<div class="admin-quotes-container">
+  <header class="dashboard-header">
+    <div class="title-section">
+      <h1>Gestion des Devis</h1>
+      <p class="subtitle">{{ filteredQuotes.length }} demande(s) en attente de traitement</p>
+    </div>
+
+    <div class="header-tools">
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="currentPage = 1" 
+          placeholder="Client, email ou référence..."
+        >
+      </div>
+
+      <button (click)="toggleSort()" class="btn-tool" [title]="sortOrder === 'desc' ? 'Trier par date croissante' : 'Trier par date décroissante'">
+        <i class="fas" [ngClass]="sortOrder === 'desc' ? 'fa-sort-amount-down' : 'fa-sort-amount-up'"></i>
+      </button>
+
+      <button (click)="loadQuotes()" class="btn-refresh" [class.spinning]="isLoading" [disabled]="isLoading">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="error" class="banner error animate-in">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+  </div>
+  <div *ngIf="successMessage" class="banner success animate-in">
+    <i class="fas fa-check-double"></i> {{ successMessage }}
+  </div>
+
+  <div class="content-card">
+    
+    <div *ngIf="isLoading" class="skeleton-container">
+      <div *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
+        <div class="skeleton-cell pulse short"></div>
+        <div class="skeleton-cell pulse long"></div>
+        <div class="skeleton-cell pulse medium"></div>
+        <div class="skeleton-cell pulse short"></div>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && filteredQuotes.length > 0">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Identifiant</th>
+            <th>Client</th>
+            <th>Matériau & Type</th>
+            <th class="text-right">Prix Final (FCFA)</th>
+            <th>Statut</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let quote of paginatedQuotes" class="quote-row">
+            <td>
+              <div class="id-badge">#{{ quote.id }}</div>
+              <span class="timestamp">{{ quote.created_at | date:'dd MMM yyyy HH:mm' }}</span>
+            </td>
+
+            <td>
+              <div class="client-cell">
+                <div class="avatar-circle">
+                  {{ (quote.client_details.name || 'U') | slice:0:1 | uppercase }}
+                </div>
+                <div class="client-info">
+                  <span class="name">{{ quote.client_details.name || 'Client Inconnu' }}</span>
+                  <span class="email">{{ quote.client_details.email }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <div class="config-cell">
+                <span class="material-name">{{ quote.material?.name || 'Sur mesure' }}</span>
+                <div class="specs">
+                  <span class="label">{{ quote.dimension_label || 'Standard' }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="text-right font-bold price-text">
+              {{ quote.final_price_fcfa | number:'1.0-0' }}
+            </td>
+
+            <td>
+              <span [class]="'badge-status ' + quote.status">
+                {{ quote.status | uppercase }}
+              </span>
+            </td>
+
+            <td class="action-cell">
+              <div class="button-group">
+                <button *ngIf="quote.status === 'sent'" 
+                        (click)="onCalculateQuote(quote)" 
+                        class="action-btn calculate" title="Fixer le prix final">
+                  <i class="fas fa-calculator"></i>
+                </button>
+
+                <button (click)="viewDetail(quote.id!)"
+                        class="action-btn view" title="Voir les détails complets">
+                  <i class="fas fa-eye"></i>
+                </button>
+
+                <button *ngIf="quote.status === 'sent' || quote.status === 'calculated'" 
+                        (click)="onRejectQuote(quote.id)" 
+                        class="action-btn reject" title="Rejeter le devis">
+                  <i class="fas fa-ban"></i>
+                </button>
+                
+                <button (click)="onDeleteQuote(quote.id)" 
+                        [disabled]="quote.order_id || isProcessing"
+                        class="action-btn delete" title="Supprimer définitivement">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <footer class="table-footer">
+        <div class="page-info">
+          Affichage de <strong>{{ paginatedQuotes.length }}</strong> sur {{ filteredQuotes.length }} devis
+        </div>
+        
+        <div class="pagination-controls">
+          <button class="nav-btn" [disabled]="currentPage === 1" (click)="currentPage = currentPage - 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          
+          <div class="page-numbers">
+            <button 
+              *ngFor="let p of [].constructor(totalPages); let i = index" 
+              [class.active]="currentPage === i + 1"
+              (click)="currentPage = i + 1">
+              {{ i + 1 }}
+            </button>
+          </div>
+
+          <button class="nav-btn" [disabled]="currentPage === totalPages" (click)="currentPage = currentPage + 1">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <div *ngIf="!isLoading && filteredQuotes.length === 0" class="empty-state animate-in">
+      <div class="empty-icon-wrapper">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>Aucun devis trouvé</h3>
+      <p>Ajustez vos critères de recherche pour le terme "<strong>{{ searchTerm }}</strong>".</p>
+      <button (click)="searchTerm = ''; currentPage = 1" class="btn-outline">
+        Réinitialiser la vue
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="user-management-container animate-fadeIn">
+    <header class="header-flex">
+        <div class="title-section">
+            <h2>Gestion des Utilisateurs</h2>
+            <p class="subtitle">
+                <i class="fa-solid fa-users-gear"></i> 
+                {{ filteredUsers.length }} utilisateur(s) enregistré(s)
+            </p>
+        </div>
+        <button class="btn-create" (click)="onCreateUser()">
+            <i class="fa-solid fa-plus"></i> Nouveau profil
+        </button>
+    </header>
+
+    <div class="filter-bar shadow-sm">
+        <div class="search-group">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input 
+                type="text" 
+                [(ngModel)]="searchTerm" 
+                (input)="applyFilters()" 
+                placeholder="Rechercher un nom ou un email..."
+                class="filter-control">
+        </div>
+        
+        <div class="select-group">
+            <i class="fa-solid fa-filter filter-icon"></i>
+            <select 
+                [(ngModel)]="roleFilter" 
+                (change)="applyFilters()" 
+                class="filter-control role-select">
+                <option value="">Tous les rôles</option>
+                <option value="admin">Administrateur</option>
+                <option value="controller">Contrôleur</option>
+                <option value="client">Client</option>
+            </select>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="state-container">
+        <div class="loader"></div>
+        <p>Synchronisation des données...</p>
+    </div>
+
+    <div *ngIf="error" class="alert-error animate-fadeIn">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+    </div>
+
+    <div class="table-container shadow-card" *ngIf="!isLoading && filteredUsers.length > 0">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th> <th>Rôle</th>
+                    <th>Inscription</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of paginatedUsers" class="animate-slideInUp">
+                    <td class="id-cell">#{{ user.id }}</td>
+                    
+                    <td>
+                        <div class="user-identity">
+                            <div class="avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
+                            <span class="name">{{ user.name }}</span>
+                        </div>
+                    </td>
+
+                    <td class="email-cell">
+                        <span class="email-text">{{ user.email }}</span>
+                    </td>
+
+                    <td>
+                        <span [class]="'role-badge role-' + user.role">
+                            {{ user.role }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="date-cell">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            {{ user.created_at | date: 'dd MMM yyyy' }}
+                        </div>
+                    </td>
+
+                    <td class="actions-cell">
+                        <button class="btn-action btn-edit" (click)="onEditUser(user.id)" aria-label="Modifier">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span class="tooltip">Modifier</span>
+                        </button>
+
+                        <button class="btn-action btn-delete" (click)="onDeleteUser(user.id)" aria-label="Supprimer">
+                            <i class="fa-regular fa-trash-can"></i>
+                            <span class="tooltip">Supprimer</span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer class="pagination-footer" *ngIf="totalPages > 1">
+            <div class="pagination-info">
+                Page <strong>{{ currentPage }}</strong> sur <strong>{{ totalPages }}</strong>
+            </div>
+            <div class="pagination-buttons">
+                <button class="btn-page" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+                    <i class="fa-solid fa-chevron-left"></i> Précédent
+                </button>
+                <button class="btn-page" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+                    Suivant <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <div *ngIf="!isLoading && filteredUsers.length === 0 && !error" class="state-container no-results">
+        <i class="fa-solid fa-magnifying-glass-plus"></i>
+        <p>Aucun utilisateur ne correspond à vos critères.</p>
+        <button class="btn-link" (click)="searchTerm = ''; roleFilter = ''; applyFilters()">
+            Effacer les filtres
+        </button>
+    </div>
+</div>

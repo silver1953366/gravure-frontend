@@ -1,0 +1,537 @@
+/* ==========================================================================
+   1. STRUCTURE ET MISE EN PAGE
+   ========================================================================== */
+.admin-carousel-container {
+  padding: 2rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.admin-header {
+  margin-bottom: 2.5rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-icon-box {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  color: #2563eb;
+}
+
+.header-text h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.header-text p {
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+}
+
+/* Grille Principale */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   2. CARTES ET FORMULAIRE (Section Gauche)
+   ========================================================================== */
+.admin-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  overflow: hidden;
+  position: sticky;
+  top: 2rem;
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #ffffff;
+  color: #1e293b;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.carousel-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+input, textarea, .select-modern, .select-status {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Contrôle de Hauteur (Range Slider) */
+.dimension-control {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #edf2f7;
+}
+
+.label-with-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.badge-value {
+  background: #2563eb;
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.range-slider {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  outline: none;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   3. ZONE D'UPLOAD ET PREVIEW
+   ========================================================================== */
+.drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: block;
+  position: relative;
+  background: #f8fafc;
+}
+
+.drop-zone:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.drop-zone.has-error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.upload-hint svg { margin-bottom: 0.75rem; }
+.upload-hint p { margin: 0; font-weight: 500; color: #475569; }
+.upload-hint small { color: #94a3b8; }
+
+.preview-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16 / 6;
+  border: 1px solid #e2e8f0;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: white;
+  font-size: 0.875rem;
+  backdrop-filter: blur(2px);
+}
+
+.preview-container:hover .preview-overlay { opacity: 1; }
+
+/* ==========================================================================
+   4. BOUTONS D'ACTION (FORMULAIRE)
+   ========================================================================== */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-cancel, .btn-save {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-cancel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.btn-cancel:hover { 
+  background: #fef2f2; 
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.btn-save {
+  background: #2563eb;
+  border: none;
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) { 
+  background: #1d4ed8; 
+  transform: translateY(-1px);
+}
+
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ==========================================================================
+   5. LISTE DES SLIDES (Section Droite)
+   ========================================================================== */
+.list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-refresh {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover { color: #2563eb; border-color: #bfdbfe; }
+
+.slides-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.slide-item {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.slide-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgb(0 0 0 / 0.1);
+}
+
+.slide-item.is-editing {
+  border: 2px solid #2563eb;
+  background: #f0f7ff;
+}
+
+.slide-img-box {
+  position: relative;
+  aspect-ratio: 16 / 8;
+}
+
+.slide-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-order-tag {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(15, 23, 42, 0.8);
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+.slide-info {
+  padding: 1.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.detail-item code {
+  background: #f1f5f9;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  color: #2563eb;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* --- DESIGN DES BOUTONS MODIFIER ET SUPPRIMER --- */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit-card, .btn-delete-card {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-edit-card:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+  transform: scale(1.05);
+}
+
+.btn-delete-card:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #ef4444;
+  animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.btn-edit-card:active, .btn-delete-card:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   6. PAGINATION
+   ========================================================================== */
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-page {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #475569;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #f0f7ff;
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.page-numbers strong {
+  color: #1e293b;
+  background: #f1f5f9;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   7. ÉTATS DE CHARGEMENT ET ANIMATIONS AVANCÉES
+   ========================================================================== */
+.loading-state, .empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem;
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* --- Keyframes Animations --- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-2px, 0, 0); }
+  40%, 60% { transform: translate3d(2px, 0, 0); }
+}
+
+/* Effet de transition quand une carte est supprimée (si utilisé avec Angular/JS) */
+.slide-item.removing {
+  animation: slideOut 0.4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes slideOut {
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+}

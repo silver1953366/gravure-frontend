@@ -1,0 +1,134 @@
+<header class="navbar-header">
+  <div class="left-section">
+    <button (click)="toggleSidebar.emit()" class="toggle-sidebar-button" aria-label="Menu">
+      <i class="fa-solid" 
+         [class.fa-bars-staggered]="!isSidebarMini()" 
+         [class.fa-bars]="isSidebarMini()">
+      </i>
+    </button>
+    <h1 class="nav-title">Espace Client</h1>
+  </div>
+  
+  <div class="right-section">
+    
+    <a routerLink="/catalog" class="nav-catalogue-link hidden-mobile">
+      <i class="fa-solid fa-shop"></i>
+      <span>Catalogue</span>
+    </a>
+
+    <button class="action-icon-btn cart-btn" (click)="openCart()" title="Mon Panier">
+      <i class="fa-solid fa-cart-shopping"></i>
+      @if (cartCount() > 0) {
+        <span class="badge badge-green">{{ cartCount() }}</span>
+      }
+    </button>
+
+    <div class="notification-wrapper">
+      <button class="action-icon-btn notif-btn" 
+              (click)="toggleNotificationMenu($event)" 
+              title="Notifications">
+        <i class="fa-solid fa-bell"></i>
+        @if (unreadCount() > 0) {
+          <span class="badge badge-red">{{ unreadCount() }}</span>
+        }
+      </button>
+
+      @if (isNotificationMenuOpen()) {
+        <div class="notification-dropdown">
+          <div class="dropdown-header">
+            <h3>Notifications récentes</h3>
+            <button class="close-dropdown" (click)="isNotificationMenuOpen.set(false)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          
+          <div class="notification-list">
+            @for (notif of notifications(); track notif.id) {
+              <div class="notif-item" 
+                   [class.unread]="!notif.is_read" 
+                   (click)="markAsRead(notif)">
+                
+                <div class="notif-avatar-box">
+                  <div class="mini-avatar" [attr.data-type]="notif.type">
+                    @switch (notif.type) {
+                      @case ('success') { <i class="fa-solid fa-check"></i> }
+                      @case ('warning') { <i class="fa-solid fa-exclamation"></i> }
+                      @case ('error') { <i class="fa-solid fa-xmark"></i> }
+                      @default { <i class="fa-solid fa-info"></i> }
+                    }
+                  </div>
+                  @if (!notif.is_read) {
+                    <div class="status-dot"></div>
+                  }
+                </div>
+
+                <div class="notif-info">
+                  <p>
+                    <span class="notif-title">{{ notif.title }}</span>
+                    <span class="notif-msg">{{ notif.message }}</span>
+                  </p>
+                  <span class="notif-meta">
+                    {{ notif.created_at | date:'shortTime' }} • {{ notif.created_at | date:'dd MMM' }}
+                  </span>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-notif">
+                <i class="fa-regular fa-bell-slash"></i>
+                <p>Aucune notification récente</p>
+              </div>
+            }
+          </div>
+
+          <div class="dropdown-footer">
+            <a [routerLink]="['/client/notifications']" 
+               class="view-all-btn" 
+               (click)="isNotificationMenuOpen.set(false)">
+              Voir tout le centre d'activités
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="user-profile-wrapper">
+      <div class="user-avatar" (click)="toggleProfileMenu($event)">
+        {{ userInitials() }}
+        <div class="online-status"></div>
+      </div>
+
+      @if (isProfileMenuOpen()) {
+        <div class="profile-dropdown">
+          <div class="dropdown-info">
+            <span class="name">{{ user()?.name }}</span>
+            <span class="email">{{ user()?.email }}</span>
+          </div>
+          
+          <div class="divider"></div>
+
+          <div class="dropdown-links">
+            <a routerLink="/client/profile" class="dropdown-item" (click)="isProfileMenuOpen.set(false)">
+              <i class="fa-regular fa-circle-user"></i> 
+              <span>Mon Profil</span>
+            </a>
+            <a routerLink="/client/settings" class="dropdown-item" (click)="isProfileMenuOpen.set(false)">
+              <i class="fa-solid fa-gear"></i> 
+              <span>Paramètres</span>
+            </a>
+            <a routerLink="/support" class="dropdown-item" (click)="isProfileMenuOpen.set(false)">
+              <i class="fa-solid fa-circle-question"></i> 
+              <span>Aide & Support</span>
+            </a>
+          </div>
+
+          <div class="divider"></div>
+
+          <button (click)="logout()" class="dropdown-item logout-item">
+            <i class="fa-solid fa-power-off"></i> 
+            <span>Se déconnecter</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

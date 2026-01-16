@@ -1,0 +1,211 @@
+<div class="pricing-container">
+  
+  <header class="page-header">
+    <div class="header-title">
+      <div class="icon-main">
+        <i class="fas fa-calculator"></i>
+      </div>
+      <div>
+        <h1>Gestion du Catalogue de Prix</h1>
+        <p>Configurez les tarifs par combinaison de Matériau, Forme et Dimension.</p>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="error" class="alert alert-error animate-fadeIn">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span [innerHTML]="error"></span>
+  </div>
+  
+  <div *ngIf="successMessage" class="alert alert-success animate-fadeIn">
+    <i class="fas fa-check-circle"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div class="card form-card" *ngIf="!isLoading">
+    <div class="card-header">
+      <h3>
+        <i [class]="isEditMode ? 'fas fa-edit' : 'fas fa-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier la référence tarifaire' : 'Ajouter une nouvelle référence' }}
+      </h3>
+    </div>
+
+    <form [formGroup]="dimensionForm" (ngSubmit)="onSubmit()" class="modern-form">
+      <div class="form-grid">
+        
+        <div class="form-group">
+          <label>Matériau <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <i class="fas fa-layer-group input-icon"></i>
+            <select formControlName="material_id">
+              <option value="" disabled>Choisir un matériau</option>
+              <option *ngFor="let m of materials" [value]="m.id">{{ m.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Forme <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <i class="fas fa-shapes input-icon"></i>
+            <select formControlName="shape_id">
+              <option value="" disabled>Choisir une forme</option>
+              <option *ngFor="let s of shapes" [value]="s.id">{{ s.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Catégorie <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <i class="fas fa-folder-open input-icon"></i>
+            <select formControlName="category_id">
+              <option value="" disabled>Choisir une catégorie</option>
+              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group lg-span">
+          <label>Description Dimension / Taille <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <i class="fas fa-ruler-combined input-icon"></i>
+            <input type="text" formControlName="dimension_label" placeholder="Ex: 60x60 cm, Standard, Grande Plaque">
+          </div>
+          <small class="hint">Identifiant unique pour ce couple Matériau/Forme.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Prix Unitaire <span class="required">*</span></label>
+          <div class="price-input-group">
+            <div class="price-input-wrapper">
+               <i class="fas fa-money-bill-wave input-icon-price"></i>
+               <input type="number" step="0.01" formControlName="unit_price_fcfa" placeholder="0.00">
+            </div>
+            <span class="currency-tag">FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <div class="checkbox-container">
+          <label class="switch">
+            <input type="checkbox" formControlName="is_active">
+            <span class="slider round"></span>
+          </label>
+          <span class="switch-label">Référence active (disponible pour devis)</span>
+        </div>
+
+        <div class="action-buttons">
+          <button type="button" class="btn btn-ghost" (click)="resetForm()" *ngIf="isEditMode">
+            <i class="fas fa-times"></i> Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="dimensionForm.invalid || isSaving">
+            <i *ngIf="!isSaving" [class]="isEditMode ? 'fas fa-save' : 'fas fa-check'"></i>
+            <span *ngIf="isSaving" class="mini-spinner"></span>
+            {{ isSaving ? 'Traitement...' : (isEditMode ? 'Mettre à jour' : 'Ajouter au catalogue') }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="table-toolbar" *ngIf="!isLoading">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearchChange()" 
+        placeholder="Rechercher une référence...">
+    </div>
+    <div class="stats-badge">
+      <i class="fas fa-database"></i>
+      <strong>{{ filteredDimensions.length }}</strong> références
+    </div>
+  </div>
+
+  <div class="card table-card">
+    
+    <div *ngIf="isLoading" class="loader-container">
+      <div class="spinner"></div>
+      <p>Synchronisation des données...</p>
+    </div>
+
+    <table class="modern-table" *ngIf="!isLoading && filteredDimensions.length > 0">
+      <thead>
+        <tr>
+          <th>Configuration</th>
+          <th>Catégorie</th>
+          <th>Description</th>
+          <th>Prix (FCFA)</th>
+          <th>Statut</th>
+          <th class="text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let dim of paginatedDimensions" class="row-hover animate-fadeIn">
+          <td>
+            <div class="config-cell">
+              <span class="mat-name">{{ dim.material?.name }}</span>
+              <span class="shape-name">{{ dim.shape?.name }}</span>
+            </div>
+          </td>
+          <td><span class="badge badge-info">{{ dim.category?.name }}</span></td>
+          <td class="font-medium">{{ dim.dimension_label }}</td>
+          <td class="price-cell">{{ dim.unit_price_fcfa | number:'1.0-0' }}</td>
+          <td>
+            <span [class]="dim.is_active ? 'status-pill active' : 'status-pill inactive'">
+              {{ dim.is_active ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="text-right actions-cell">
+            <button class="btn-icon edit" (click)="editDimension(dim)" title="Modifier">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn-icon delete" (click)="deleteDimension(dim.id)" title="Supprimer">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state-container animate-fadeIn" *ngIf="!isLoading && filteredDimensions.length === 0">
+      <div class="empty-state-icon">
+        <i class="fas fa-search-minus"></i>
+      </div>
+      <h4>Aucun résultat trouvé</h4>
+      <p>Aucun tarif ne correspond à : <strong>"{{ searchTerm }}"</strong>.</p>
+      
+      <div class="empty-state-suggestions">
+        <span>Suggestions :</span>
+        <ul>
+          <li>Vérifiez l'orthographe.</li>
+          <li>Recherchez par matériau (ex: Granit).</li>
+          <li>Effacez les filtres pour tout voir.</li>
+        </ul>
+      </div>
+
+      <button type="button" class="btn btn-outline" (click)="searchTerm = ''; onSearchChange()">
+        <i class="fas fa-eraser"></i> Réinitialiser
+      </button>
+    </div>
+
+    <footer class="pagination-footer" *ngIf="!isLoading && totalPages > 1">
+      <div class="pagination-info">
+        Page {{ currentPage }} sur {{ totalPages }}
+      </div>
+      <div class="pagination-controls">
+        <button class="btn-nav" [disabled]="currentPage === 1" (click)="currentPage = currentPage - 1">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="btn-nav" [disabled]="currentPage === totalPages" (click)="currentPage = currentPage + 1">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

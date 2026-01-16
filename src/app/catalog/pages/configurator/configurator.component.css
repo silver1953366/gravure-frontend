@@ -1,0 +1,274 @@
+/* =====================================================
+ * 🎨 STYLE CONFIGURATEUR (Basé sur le modèle Signomatic)
+ * ===================================================== */
+
+/* Variables communes */
+:root {
+    --color-primary: #4f46e5; /* Indigo */
+    --color-secondary: #059669; /* Vert pour actions */
+    --color-text-main: #1f2937; /* Gris foncé */
+    --color-text-sub: #6b7280;
+    --color-border: #e5e7eb;
+    --color-bg-light: #f9fafb;
+}
+
+/* --- Layout Principal --- */
+.configurator-wrapper {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* --- Colonne d'Aperçu (Gauche) --- */
+.preview-zone {
+    flex: 1;
+    background-color: var(--color-bg-light);
+    padding: 30px;
+    border-right: 1px solid var(--color-border);
+    min-width: 350px;
+}
+
+.preview-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.plaque-display-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 350px; 
+    background-color: #ffffff; /* Fond clair pour simuler l'espace de travail */
+    border: 1px dashed var(--color-border);
+    border-radius: 8px;
+}
+
+.plaque-render-wrapper {
+    perspective: 1000px; /* Pour un futur effet 3D */
+}
+
+.simulated-plaque {
+    /* Styles appliqués dynamiquement par [ngStyle] */
+    min-width: 50px;
+    min-height: 25px;
+    border: 2px solid; 
+    background-color: #E2E8F0;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.engraving-text-display {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-main); 
+    margin: 0;
+    text-align: center;
+}
+.dimension-label-display {
+    font-size: 10px;
+    color: var(--color-text-sub);
+    margin-top: 5px;
+}
+
+/* --- Colonne des Étapes (Droite) --- */
+.steps-column {
+    flex: 1.5;
+    padding: 30px;
+    position: relative;
+}
+
+.step-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: 25px;
+    border-bottom: 3px solid var(--color-primary);
+    padding-bottom: 10px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: var(--color-text-sub);
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.back-button:hover {
+    color: var(--color-primary);
+}
+
+/* --- Styles des Options (Étape 4) --- */
+.option-box {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background-color: #fcfcfd;
+}
+
+.input-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text-main);
+    font-size: 15px;
+}
+
+.input-field, .select-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* Contrôle de Quantité */
+.quantity-control-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-label {
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.quantity-button {
+    width: 35px;
+    height: 35px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.quantity-button:hover {
+    background-color: #3e38c2; /* Darker primary */
+}
+
+.quantity-value {
+    font-size: 18px;
+    font-weight: 700;
+    min-width: 30px;
+    text-align: center;
+}
+
+
+/* --- Footer et Prix --- */
+.configurator-footer {
+    background-color: #ffffff;
+    border-top: 1px solid var(--color-border);
+    padding: 20px 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.footer-content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.total-price-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-secondary);
+}
+
+.engraving-cost-info {
+    font-size: 12px;
+    color: var(--color-text-sub);
+}
+
+/* Boutons d'Action (Réutilisés du Catalogue) */
+.action-button {
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.primary-button {
+    background-color: var(--color-secondary);
+    color: white;
+    border: none;
+}
+
+.primary-button:hover:not([disabled]) {
+    background-color: #047857; 
+}
+
+.primary-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 900px) {
+    .configurator-wrapper {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .preview-zone {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        min-width: auto;
+        padding: 20px;
+    }
+
+    .steps-column {
+        padding: 20px;
+    }
+
+    .footer-content-wrapper {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+    }
+
+    .total-price-value {
+        font-size: 28px;
+    }
+}

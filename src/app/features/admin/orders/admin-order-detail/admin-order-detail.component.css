@@ -1,0 +1,131 @@
+/* src/app/features/admin/orders/admin-order-detail/admin-order-detail.component.css */
+
+.order-detail-container {
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    max-width: 1000px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #34495e;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #2c3e50;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.btn-back {
+    background: #bdc3c7;
+    color: #2c3e50;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+    font-weight: 600;
+}
+
+.btn-back:hover {
+    background: #95a5a6;
+}
+
+/* Cartes de détail */
+.detail-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.info-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.info-box {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    background-color: #fefefe;
+}
+
+.info-box p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.price-total {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #27ae60;
+}
+
+/* Tableau des articles */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.items-table th, .items-table td {
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.items-table th {
+    background-color: #ecf0f1;
+    color: #34495e;
+}
+
+.total-summary {
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+    font-size: 1.2em;
+}
+
+/* Gestion du statut */
+.status-control {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+/* Styles pour les statuts (assurez-vous que ces couleurs correspondent à celles de admin-orders.component.css) */
+.status-select.status-pending_payment { background-color: #f0ad4e; color: white; border-color: #f0ad4e;}
+.status-select.status-processing { background-color: #3498db; color: white; border-color: #3498db; }
+.status-select.status-ready_for_pickup { background-color: #2ecc71; color: white; border-color: #2ecc71; }
+.status-select.status-completed { background-color: #1abc9c; color: white; border-color: #1abc9c; }
+.status-select.status-cancelled { background-color: #95a5a6; color: white; border-color: #95a5a6; }
+
+.alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+.alert-success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+.loading-message { text-align: center; color: #7f8c8d; }

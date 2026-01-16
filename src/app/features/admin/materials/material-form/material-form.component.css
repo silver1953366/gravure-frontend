@@ -1,0 +1,213 @@
+/* ---------------------------------------------------- */
+/* --- CONTENEUR ET HEADER --- */
+/* ---------------------------------------------------- */
+.material-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+    font-family: 'Inter', sans-serif;
+}
+
+h3 {
+    color: #1a202c; 
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------- */
+/* --- FORM GROUP ET CHAMPS --- */
+/* ---------------------------------------------------- */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.form-group .required {
+    color: #e53e3e; /* Rouge pour indiquer les champs requis */
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #4a5568;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+input[readonly] {
+    background-color: #f7fafc;
+    cursor: not-allowed;
+    color: #a0aec0;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ---------------------------------------------------- */
+/* --- MESSAGES ET ÉTATS --- */
+/* ---------------------------------------------------- */
+.error-message {
+    margin-top: 6px;
+    color: #e53e3e;
+    font-size: 0.85em;
+    font-weight: 500;
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.alert-error {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-left: 5px solid #ef4444;
+    font-weight: 600;
+}
+
+.info-text {
+    display: block;
+    margin-top: 6px;
+    color: #718096;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.loading-data {
+    text-align: center;
+    padding: 40px;
+    color: #3b82f6;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------- */
+/* --- IMAGE PREVIEW --- */
+/* ---------------------------------------------------- */
+.image-preview {
+    margin-top: 15px;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    display: inline-block;
+    background-color: #f8fafc;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    display: block;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ---------------------------------------------------- */
+/* --- BOUTON DE SOUMISSION ET SPINNER --- */
+/* ---------------------------------------------------- */
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1em;
+    background-color: #059669; 
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2);
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-submit:hover:not([disabled]) {
+    background-color: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+}
+
+.btn-submit:active:not([disabled]) {
+    transform: translateY(0);
+}
+
+.btn-submit[disabled] {
+    background-color: #cbd5e0;
+    color: #718096;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Petit spinner pour le chargement dans le bouton */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .material-form-container {
+        margin: 10px;
+        padding: 20px;
+    }
+}

@@ -1,0 +1,52 @@
+<aside class="sidebar-container" [class.open]="isOpen">
+    
+    <div class="sidebar-header">
+        <h2>Filtrer le Catalogue</h2>
+        <button (click)="closeSidebar.emit()" class="close-button" aria-label="Fermer les filtres">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar-content">
+        
+        <div class="filter-group">
+            <h3 class="filter-title">Matériaux</h3>
+            @for (material of materials; track material.name) {
+                <label class="filter-option checkbox-option">
+                    <input type="checkbox" [(ngModel)]="material.selected" (change)="applyFilters()">
+                    <span>{{ material.name }} ({{ material.count }})</span>
+                </label>
+            }
+        </div>
+        
+        <div class="filter-group">
+            <h3 class="filter-title">Formes</h3>
+            @for (shape of shapes; track shape.name) {
+                <label class="filter-option radio-option">
+                    <input type="radio" name="shape" [(ngModel)]="shape.selected" [value]="true" (change)="applyFilters()">
+                    <span>{{ shape.name }}</span>
+                </label>
+            }
+        </div>
+        
+        <div class="filter-group">
+            <h3 class="filter-title">Gamme de Prix</h3>
+            <div class="range-inputs">
+                <input type="number" [(ngModel)]="minPrice" placeholder="Min" (blur)="applyFilters()">
+                <span>-</span>
+                <input type="number" [(ngModel)]="maxPrice" placeholder="Max" (blur)="applyFilters()">
+            </div>
+            <p class="price-display">Actuel: {{ minPrice }}€ - {{ maxPrice }}€</p>
+        </div>
+        
+    </div>
+    
+    <div class="sidebar-footer">
+        <button (click)="resetFilters()" class="btn-reset">
+            Réinitialiser
+        </button>
+    </div>
+
+</aside>
+
+<div class="sidebar-overlay" [class.open]="isOpen" (click)="closeSidebar.emit()"></div>

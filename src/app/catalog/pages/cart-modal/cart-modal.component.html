@@ -1,0 +1,119 @@
+@if (isOpen()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      
+      <header class="modal-header">
+        <h2>Votre Panier
+          @if (cart$ | async; as cart) {
+            @if (cart.items.length > 0) {
+              <span class="item-count">{{ cart.items.length }} Article(s)</span>
+            }
+          }
+        </h2>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </header>
+
+      <div class="modal-content">
+        
+        @if (cart$ | async; as cart) { 
+            
+            @if (cart.items.length === 0) {
+              
+              <div class="empty-cart-message">
+                  
+                  <h2>Votre panier est actuellement vide</h2>
+                  
+                  <p>
+                      Rendez-vous sur notre Page Design pour commencer à concevoir vos signalétiques ou 
+                      <a routerLink="/client/dashboard" (click)="closeModal()">identifiez-vous</a> afin de 
+                      consulter vos précédentes commandes.
+                  </p>
+                  
+                  <a routerLink="/configurator" (click)="closeModal()" class="primary-cta-btn">
+                      À vous de jouer
+                  </a>
+              </div>
+
+            } @else {
+              
+              <div class="cart-content-wrapper">
+                
+                <div class="cart-scroll-area">
+                  
+                  @for (item of cart.items; track item.id) {
+                    <div class="cart-item">
+                      
+                      <div class="item-info">
+                        <h3 class="item-name">{{ item.materialDimension.material.name }} - {{ item.materialDimension.shape.name }}</h3>
+                        <p *ngIf="item.engraving_text" class="item-option">Gravure: "{{ item.engraving_text }}"</p>
+                        <p class="item-option">Options: {{ item.mounting_option || 'Standard' }}</p>
+                        
+                        <div class="item-controls">
+                            <label>Qté:</label>
+                            <input 
+                              type="number" 
+                              [ngModel]="item.quantity" 
+                              (change)="onUpdateQuantity(item, $event, cart)" 
+                              min="1"
+                              class="quantity-input">
+                            
+                            <button (click)="onRemoveItem(item.id)" class="remove-btn">
+                              Retirer
+                            </button>
+                        </div>
+                      </div>
+                      
+                      <div class="item-price-info">
+                          <span class="unit-price-text">P.U. : {{ item.fixed_unit_price_fcfa | number:'1.0-0' }} FCFA</span>
+                          <span class="total-item-price-text">{{ (item.fixed_unit_price_fcfa * item.quantity) | number:'1.0-0' }} FCFA</span>
+                      </div>
+
+                    </div>
+                  }
+                </div>
+
+                <div class="cart-summary-footer">
+                  <div class="recap-and-actions-container">
+                      
+                      <div class="recap-summary-details">
+                          <div class="summary-line">
+                              <span>Vos articles ({{ cart.items.length }})</span> 
+                              <span>{{ calculateTotalPrice(cart) | number:'1.0-0' }} FCFA</span>
+                          </div>
+                          <div class="summary-line">
+                              <span>Frais de livraison</span>
+                              <span>Calculé</span>
+                          </div>
+                          <div class="summary-line total-ttc">
+                              <span>Total TTC</span>
+                              <strong>À déterminer</strong>
+                          </div>
+                          <p class="vat-line">TVA (21%) : À déterminer</p>
+                      </div>
+
+                      <div class="recap-actions">
+                          <button (click)="onConvertToQuote()" class="checkout-btn">
+                              Demander un Devis
+                          </button>
+                          <button class="continue-shopping-btn" (click)="closeModal()">
+                              Continuer le shopping
+                          </button>
+                          <div class="discount-info">Rabais 10% (À déterminer)</div>
+                      </div>
+
+                  </div>
+                </div>
+
+              </div>
+            }
+        } @else {
+             <div class="loading-message-container">
+                <div class="loading-message-spinner"></div>
+                <div class="loading-message" style="color: red;">Erreur critique lors de la récupération du panier.</div>
+            </div>
+        }
+      </div>
+    </div>
+  </div>
+}

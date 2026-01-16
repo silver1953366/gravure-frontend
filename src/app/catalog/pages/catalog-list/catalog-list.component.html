@@ -1,0 +1,187 @@
+<section class="carousel-container">
+  <div class="hero-carousel-wrapper" *ngIf="!isLoading(); else carouselLoading">
+    
+    <div class="hero-carousel" [ngStyle]="carouselStyle()">
+      <div 
+        class="carousel-slide" 
+        *ngFor="let slide of carouselData(); let i = index"
+        [style.width.%]="100 / carouselData().length"
+      >
+        <img [src]="slide.full_image_url" 
+             [alt]="slide.title" 
+             class="slide-bg-image"
+             [style.height.px]="slide.height || slide.height || 480">
+        
+        <div class="carousel-overlay"></div>
+        
+        <div class="carousel-content">
+          <span class="carousel-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            </svg>
+            Sélection Premium
+          </span>
+          
+          <h2 class="carousel-title">{{ slide.title }}</h2>
+          <p class="carousel-subtitle">{{ slide.subtitle }}</p>
+          
+          <div class="carousel-actions">
+            <button *ngIf="(slide.link || slide.link) === '#login'" 
+                    (click)="handleCarouselAction(slide, $event)" 
+                    class="btn-modern-primary">
+              <span>{{ slide.category_name || 'Se connecter' }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                <polyline points="10 17 15 12 10 7"></polyline>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+              </svg>
+            </button>
+
+            <a *ngIf="(slide.link || slide.link) !== '#login'" 
+               [routerLink]="slide.link || slide.link || '/catalog'" 
+               class="btn-modern-primary">
+              <span>{{ slide.category_name || 'Explorer la Collection' }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-nav-controls" *ngIf="carouselData().length > 1">
+      <button class="nav-arrow prev" (click)="prevSlide()" aria-label="Slide précédente">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="nav-arrow next" (click)="nextSlide()" aria-label="Slide suivante">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="carousel-indicators" *ngIf="carouselData().length > 1">
+      <div *ngFor="let slide of carouselData(); let i = index"
+           class="indicator-bar"
+           [class.is-active]="i === currentSlideIndex()"
+           (click)="goToSlide(i)">
+        <div class="progress-fill" *ngIf="i === currentSlideIndex()"></div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #carouselLoading>
+    <div class="hero-carousel-wrapper skeleton-shimmer">
+      <div class="skeleton-glass-box"></div>
+    </div>
+  </ng-template>
+</section>
+
+<div id="material-explorer-section" class="content-header-container">
+  <header class="page-intro">
+    <h1 class="page-title">Nos Matériaux <span>Premium</span></h1>
+  </header>
+
+  <nav class="filter-wrapper">
+    <div class="filter-container">
+      <button class="filter-tab" 
+              [class.active]="selectedCategory() === null" 
+              (click)="selectCategory(null)">
+        <svg class="icon-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Tous
+      </button>
+      
+      <button *ngFor="let category of categories()"
+              class="filter-tab"
+              [class.active]="selectedCategory()?.id === category.id"
+              (click)="selectCategory(category)">
+        <svg *ngIf="category.name === 'Divers'" class="icon-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <polyline points="16 6 12 2 8 6"></polyline>
+          <line x1="12" y1="2" x2="12" y2="15"></line>
+        </svg>
+        <svg *ngIf="category.name !== 'Divers'" class="icon-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ category.name }}
+      </button>
+    </div>
+  </nav>
+</div>
+
+<main class="material-explorer">
+  <div *ngIf="isLoading()" class="modern-grid-5">
+    <div class="skeleton-compact-card skeleton-shimmer" *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]"></div>
+  </div>
+
+  <div *ngIf="!isLoading()" [@listAnimation]="filteredMaterials().length">
+    <div *ngIf="filteredMaterials().length > 0; else noResults" class="modern-grid-5">
+      
+      <article *ngFor="let material of filteredMaterials()" class="premium-card-compact">
+        <div class="card-media">
+          <img [src]="material.image_url" [alt]="material.name" loading="lazy" />
+          <div class="card-badge-overlay">
+            <span class="mini-tag" [class.tag-divers]="material.category?.name === 'Divers'">
+              <svg *ngIf="material.category?.name !== 'Divers'" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                <circle cx="12" cy="12" r="12"></circle>
+              </svg>
+              {{ material.category?.name || 'Divers' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-info">
+          <h3 class="product-title" [title]="material.name">{{ material.name }}</h3>
+          <p class="product-excerpt">{{ material.description }}</p>
+          
+          <div class="card-actions-stack">
+            <a [routerLink]="['/configurator', material.id]" class="btn-action-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a2 2 0 0 1-2.79-2.79L14.7 6.3Z"></path>
+                <path d="m5.2 18.8 4.27-4.27"></path>
+                <path d="M9 15.3l3.6-3.6"></path>
+                <path d="M3.2 21.8a.5.5 0 0 0 .7 0l4.4-4.4a3 3 0 1 0-4.24-4.24l-4.4 4.4a.5.5 0 0 0 0 .7l3.54 3.54Z"></path>
+              </svg>
+              Personnaliser
+            </a>
+            <a [routerLink]="['/product', material.id]" class="btn-action-outline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              Détails
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <ng-template #noResults>
+      <div class="empty-state">
+        <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+        <h3>Aucun matériau trouvé</h3>
+        <p>Nous n'avons pas de correspondance pour cette sélection précise.</p>
+        <button (click)="selectCategory(null)" class="btn-reset">
+            Réinitialiser les filtres
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</main>

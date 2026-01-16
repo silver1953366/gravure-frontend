@@ -1,0 +1,131 @@
+<div class="activity-log-container">
+    <div class="header-section">
+        <h2>Journal d'Activité Système</h2>
+        <p>Audit complet des actions utilisateurs sur les ressources de l'application.</p>
+    </div>
+
+    <div class="filter-pagination-controls">
+        <div class="filters">
+            <div class="form-group">
+                <label for="filterUserId">ID Utilisateur</label>
+                <input id="filterUserId" type="number" [(ngModel)]="filterUserId" placeholder="Ex: 12" name="filterUserId">
+            </div>
+            <div class="form-group">
+                <label for="filterAction">Action</label>
+                <select id="filterAction" [(ngModel)]="filterAction" name="filterAction">
+                    <option value="">Toutes les actions</option>
+                    <option *ngFor="let action of commonActions" [value]="action">{{ action | uppercase }}</option>
+                </select>
+            </div>
+            <div class="filter-buttons">
+                <button (click)="applyFilters()" class="btn-primary">Filtrer</button>
+                <button (click)="filterUserId=null; filterAction=''; applyFilters()" class="btn-secondary">Reset</button>
+            </div>
+        </div>
+        
+        <div *ngIf="activitiesData as data" class="pagination-info">
+            <span *ngIf="data.total > 0">
+                Affichage de <strong>{{ data.from }}</strong> à <strong>{{ data.to }}</strong> sur <strong>{{ data.total }}</strong> logs.
+            </span>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="state-message loading">
+        <div class="spinner"></div> Chargement du journal d'activité...
+    </div>
+    <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+    <div class="table-responsive" *ngIf="!isLoading && activities.length > 0">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date & Heure</th>
+                    <th>Utilisateur</th>
+                    <th>Action</th>
+                    <th>Ressource</th>
+                    <th>Adresse IP</th>
+                    <th>Audit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let activity of activities">
+                    <td>#{{ activity.id }}</td>
+                    <td>{{ activity.created_at | date:'short' }}</td>
+                    <td>
+                        <div class="user-cell">
+                            <strong>{{ activity.user?.name }}</strong>
+                            <span>ID: {{ activity.user_id }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="action-badge action-{{ activity.action }}">
+                            {{ activity.action | uppercase }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="model-tag">{{ getModelName(activity.model_type) }}</span>
+                        <small>#{{ activity.model_id }}</small>
+                    </td>
+                    <td class="ip-address">{{ activity.ip_address }}</td>
+                    <td>
+                        <button class="btn-details" (click)="openModal(activity)">
+                            Voir Snapshot
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="!isLoading && activities.length > 0" class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">Précédent</button>
+        <span class="page-indicator">Page {{ activitiesData?.current_page }} / {{ activitiesData?.last_page }}</span>
+        <button class="page-btn" [disabled]="currentPage === activitiesData?.last_page" (click)="onPageChange(currentPage + 1)">Suivant</button>
+    </div>
+
+    <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Détails techniques de l'action #{{ selectedActivity?.id }}</h3>
+                <button class="close-button" (click)="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Action effectuée</label>
+                        <span class="action-badge action-{{ selectedActivity?.action }}">
+                            {{ selectedActivity?.action | uppercase }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <label>Modèle affecté</label>
+                        <span>{{ getModelName(selectedActivity?.model_type) }} (ID: {{ selectedActivity?.model_id }})</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Par l'utilisateur</label>
+                        <span>{{ selectedActivity?.user?.name }} ({{ selectedActivity?.user?.email }})</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Date précise</label>
+                        <span>{{ selectedActivity?.created_at | date:'medium' }}</span>
+                    </div>
+                </div>
+
+                <label class="json-label">Données enregistrées (Snapshot) :</label>
+                <div class="json-container">
+                    <pre class="json-viewer"><code>{{ formatSnapshot(selectedActivity?.data_snapshot) }}</code></pre>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeModal()">Fermer la vue audit</button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && activities.length === 0 && !error" class="empty-state">
+        <p>Aucune activité ne correspond à vos critères de recherche.</p>
+    </div>
+</div>

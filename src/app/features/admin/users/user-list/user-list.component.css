@@ -1,0 +1,384 @@
+/* --- Variables et Fondations --- */
+:host {
+    --primary: #1e3c72;
+    --primary-light: #2a5298;
+    --accent: #0284c7; 
+    --danger: #ef4444; 
+    --warning: #ffc107;
+    --success: #2ecc71;
+    --bg-gray: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+.user-management-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* --- Header & Titres --- */
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+h2 {
+    color: var(--primary);
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+.btn-create {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-create:hover {
+    background: #0369a1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(2, 132, 199, 0.4);
+}
+
+/* --- Barre de Filtres --- */
+.filter-bar {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.search-group, .select-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-group { flex: 2; }
+.select-group { flex: 1; }
+
+.search-icon, .filter-icon {
+    position: absolute;
+    left: 15px;
+    color: var(--text-muted);
+    z-index: 1;
+}
+
+.filter-control {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    background: var(--bg-gray);
+}
+
+.filter-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+}
+
+/* --- Tableau des Utilisateurs --- */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th {
+    background: #f1f5f9;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.user-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.user-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* --- Cellule Identité & Avatar (Adaptée) --- */
+.user-identity {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0; /* Empêche l'avatar de s'écraser */
+}
+
+/* Style pour le nom séparé */
+.user-identity .name {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Style pour l'email dans sa propre cellule */
+.email-cell {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* --- Badges de Rôles --- */
+.role-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.role-admin { background: #fee2e2; color: #b91c1c; }
+.role-controller { background: #fef3c7; color: #b45309; }
+.role-client { background: #dcfce7; color: #15803d; }
+
+/* --- Actions & Boutons --- */
+.actions-cell {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-action {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit { color: var(--accent); background: #f0f9ff; border-color: #e0f2fe; }
+.btn-edit:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+
+.btn-delete { color: var(--danger); background: #fef2f2; border-color: #fee2e2; }
+.btn-delete:hover { background: var(--danger); color: white; transform: translateY(-2px); }
+
+.btn-delete:hover i {
+    animation: shake 0.4s ease-in-out infinite;
+}
+
+/* Tooltips */
+.tooltip {
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #1e293b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.btn-action:hover .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* --- Pagination --- */
+.pagination-footer {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.btn-page {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: var(--bg-gray);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Aucun utilisateur / Filtre vide --- */
+.state-container.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.no-results i {
+    font-size: 3.5rem;
+    color: #cbd5e0;
+    margin-bottom: 20px;
+    animation: pulseIcon 2s infinite ease-in-out;
+}
+
+.no-results p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
+.btn-link {
+    background: #f1f5f9;
+    color: var(--accent);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-link:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* --- États de Chargement --- */
+.state-container {
+    padding: 60px;
+    text-align: center;
+    background: white;
+    border-radius: 12px;
+    color: var(--text-muted);
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+}
+
+/* --- Animations --- */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+.animate-slideInUp {
+    animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .header-flex, .filter-bar { flex-direction: column; align-items: stretch; }
+    .user-table thead { display: none; }
+    .user-table td { display: block; text-align: right; border: none; padding-left: 50%; position: relative; border-bottom: 1px solid #f1f1f1; }
+    .user-table td::before { content: attr(data-label); position: absolute; left: 15px; font-weight: 700; color: var(--text-muted); }
+    .user-identity { justify-content: flex-end; }
+    /* Ajustement spécifique mobile pour l'email cell */
+    .email-cell { display: block; }
+}
